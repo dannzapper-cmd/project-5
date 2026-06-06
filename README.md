@@ -78,18 +78,18 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 0 — Product contract and repo foundation**
+**Phase 1 — Telemetry Spine**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Pydantic event schemas | Telemetry ingest |
-| Topic taxonomy docs | MQTT/Redis wiring |
-| FastAPI `GET /health` | WebSocket broadcast |
-| Docker Compose profiles | ONNX inference |
-| ADRs, safety docs, evidence checklist | LangGraph agents |
-| Dashboard static placeholder | Digital twin, ROS2 |
+| Synthetic sensor generators → MQTT | ONNX edge inference |
+| FastAPI MQTT ingest + validation | Sensor fusion |
+| Redis Streams append (bounded MAXLEN) | LangGraph agents |
+| WebSocket live broadcast | Digital twin, ROS2 |
+| Live dashboard (5 streams) | MLflow, observability stack |
+| Replay publish foundation | Full Redis replay consumers |
 
-**Next phase:** [Phase 1 — Telemetry Spine](ROADMAP.md#phase-1-telemetry-spine)
+**Next phase:** [Phase 2 — Edge AI Core](ROADMAP.md#phase-2-edge-ai-core)
 
 ---
 
@@ -133,7 +133,7 @@ Profiles prevent all systems from running at once and enable staged development.
 
 | Profile | Purpose |
 |---------|---------|
-| `core` | API, dashboard placeholder, Redis, Mosquitto |
+| `core` | API, live dashboard, Redis, Mosquitto, sensor-generators |
 | `obs` | Prometheus, Grafana (Phase 7+) |
 | `learning` | MLflow (Phase 4+) |
 | `ros2` | ROS2 thin adapter (Phase 5+) |
@@ -143,11 +143,12 @@ Profiles prevent all systems from running at once and enable staged development.
 | `full` | Union of all profiles for late integration demos |
 
 ```bash
-# Validate core profile (Phase 0)
+# Validate core profile
 make compose-config
 
-# Start core skeleton (Phase 0)
+# Start Phase 1 telemetry spine
 make compose-core
+# or: make telemetry-up
 ```
 
 Details: [docs/architecture/profiles.md](docs/architecture/profiles.md)
@@ -179,7 +180,7 @@ Policies: [docs/safety/](docs/safety/)
 | MLOps and learning loops | MLflow, fine-tuning, Flower, RL (future phases) |
 | Observability | OpenTelemetry, Prometheus, Grafana (Phase 7) |
 | Robotics integration | ROS2 thin adapter + mandatory Nav2 MiniLab |
-| Replay and failure injection | Redis Streams replay mode (Phase 1+) |
+| Replay and failure injection | MQTT replay publish + Redis buffer (Phase 1) |
 | Modular profiles | Documented trade-offs in ADRs and cost docs |
 
 ---
@@ -198,13 +199,14 @@ Policies: [docs/safety/](docs/safety/)
 ## Repository Structure
 
 ```
-apps/api/          FastAPI gateway (Phase 0: health only)
-apps/dashboard/    Static placeholder (Phase 1+: live UI)
-services/          Microservice placeholders per roadmap phase
-docs/              Architecture, ADRs, safety, evidence, schemas
-infra/             Mosquitto, Prometheus, Grafana configs
-tests/             Phase 0 schema tests
-scripts/           Dev validation scripts
+apps/api/                      FastAPI gateway + MQTT ingest + WebSockets
+apps/dashboard/                Live Phase 1 telemetry dashboard (port 3000)
+services/sensor-generators/    Synthetic MQTT publishers
+replay/                        JSONL scenarios + replay_publish.py
+docs/                          Architecture, ADRs, safety, evidence, schemas
+infra/                         Mosquitto, Prometheus, Grafana configs
+tests/                         Schema, generator, routing, replay tests
+scripts/                       Dev validation scripts
 ```
 
 ---
@@ -219,42 +221,61 @@ Dependencies are managed in **`pyproject.toml`** (not `requirements.txt`).
 
 ## Commands
 
-### Phase 0 — Available Now
+### Setup
 
 ```bash
-# Create virtual environment
+git pull
 python -m venv .venv
 source .venv/bin/activate
-
-# Install with dev dependencies
 pip install -e ".[dev]"
-
-# Run schema tests (no external services)
 make test
-
-# Lightweight dev validation
 make dev-check
-
-# Validate Docker Compose core profile
-make compose-config
-
-# Start core skeleton (API + Redis + Mosquitto + dashboard placeholder)
-make compose-core
-
-# Start API locally (without Docker)
-make api
-# Health: http://localhost:8000/health
 ```
 
-### Future Runtime Commands (Phase 1+)
+### Phase 1 — Telemetry Spine
 
 ```bash
-# Telemetry demo (Phase 1 — not yet implemented)
-# make demo-telemetry
+# Validate Compose config
+docker compose --profile core config
+# or: make compose-config
 
-# Replay session (Phase 1 — not yet implemented)
-# make replay SESSION_ID=...
+# Start full spine (Mosquitto, Redis, API, generators, dashboard)
+docker compose --profile core up --build
+# or: make telemetry-up
 
+# URLs (browser on host machine)
+# Dashboard:  http://localhost:3000
+# API health: http://localhost:8000/health
+# Telemetry:  http://localhost:8000/telemetry/status
+
+make api-status   # pretty-print telemetry status JSON
+make telemetry-logs
+make telemetry-down
+```
+
+### Replay
+
+```bash
+make replay-generate    # regenerate JSONL scenario files
+make replay-normal      # publish normal_session to MQTT
+make replay-dropout     # publish sensor_dropout scenario
+```
+
+### Phase 1 Evidence (collect after demo)
+
+| Artifact | How to capture |
+|----------|----------------|
+| Dashboard live telemetry | Screenshot at http://localhost:3000 |
+| Generator logs | `docker compose logs sensor-generators` |
+| Telemetry status | `curl http://localhost:8000/telemetry/status` |
+| Redis stream proof | `redis-cli XLEN axon:v1:stream:sensors:emg` |
+| MQTT proof | `mosquitto_sub -t 'axon/v1/sensors/#' -v` |
+
+See [docs/evidence/evidence-checklist.md](docs/evidence/evidence-checklist.md).
+
+### Future Phases
+
+```bash
 # Full portfolio demo (Phase 9 — not yet implemented)
 # docker compose --profile full up
 ```

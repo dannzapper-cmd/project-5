@@ -63,6 +63,14 @@ Validation occurs **before** inference:
 2. Quality/confidence bounds check
 3. Missing/corrupt data flagged — never silently repaired without lowering confidence
 
-## Phase 0 Note
+## Phase 1 Runtime (Implemented)
 
-Event flow is documented and schema contracts exist. No runtime pipeline is wired yet.
+The following path is live under the `core` Docker Compose profile:
+
+1. `sensor-generators` publishes `SensorEventV1` to MQTT
+2. `api` subscribes via aiomqtt (background reconnect loop)
+3. Events validated with Pydantic, appended to Redis Streams (MAXLEN ~1000)
+4. WebSocket broadcast to dashboard at `ws://localhost:8000`
+5. Replay via `replay/replay_publish.py` → MQTT (same ingest path)
+
+Not yet implemented: downstream consumers, ONNX inference, fusion, agents.

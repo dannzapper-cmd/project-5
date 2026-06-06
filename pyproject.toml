@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "axon"
-version = "0.1.0"
+version = "0.2.0"
 description = "AXON - Bio-Robotics Edge Command System"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -24,6 +24,8 @@ dependencies = [
     "pydantic>=2.9.0",
     "pydantic-settings>=2.6.0",
     "python-dotenv>=1.0.0",
+    "aiomqtt>=2.0.0",
+    "redis>=5.0.0",
 ]
 
 [project.optional-dependencies]
@@ -32,8 +34,6 @@ dev = [
     "ruff>=0.8.0",
     "httpx>=0.27.0",
 ]
-# Future phase dependency groups (empty in Phase 0; activate per phase)
-telemetry = []   # Phase 1: MQTT, Redis, WebSocket clients
 edge-ai = []     # Phase 2: onnxruntime, numpy
 agents = []      # Phase 3: langgraph, langchain
 mlops = []       # Phase 4: mlflow, training tooling
@@ -45,8 +45,8 @@ observability = []  # Phase 7: opentelemetry SDK/exporters
 axon-dev-check = "scripts.dev_check:main"
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["apps*", "scripts*"]
+where = [".", "services/sensor-generators"]
+include = ["apps*", "scripts*", "axon_generators*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -56,7 +56,7 @@ addopts = "-q"
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-src = ["apps", "scripts", "tests"]
+src = ["apps", "scripts", "tests", "services/sensor-generators", "replay"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

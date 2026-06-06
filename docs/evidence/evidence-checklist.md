@@ -12,10 +12,18 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 
 ## Phase 1 — Telemetry Spine
 
+- [ ] Core profile starts (`docker compose --profile core up --build`)
+- [ ] Sensor generator logs show publishing
+- [ ] MQTT topics receive events (`mosquitto_sub -t 'axon/v1/sensors/#' -v`)
+- [ ] API validates events (`/telemetry/status` counters increase)
+- [ ] Redis Streams contain events (`redis-cli XLEN axon:v1:stream:sensors:emg`)
+- [ ] WebSocket dashboard receives live events
+- [ ] Dashboard screenshot with 5 live streams (EMG, ECG-like, IMU, SpO2-proxy, robot_state)
 - [ ] Telemetry video (synthetic streams)
-- [ ] MQTT topic proof
-- [ ] Redis Streams proof
-- [ ] WebSocket live update proof
+- [ ] Replay `normal_session` works (`make replay-normal`)
+- [ ] Replay `sensor_dropout` works (`make replay-dropout`)
+- [ ] Invalid event is rejected safely (invalid_events counter)
+- [ ] No medical claims in UI/docs review
 
 ## Phase 2 — Edge AI Core
 
@@ -30,7 +38,7 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 - [ ] LangChain tool/RAG/retriever evidence
 - [ ] Human-in-the-loop decision screenshot
 - [ ] Failure injection demo
-- [ ] Replay mode demo
+- [ ] Replay mode demo (full Redis consumer replay)
 
 ## Phase 4 — MLOps
 

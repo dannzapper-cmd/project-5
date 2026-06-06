@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Lightweight Phase 0 development validation (no external services)."""
+"""Lightweight Phase 1 development validation (no external services)."""
 
 from __future__ import annotations
 
 from apps.api.app.schemas.events import DecisionEventV1, SensorEventV1
+
+from axon_generators.config import GeneratorConfig
+from axon_generators.generator import generate_event_batch
 
 
 def main() -> None:
@@ -23,11 +26,13 @@ def main() -> None:
         confidence=0.95,
         recommended_action="continue",
         requires_human_confirmation=False,
-        rationale="Phase 0 schema validation only.",
+        rationale="Phase 1 schema validation only.",
     )
+    batch = generate_event_batch(GeneratorConfig(axon_seed=1), tick=0, seed=1)
     assert sensor.event_id
     assert decision.event_id
-    print("AXON Phase 0 dev check: schemas import and instantiate successfully.")
+    assert len(batch) == 5
+    print("AXON Phase 1 dev check: schemas and generator batch OK.")
 
 
 if __name__ == "__main__":

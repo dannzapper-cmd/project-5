@@ -38,11 +38,11 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 0 — Product Contract and Repo Foundation**
+**Phase 1 — Telemetry Spine**
 
-Delivered: repo skeleton, schemas, docs, ADRs, Compose profiles, health API, tests.
+Delivered: synthetic sensor generators, MQTT ingest, Redis Streams append, WebSocket broadcast, live dashboard, replay publish foundation.
 
-Not delivered: telemetry, inference, agents, ML, ROS2, digital twin runtime.
+Not delivered: ONNX inference, fusion, agents, ML, ROS2, digital twin 3D, full Redis replay consumers.
 
 ## Forbidden Claims
 
