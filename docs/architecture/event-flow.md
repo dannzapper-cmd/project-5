@@ -63,14 +63,26 @@ Validation occurs **before** inference:
 2. Quality/confidence bounds check
 3. Missing/corrupt data flagged — never silently repaired without lowering confidence
 
-## Phase 1 Runtime (Implemented)
+## Phase 2 Runtime (Implemented)
 
 The following path is live under the `core` Docker Compose profile:
+
+1. `sensor-generators` publishes `SensorEventV1` to MQTT
+2. `api` subscribes via aiomqtt, validates, appends to Redis Streams
+3. `edge-inference` consumes EMG/IMU streams via XREAD BLOCK
+4. ONNX Runtime CPU inference produces `ModelScoreEventV1`
+5. Model scores appended to `axon:v1:stream:model_scores`
+6. `api` model score watcher broadcasts to `/ws/v1/model-scores`
+7. Dashboard shows live telemetry and model score panels
+
+Not yet implemented: sensor fusion, agents, decision events.
+
+## Phase 1 Runtime (Implemented)
+
+The telemetry ingest path from Phase 1 remains active:
 
 1. `sensor-generators` publishes `SensorEventV1` to MQTT
 2. `api` subscribes via aiomqtt (background reconnect loop)
 3. Events validated with Pydantic, appended to Redis Streams (MAXLEN ~1000)
 4. WebSocket broadcast to dashboard at `ws://localhost:8000`
 5. Replay via `replay/replay_publish.py` → MQTT (same ingest path)
-
-Not yet implemented: downstream consumers, ONNX inference, fusion, agents.

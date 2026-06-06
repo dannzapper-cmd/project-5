@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     axon_env: str = "development"
-    axon_phase: int = 1
-    axon_version: str = "0.2.0"
+    axon_phase: int = 2
+    axon_version: str = "0.3.0"
     axon_service_name: str = "axon-api"
 
     api_host: str = "0.0.0.0"

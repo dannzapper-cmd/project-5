@@ -38,11 +38,11 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 1 — Telemetry Spine**
+**Phase 2 — Edge AI Core**
 
-Delivered: synthetic sensor generators, MQTT ingest, Redis Streams append, WebSocket broadcast, live dashboard, replay publish foundation.
+Delivered: Phase 1 telemetry spine plus ONNX Runtime inference, edge-inference service, ModelScoreEventV1 stream, dashboard model score panels, inference benchmark.
 
-Not delivered: ONNX inference, fusion, agents, ML, ROS2, digital twin 3D, full Redis replay consumers.
+Not delivered: sensor fusion, agents, ML training, ROS2, digital twin 3D, full Redis replay consumers.
 
 ## Forbidden Claims
 
@@ -76,7 +76,7 @@ Not delivered: ONNX inference, fusion, agents, ML, ROS2, digital twin 3D, full R
 
 | Profile | When |
 |---------|------|
-| `core` | Default dev (API, Redis, Mosquitto, dashboard placeholder) |
+| `core` | Default dev (API, Redis, Mosquitto, dashboard, sensor-generators, edge-inference) |
 | `sim` | Sensor simulation (Phase 1+) |
 | `obs` | Metrics/dashboards (Phase 7) |
 | `learning` | MLflow/training (Phase 4+) |

@@ -1,4 +1,4 @@
-"""AXON API gateway entrypoint (Phase 1: telemetry spine)."""
+"""AXON API gateway entrypoint (Phase 2: telemetry + edge AI)."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

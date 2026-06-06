@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AXON Dashboard — Phase 1 Telemetry</title>
+  <title>AXON Dashboard — Phase 2 Edge AI</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,10 +12,15 @@
       <p class="tagline">Perceive. Decide. Learn. Operate.</p>
       <h1>AXON — Bio-Robotics Edge Command System</h1>
       <div class="badges">
-        <span class="badge">Phase 1 — Telemetry Spine</span>
+        <span class="badge">Phase 2 — Edge AI Core</span>
         <span class="badge mode" id="mode-label">Mode: awaiting</span>
         <span class="badge scenario" id="scenario-label">Scenario: —</span>
       </div>
+      <p class="safety-banner">
+        ⚠ Synthetic biomedical-inspired signals only.
+        Not medical data. Not for diagnosis or treatment.
+        Operational simulation scores only.
+      </p>
     </header>
 
     <section class="status-panel">
@@ -24,19 +29,39 @@
         <div class="status-item"><span id="api-status" class="dot offline"></span> API</div>
         <div class="status-item"><span id="ws-sensors-status" class="dot offline"></span> WebSocket Sensors</div>
         <div class="status-item"><span id="ws-robot-status" class="dot offline"></span> WebSocket Robot State</div>
+        <div class="status-item"><span id="ws-model-scores-status" class="dot offline"></span> WebSocket Model Scores</div>
       </div>
-      <p class="event-counter">Events received: <strong id="event-counter">0</strong></p>
-    </section>
-
-    <section class="cards" id="signal-cards"></section>
-
-    <section class="future-panel disabled">
-      <h2>Future Panels (not implemented)</h2>
-      <p class="muted">Sensor fusion, model scores, agent traces, digital twin — Phase 2+</p>
+      <p class="event-counter">Sensor events received: <strong id="event-counter">0</strong></p>
+      <p class="event-counter">Model scores received: <strong id="model-score-counter">0</strong></p>
     </section>
 
     <section>
-      <h2>Last 20 Events</h2>
+      <h2>Edge AI Status</h2>
+      <div class="status-grid">
+        <div class="status-item">Last model: <strong id="last-model-name">—</strong></div>
+        <div class="status-item">Last score latency: <strong id="last-latency">—</strong></div>
+        <div class="status-item">Inference p50 (session): <strong id="latency-p50">—</strong></div>
+        <div class="status-item">Inference p95 (session): <strong id="latency-p95">—</strong></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Live Telemetry</h2>
+      <div class="cards" id="signal-cards"></div>
+    </section>
+
+    <section>
+      <h2>Live Model Scores</h2>
+      <div class="cards" id="model-score-cards"></div>
+    </section>
+
+    <section class="future-panel disabled">
+      <h2>Future Panels (not implemented)</h2>
+      <p class="muted">Sensor fusion, agent traces, digital twin — Phase 3+</p>
+    </section>
+
+    <section>
+      <h2>Last 20 Sensor Events</h2>
       <div class="table-wrap">
         <table>
           <thead>
@@ -54,8 +79,30 @@
       </div>
     </section>
 
+    <section>
+      <h2>Last 20 Model Score Events</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Model</th>
+              <th>Version</th>
+              <th>Input Signal</th>
+              <th>Score</th>
+              <th>Confidence</th>
+              <th>Label</th>
+              <th>Latency (ms)</th>
+            </tr>
+          </thead>
+          <tbody id="model-scores-table"></tbody>
+        </table>
+      </div>
+    </section>
+
     <footer>
       Synthetic biomedical-inspired signals only. Not medical data. Not for diagnosis or treatment.
+      Scores are operational simulation outputs, not diagnosis.
       Simulated rehab session — virtual subject telemetry.
     </footer>
   </div>
