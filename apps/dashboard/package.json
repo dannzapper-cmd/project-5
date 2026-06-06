@@ -1,0 +1,11 @@
+{
+  "name": "@axon/dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AXON dashboard placeholder — Phase 0",
+  "scripts": {
+    "dev": "echo 'Dashboard dev server not implemented until Phase 1+'",
+    "build": "echo 'Dashboard build not implemented until Phase 1+'",
+    "preview": "echo 'Serve apps/dashboard/index.html via nginx in compose-core'"
+  }
+}

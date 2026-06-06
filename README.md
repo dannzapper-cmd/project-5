@@ -1,1 +1,285 @@
-# project-5
+# AXON - Bio-Robotics Edge Command System
+
+**Perceive. Decide. Learn. Operate.**
+
+AXON is a modular Edge AI, IoT, robotics software, and biomedical-inspired synthetic monitoring system for simulated rehabilitation robot operations.
+
+---
+
+## What AXON Is
+
+A reproducible intelligent systems project that will:
+
+- Ingest **synthetic telemetry** (EMG, ECG-like, IMU, SpO2-proxy, robot state, environment)
+- Run **edge-like inference** with ONNX Runtime
+- **Fuse sensors** into operational state with confidence scoring
+- **Coordinate agents** via LangGraph with LangChain tools/RAG
+- Support **learning loops** (MLflow, fine-tuning, continual learning, Flower, RL)
+- **Visualize operations** through a live dashboard and digital twin
+- Collect **evidence** for every major capability
+
+**Expanded name:** Autonomous eXecution and Operations Network  
+**Fixed scenario:** Simulated Rehab Robot Ops
+
+## What AXON Is Not
+
+- Not a chatbot
+- Not a static dashboard
+- Not a medical device
+- Not a diagnostic system
+- Not based on real patient data
+- Not dependent on expensive always-on infrastructure
+- Not a robotics hardware project blocked by physical devices
+
+---
+
+## Future High-Level Architecture
+
+```
+Synthetic Sensors / IoT Nodes
+        │
+        ▼
+   MQTT / Mosquitto
+        │
+        ▼
+FastAPI async gateway + Pydantic event schemas
+        │
+        ▼
+Redis Streams buffer + replay mode
+        │
+        ├──────────────────┐
+        ▼                  ▼
+ONNX Runtime          Sensor Fusion
+ edge inference            │
+        │                  │
+        └────────┬─────────┘
+                 ▼
+        LangGraph Agent Layer
+                 │
+                 ▼
+   LangChain tools / RAG / retrievers
+                 │
+                 ▼
+        WebSocket broadcast
+                 │
+        ┌────────┴────────┐
+        ▼                 ▼
+  Dashboard +      Evidence Center
+  Digital Twin
+        │
+        ├─ MLflow / Observability / Learning Loops
+        ├─ ROS2 thin adapter
+        └─ Advanced ROS2 Nav2 + SLAM MiniLab profile
+```
+
+See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile details.
+
+---
+
+## Current Phase
+
+**Phase 0 — Product contract and repo foundation**
+
+| Delivered | Not Yet Implemented |
+|-----------|---------------------|
+| Pydantic event schemas | Telemetry ingest |
+| Topic taxonomy docs | MQTT/Redis wiring |
+| FastAPI `GET /health` | WebSocket broadcast |
+| Docker Compose profiles | ONNX inference |
+| ADRs, safety docs, evidence checklist | LangGraph agents |
+| Dashboard static placeholder | Digital twin, ROS2 |
+
+**Next phase:** [Phase 1 — Telemetry Spine](ROADMAP.md#phase-1-telemetry-spine)
+
+---
+
+## Mandatory Roadmap Technologies
+
+- Edge AI
+- IoT and real-time telemetry
+- MQTT / Eclipse Mosquitto
+- Redis Streams
+- FastAPI + WebSockets
+- Pydantic event schemas
+- ONNX Runtime edge inference
+- Sensor fusion
+- Deep learning with small models
+- Fine-tuning
+- TinyML / tiny deep learning path
+- MLflow for MLOps
+- Continual learning
+- Federated learning with Flower
+- RL micro-module with Gymnasium / Stable-Baselines3
+- LangGraph (main agent orchestration runtime)
+- LangChain (tools, RAG, retrievers, research/model-call layer)
+- Human-in-the-loop safety
+- Safety boundaries
+- Failure injection
+- Replay mode
+- OpenTelemetry / metrics / logs
+- Docker Compose profiles
+- Evidence Center
+- Digital twin
+- ROS2 thin adapter
+- Full ROS2 Nav2 + SLAM MiniLab (mandatory advanced phase)
+- Cost and hardware report
+- Optional hardware: ESP32, Raspberry Pi, Jetson Nano, Edge Impulse / TFLite Micro
+
+---
+
+## Docker Compose Profiles
+
+Profiles prevent all systems from running at once and enable staged development.
+
+| Profile | Purpose |
+|---------|---------|
+| `core` | API, dashboard placeholder, Redis, Mosquitto |
+| `obs` | Prometheus, Grafana (Phase 7+) |
+| `learning` | MLflow (Phase 4+) |
+| `ros2` | ROS2 thin adapter (Phase 5+) |
+| `ros2-nav-slam` | Nav2 + SLAM MiniLab (Phase 5.5, mandatory) |
+| `sim` | Sensor simulation orchestrator (Phase 1+) |
+| `llm` | Optional LLM copilot (Phase 3+, not always-on) |
+| `full` | Union of all profiles for late integration demos |
+
+```bash
+# Validate core profile (Phase 0)
+make compose-config
+
+# Start core skeleton (Phase 0)
+make compose-core
+```
+
+Details: [docs/architecture/profiles.md](docs/architecture/profiles.md)
+
+---
+
+## Safety and Biomedical Boundary
+
+AXON uses **synthetic biomedical-inspired signals only**.
+
+- No real patient data
+- No diagnosis or treatment advice
+- No clinical or medical-device claims
+- Software engineering simulation for portfolio demonstration
+
+Policies: [docs/safety/](docs/safety/)
+
+---
+
+## Why This Is Senior-Leaning
+
+| Practice | AXON Implementation |
+|----------|---------------------|
+| Event-driven architecture | MQTT → API → Redis → services → WebSocket |
+| Data contracts | Pydantic v2 schemas + topic taxonomy |
+| Safety boundaries | Biomedical policy + HITL policy |
+| Human-in-the-loop | `requires_human_confirmation` in decision events |
+| Evidence Center | Phase-gated checklist with reproducible proof |
+| MLOps and learning loops | MLflow, fine-tuning, Flower, RL (future phases) |
+| Observability | OpenTelemetry, Prometheus, Grafana (Phase 7) |
+| Robotics integration | ROS2 thin adapter + mandatory Nav2 MiniLab |
+| Replay and failure injection | Redis Streams replay mode (Phase 1+) |
+| Modular profiles | Documented trade-offs in ADRs and cost docs |
+
+---
+
+## Claims We Avoid
+
+- Medical-grade monitoring
+- Diagnosis of arrhythmia, fatigue, oxygen problems, or clinical conditions
+- Production-ready medical device
+- Real hospital/clinic deployment
+- Autonomous clinical decision-maker
+- Enterprise healthcare compliance claims
+
+---
+
+## Repository Structure
+
+```
+apps/api/          FastAPI gateway (Phase 0: health only)
+apps/dashboard/    Static placeholder (Phase 1+: live UI)
+services/          Microservice placeholders per roadmap phase
+docs/              Architecture, ADRs, safety, evidence, schemas
+infra/             Mosquitto, Prometheus, Grafana configs
+tests/             Phase 0 schema tests
+scripts/           Dev validation scripts
+```
+
+---
+
+## Python Packaging
+
+Dependencies are managed in **`pyproject.toml`** (not `requirements.txt`).
+
+`pyproject.toml` provides a modern single place for project metadata, dependencies, optional dependency groups, test configuration, and lint configuration — keeping Phase 0 installs lightweight while allowing phase-specific extras later.
+
+---
+
+## Commands
+
+### Phase 0 — Available Now
+
+```bash
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install with dev dependencies
+pip install -e ".[dev]"
+
+# Run schema tests (no external services)
+make test
+
+# Lightweight dev validation
+make dev-check
+
+# Validate Docker Compose core profile
+make compose-config
+
+# Start core skeleton (API + Redis + Mosquitto + dashboard placeholder)
+make compose-core
+
+# Start API locally (without Docker)
+make api
+# Health: http://localhost:8000/health
+```
+
+### Future Runtime Commands (Phase 1+)
+
+```bash
+# Telemetry demo (Phase 1 — not yet implemented)
+# make demo-telemetry
+
+# Replay session (Phase 1 — not yet implemented)
+# make replay SESSION_ID=...
+
+# Full portfolio demo (Phase 9 — not yet implemented)
+# docker compose --profile full up
+```
+
+---
+
+## Documentation Index
+
+| Document | Description |
+|----------|-------------|
+| [ROADMAP.md](ROADMAP.md) | Phased delivery plan |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | AI agent and contributor context |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution rules |
+| [docs/architecture/](docs/architecture/) | System diagrams |
+| [docs/adr/](docs/adr/) | Architecture decision records |
+| [docs/evidence/](docs/evidence/) | Evidence Center |
+| [docs/safety/](docs/safety/) | Safety policies |
+| [docs/schemas/](docs/schemas/) | Event contracts and topic taxonomy |
+
+---
+
+## License
+
+MIT (see project metadata in `pyproject.toml`).
+
+---
+
+*AXON — Simulated Rehab Robot Ops. Synthetic signals only. Not for clinical use.*

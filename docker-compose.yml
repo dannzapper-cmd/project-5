@@ -1,0 +1,128 @@
+# AXON - Bio-Robotics Edge Command System
+# Phase 0: skeleton services and profile scaffolding.
+# Profiles prevent all systems from running at once.
+
+name: axon
+
+x-placeholder-command: &placeholder-command
+  - /bin/sh
+  - -c
+  - echo "AXON placeholder: $${AXON_PLACEHOLDER_MESSAGE:-Not implemented in Phase 0}" && sleep infinity
+
+services:
+  # --- Phase 0 / Phase 1+ core ---
+  api:
+    profiles: [core, full]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      AXON_ENV: ${AXON_ENV:-development}
+      AXON_PHASE: ${AXON_PHASE:-0}
+      AXON_VERSION: ${AXON_VERSION:-0.1.0}
+      REDIS_URL: redis://redis:6379/0
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+    depends_on:
+      redis:
+        condition: service_started
+      mosquitto:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  dashboard:
+    profiles: [core, full]
+    image: nginx:alpine
+    ports:
+      - "${DASHBOARD_PORT:-8080}:80"
+    volumes:
+      - ./apps/dashboard:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+
+  redis:
+    profiles: [core, full]
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  mosquitto:
+    profiles: [core, full]
+    image: eclipse-mosquitto:2
+    ports:
+      - "${MQTT_PORT:-1883}:1883"
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  # --- Phase 4+ learning ---
+  mlflow-placeholder:
+    profiles: [learning, full]
+    image: alpine:3.20
+    environment:
+      AXON_PLACEHOLDER_MESSAGE: "MLflow tracking server — Phase 4 (MLOps + Fine-tuning)"
+    command: *placeholder-command
+
+  # --- Phase 7+ observability ---
+  prometheus:
+    profiles: [obs, full]
+    image: prom/prometheus:v2.55.0
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+
+  grafana-placeholder:
+    profiles: [obs, full]
+    image: alpine:3.20
+    environment:
+      AXON_PLACEHOLDER_MESSAGE: "Grafana dashboards — Phase 7 (Observability + Reliability)"
+    command: *placeholder-command
+
+  # --- Phase 5+ ROS2 ---
+  ros2-bridge-placeholder:
+    profiles: [ros2, full]
+    image: alpine:3.20
+    environment:
+      AXON_PLACEHOLDER_MESSAGE: "ROS2 thin adapter bridge — Phase 5 (Digital Twin + ROS2 Core)"
+    command: *placeholder-command
+
+  # --- Phase 5.5 mandatory advanced ROS2 ---
+  ros2-nav-slam-minilab-placeholder:
+    profiles: [ros2-nav-slam, full]
+    image: alpine:3.20
+    environment:
+      AXON_PLACEHOLDER_MESSAGE: "ROS2 Nav2 + SLAM MiniLab — Phase 5.5 (mandatory advanced)"
+    command: *placeholder-command
+
+  # --- Phase 1+ simulation ---
+  sim-placeholder:
+    profiles: [sim, full]
+    image: alpine:3.20
+    environment:
+      AXON_PLACEHOLDER_MESSAGE: "Sensor simulation orchestrator — Phase 1+ (Telemetry Spine)"
+    command: *placeholder-command
+
+  # --- Phase 3+ LLM copilot (optional, not always-on) ---
+  llm-copilot-placeholder:
+    profiles: [llm, full]
+    image: alpine:3.20
+    environment:
+      AXON_PLACEHOLDER_MESSAGE: "LLM copilot layer — Phase 3+ (optional profile, no local always-on LLM required)"
+    command: *placeholder-command
+
+volumes:
+  redis_data:

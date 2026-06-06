@@ -1,0 +1,16 @@
+# AXON Prometheus placeholder configuration (Phase 7+)
+# Phase 0: minimal config for compose validation under obs profile.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Future Phase 7 targets:
+  # - axon-api (OpenTelemetry metrics exporter)
+  # - edge-inference
+  # - fusion-service
