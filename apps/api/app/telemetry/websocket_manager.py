@@ -18,6 +18,11 @@ AWAITING_DATA_MESSAGE: dict[str, Any] = {
     "message": "Waiting for synthetic telemetry...",
 }
 
+AWAITING_MODEL_SCORES_MESSAGE: dict[str, Any] = {
+    "type": "waiting",
+    "message": "Awaiting model scores...",
+}
+
 
 class WebSocketManager:
     """Manage WebSocket clients per channel."""
@@ -27,6 +32,7 @@ class WebSocketManager:
             "sensors": set(),
             "robot-state": set(),
             "health": set(),
+            "model-scores": set(),
         }
         self._lock = asyncio.Lock()
 

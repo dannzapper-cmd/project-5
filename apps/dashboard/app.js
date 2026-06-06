@@ -1,4 +1,4 @@
-/** AXON Phase 1 live telemetry dashboard (vanilla JS). */
+/** AXON Phase 2 live telemetry + model score dashboard (vanilla JS). */
 
 const SIGNALS = [
   { key: "emg", label: "EMG" },
@@ -8,12 +8,20 @@ const SIGNALS = [
   { key: "robot_state", label: "Robot State" },
 ];
 
+const MODELS = [
+  { key: "emg_anomaly", label: "EMG Anomaly-like" },
+  { key: "imu_movement", label: "IMU Movement-risk-like" },
+];
+
 const config = window.AXON_CONFIG || { apiBase: "http://localhost:8000", wsBase: "ws://localhost:8000" };
 
 const state = {
   events: [],
+  modelScores: [],
   counters: Object.fromEntries(SIGNALS.map((s) => [s.key, 0])),
   sparkHistory: Object.fromEntries(SIGNALS.map((s) => [s.key, []])),
+  latestScores: {},
+  latencyHistory: [],
   scenario: "—",
   mode: "awaiting",
 };
@@ -33,6 +41,23 @@ function initCards() {
       <canvas class="sparkline" id="spark-${s.key}" width="180" height="48"></canvas>
       <div class="sub">Quality: <span id="quality-${s.key}">—</span></div>
       <div class="sub">Updated: <span id="time-${s.key}">—</span></div>
+    </div>`
+  ).join("");
+}
+
+function initModelScoreCards() {
+  const container = document.getElementById("model-score-cards");
+  container.innerHTML = MODELS.map(
+    (m) => `
+    <div class="card model-card" id="model-card-${m.key}">
+      <h3>${m.label}</h3>
+      <div class="metric" id="score-${m.key}">—</div>
+      <div class="sub">Label: <span id="label-${m.key}">—</span></div>
+      <div class="sub">Confidence: <span id="confidence-${m.key}">—</span></div>
+      <div class="sub">Latency: <span id="model-latency-${m.key}">—</span> ms</div>
+      <div class="sub">Version: <span id="version-${m.key}">—</span></div>
+      <div class="sub">Input: <span id="input-signal-${m.key}">—</span></div>
+      <div class="sub">Updated: <span id="model-time-${m.key}">—</span></div>
     </div>`
   ).join("");
 }
@@ -87,6 +112,37 @@ function updateCard(event) {
   }
 }
 
+function percentile(arr, p) {
+  if (!arr.length) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const idx = Math.ceil((p / 100) * sorted.length) - 1;
+  return sorted[Math.max(0, idx)];
+}
+
+function updateModelScoreCard(event) {
+  const key = event.model_name;
+  state.latestScores[key] = event;
+  state.latencyHistory.push(event.latency_ms);
+  if (state.latencyHistory.length > 100) state.latencyHistory.shift();
+
+  const scoreEl = document.getElementById(`score-${key}`);
+  if (!scoreEl) return;
+
+  document.getElementById(`score-${key}`).textContent = event.score.toFixed(3);
+  document.getElementById(`label-${key}`).textContent = event.output_label;
+  document.getElementById(`confidence-${key}`).textContent = event.confidence.toFixed(3);
+  document.getElementById(`model-latency-${key}`).textContent = event.latency_ms.toFixed(2);
+  document.getElementById(`version-${key}`).textContent = event.model_version;
+  document.getElementById(`input-signal-${key}`).textContent =
+    event.metadata?.input_signal || event.metadata?.signal_type || "—";
+  document.getElementById(`model-time-${key}`).textContent = new Date(event.timestamp).toLocaleTimeString();
+
+  document.getElementById("last-model-name").textContent = event.model_name;
+  document.getElementById("last-latency").textContent = event.latency_ms.toFixed(2) + " ms";
+  document.getElementById("latency-p50").textContent = percentile(state.latencyHistory, 50).toFixed(2) + " ms";
+  document.getElementById("latency-p95").textContent = percentile(state.latencyHistory, 95).toFixed(2) + " ms";
+}
+
 function pushEvent(event) {
   state.events.unshift(event);
   if (state.events.length > 20) state.events.pop();
@@ -95,6 +151,16 @@ function pushEvent(event) {
   );
   updateCard(event);
   renderTable();
+}
+
+function pushModelScore(event) {
+  state.modelScores.unshift(event);
+  if (state.modelScores.length > 20) state.modelScores.pop();
+  document.getElementById("model-score-counter").textContent = String(
+    Number(document.getElementById("model-score-counter").textContent) + 1
+  );
+  updateModelScoreCard(event);
+  renderModelScoresTable();
 }
 
 function renderTable() {
@@ -114,6 +180,22 @@ function renderTable() {
     .join("");
 }
 
+function renderModelScoresTable() {
+  const tbody = document.getElementById("model-scores-table");
+  tbody.innerHTML = state.modelScores
+    .map((e) => `<tr>
+      <td>${new Date(e.timestamp).toLocaleTimeString()}</td>
+      <td>${e.model_name}</td>
+      <td>${e.model_version}</td>
+      <td>${e.metadata?.input_signal || e.metadata?.signal_type || "—"}</td>
+      <td>${e.score.toFixed(3)}</td>
+      <td>${e.confidence.toFixed(3)}</td>
+      <td>${e.output_label}</td>
+      <td>${e.latency_ms.toFixed(2)}</td>
+    </tr>`)
+    .join("");
+}
+
 function handleWsMessage(msg) {
   if (msg.type === "event" && msg.event) {
     pushEvent(msg.event);
@@ -126,19 +208,29 @@ function handleWsMessage(msg) {
   }
 }
 
-function connectWs(path, statusId, filterFn) {
+function handleModelScoreMessage(msg) {
+  if (msg.type === "model_score" && msg.event) {
+    pushModelScore(msg.event);
+    return;
+  }
+  if (msg.type === "waiting") {
+    setDot("ws-model-scores-status", false, true);
+  }
+}
+
+function connectWs(path, statusId, filterFn, handler) {
   const ws = new WebSocket(`${config.wsBase}${path}`);
   ws.onopen = () => setDot(statusId, true);
   ws.onclose = () => {
     setDot(statusId, false);
-    setTimeout(() => connectWs(path, statusId, filterFn), 2000);
+    setTimeout(() => connectWs(path, statusId, filterFn, handler), 2000);
   };
   ws.onerror = () => setDot(statusId, false);
   ws.onmessage = (ev) => {
     try {
       const msg = JSON.parse(ev.data);
       if (filterFn && !filterFn(msg)) return;
-      handleWsMessage(msg);
+      handler(msg);
     } catch (_) {
       /* ignore malformed */
     }
@@ -162,15 +254,18 @@ async function checkApiHealth() {
 }
 
 initCards();
+initModelScoreCards();
 checkApiHealth();
 setInterval(checkApiHealth, 10000);
 
 connectWs("/ws/v1/sensors", "ws-sensors-status", (msg) => {
   if (msg.type === "event") return msg.event?.signal_type !== "robot_state";
   return true;
-});
+}, handleWsMessage);
 
 connectWs("/ws/v1/robot-state", "ws-robot-status", (msg) => {
   if (msg.type === "event") return msg.event?.signal_type === "robot_state";
   return true;
-});
+}, handleWsMessage);
+
+connectWs("/ws/v1/model-scores", "ws-model-scores-status", null, handleModelScoreMessage);

@@ -1,4 +1,4 @@
-"""FastAPI lifespan: Redis + background MQTT subscriber."""
+"""FastAPI lifespan: Redis + background MQTT subscriber + model score watcher."""
 
 from __future__ import annotations
 
@@ -11,17 +11,20 @@ from fastapi import FastAPI
 from redis.asyncio import Redis
 
 from apps.api.app.core.config import settings
+from apps.api.app.telemetry.model_score_watcher import watch_model_scores
 from apps.api.app.telemetry.mqtt_client import mqtt_subscriber_loop
 from apps.api.app.telemetry.state import telemetry_state
+from apps.api.app.telemetry.websocket_manager import ws_manager
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Start Redis client and MQTT background task; cleanup on shutdown."""
+    """Start Redis client and background tasks; cleanup on shutdown."""
     redis: Redis | None = None
     mqtt_task: asyncio.Task | None = None
+    model_score_task: asyncio.Task | None = None
 
     try:
         redis = Redis.from_url(settings.redis_url, decode_responses=False)
@@ -41,14 +44,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     )
     logger.info("MQTT background subscriber task started")
 
+    model_score_task = asyncio.create_task(watch_model_scores(ws_manager, redis))
+    logger.info("Model score watcher task started")
+
     yield
 
-    if mqtt_task is not None:
-        mqtt_task.cancel()
-        try:
-            await mqtt_task
-        except asyncio.CancelledError:
-            pass
+    for task in (mqtt_task, model_score_task):
+        if task is not None:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
     if redis is not None:
         await redis.aclose()

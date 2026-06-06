@@ -1,5 +1,5 @@
 # AXON - Bio-Robotics Edge Command System
-# Phase 1: Telemetry spine (core profile)
+# Phase 2: Telemetry spine + Edge AI inference (core profile)
 
 name: axon
 
@@ -46,8 +46,8 @@ services:
       - "${API_PORT:-8000}:8000"
     environment:
       AXON_ENV: ${AXON_ENV:-development}
-      AXON_PHASE: ${AXON_PHASE:-1}
-      AXON_VERSION: ${AXON_VERSION:-0.2.0}
+      AXON_PHASE: ${AXON_PHASE:-2}
+      AXON_VERSION: ${AXON_VERSION:-0.3.0}
       REDIS_URL: redis://redis:6379/0
       MQTT_HOST: mosquitto
       MQTT_PORT: 1883
@@ -80,6 +80,30 @@ services:
     depends_on:
       mosquitto:
         condition: service_healthy
+
+  edge-inference:
+    profiles: [core, full]
+    build:
+      context: .
+      dockerfile: services/edge-inference/Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MODEL_DIR: /app/models/onnx
+      METADATA_DIR: /app/models/metadata
+      MODEL_SCORE_STREAM: axon:v1:stream:model_scores
+      INFERENCE_INTERVAL_MS: ${INFERENCE_INTERVAL_MS:-500}
+      AXON_PHASE: "Phase 2 - Edge AI Core"
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import redis; r = redis.Redis.from_url('redis://redis:6379/0'); r.ping()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   dashboard:
     profiles: [core, full]

@@ -1,6 +1,7 @@
 .PHONY: help install test lint dev-check api compose-config compose-core clean \
 	telemetry-up telemetry-down telemetry-logs replay-generate \
-	replay-normal replay-fatigue replay-dropout replay-spike replay-multi api-status
+	replay-normal replay-fatigue replay-dropout replay-spike replay-multi api-status \
+	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -13,10 +14,10 @@ COMPOSE := docker compose --profile core
 help: ## Show available commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install package with dev dependencies
+install: ## Install package with dev and edge-ai dependencies
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -e ".[dev]"
+	$(PIP) install -e ".[dev,edge-ai]"
 
 test: ## Run unit tests (no Docker/MQTT/Redis required)
 	$(PYTEST) tests/
@@ -33,10 +34,27 @@ api: ## Start FastAPI dev server locally
 compose-config: ## Validate Docker Compose core profile configuration
 	docker compose --profile core config
 
-compose-core: ## Start core profile (Phase 1 telemetry spine)
+compose-core: ## Start core profile (Phase 2 edge AI stack)
 	$(COMPOSE) up --build
 
-telemetry-up: ## Start Phase 1 core stack in background
+models-generate: ## Generate Phase 2 ONNX model artifacts
+	$(PYTHON) scripts/generate_phase2_models.py
+
+benchmark-inference: ## Run ONNX inference benchmark and write evidence report
+	$(PYTHON) scripts/benchmark_inference.py
+
+edge-ai-up: ## Start Phase 2 core stack (requires models-generate first)
+	@test -f models/onnx/emg_anomaly_v0.onnx || \
+		(echo "ERROR: Run 'make models-generate' first." && exit 1)
+	$(COMPOSE) up --build
+
+edge-ai-logs: ## Tail logs for edge inference and API
+	$(COMPOSE) logs -f edge-inference api
+
+model-status: ## Fetch model score status from local API
+	curl -s http://localhost:8000/model-scores/status | python3 -m json.tool
+
+telemetry-up: ## Start Phase 2 core stack in background
 	$(COMPOSE) up --build -d
 
 telemetry-down: ## Stop Phase 1 core stack

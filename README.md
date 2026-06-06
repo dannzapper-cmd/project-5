@@ -78,18 +78,41 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 1 — Telemetry Spine**
+**Phase 2 — Edge AI Core**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Synthetic sensor generators → MQTT | ONNX edge inference |
-| FastAPI MQTT ingest + validation | Sensor fusion |
-| Redis Streams append (bounded MAXLEN) | LangGraph agents |
-| WebSocket live broadcast | Digital twin, ROS2 |
-| Live dashboard (5 streams) | MLflow, observability stack |
-| Replay publish foundation | Full Redis replay consumers |
+| Phase 1 telemetry spine (MQTT → Redis → WebSocket) | Sensor fusion |
+| ONNX Runtime CPU inference (emg_anomaly, imu_movement) | LangGraph agents |
+| Edge inference service consuming Redis Streams | Digital twin, ROS2 |
+| ModelScoreEventV1 → model_scores stream | MLflow, observability stack |
+| Dashboard model score panels + latency metrics | Full Redis replay consumers |
+| Lightweight inference benchmark report | |
 
-**Next phase:** [Phase 2 — Edge AI Core](ROADMAP.md#phase-2-edge-ai-core)
+**Next phase:** [Phase 3 — Agents + Safety](ROADMAP.md#phase-3-agents--safety)
+
+---
+
+## Phase 2 — Edge AI Core Quickstart
+
+```bash
+# Step 1: Generate ONNX models (required before Docker build)
+make models-generate
+
+# Step 2: Start Phase 2 core stack
+docker compose --profile core up --build
+# or: make edge-ai-up
+
+# Verify
+curl http://localhost:8000/telemetry/status
+curl http://localhost:8000/model-scores/status
+redis-cli XLEN axon:v1:stream:model_scores
+
+# Benchmark (local, no Docker)
+make benchmark-inference
+```
+
+Dashboard: http://localhost:3000 — live telemetry + model score panels.
 
 ---
 
@@ -133,7 +156,7 @@ Profiles prevent all systems from running at once and enable staged development.
 
 | Profile | Purpose |
 |---------|---------|
-| `core` | API, live dashboard, Redis, Mosquitto, sensor-generators |
+| `core` | API, dashboard, Redis, Mosquitto, sensor-generators, edge-inference |
 | `obs` | Prometheus, Grafana (Phase 7+) |
 | `learning` | MLflow (Phase 4+) |
 | `ros2` | ROS2 thin adapter (Phase 5+) |
@@ -146,9 +169,10 @@ Profiles prevent all systems from running at once and enable staged development.
 # Validate core profile
 make compose-config
 
-# Start Phase 1 telemetry spine
-make compose-core
-# or: make telemetry-up
+# Start Phase 2 edge AI stack
+make models-generate
+make edge-ai-up
+# or: make compose-core
 ```
 
 Details: [docs/architecture/profiles.md](docs/architecture/profiles.md)
@@ -200,7 +224,9 @@ Policies: [docs/safety/](docs/safety/)
 
 ```
 apps/api/                      FastAPI gateway + MQTT ingest + WebSockets
-apps/dashboard/                Live Phase 1 telemetry dashboard (port 3000)
+apps/dashboard/                Live Phase 2 dashboard (telemetry + model scores)
+services/edge-inference/       ONNX Runtime edge inference service
+models/                        ONNX artifacts + metadata (generated)
 services/sensor-generators/    Synthetic MQTT publishers
 replay/                        JSONL scenarios + replay_publish.py
 docs/                          Architecture, ADRs, safety, evidence, schemas
@@ -227,7 +253,7 @@ Dependencies are managed in **`pyproject.toml`** (not `requirements.txt`).
 git pull
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[dev,edge-ai]"
 make test
 make dev-check
 ```

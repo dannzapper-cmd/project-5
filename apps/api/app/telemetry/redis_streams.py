@@ -8,7 +8,8 @@ from typing import Any
 
 from redis.asyncio import Redis
 
-from apps.api.app.schemas.events import SensorEventV1
+from apps.api.app.schemas.events import ModelScoreEventV1, SensorEventV1
+from apps.api.app.telemetry.model_score_streams import MODEL_SCORE_STREAM
 from apps.api.app.telemetry.state import telemetry_state
 
 logger = logging.getLogger(__name__)
@@ -77,3 +78,38 @@ async def get_last_events_by_signal(
         if msg:
             messages.append(msg)
     return messages
+
+
+def model_score_to_ws_message(event: ModelScoreEventV1) -> dict[str, Any]:
+    """Serialize ModelScoreEventV1 for WebSocket broadcast."""
+    return {"type": "model_score", "event": event.model_dump(mode="json")}
+
+
+async def get_last_model_scores_by_name(
+    redis: Redis | None,
+    limit: int = 10,
+) -> list[dict[str, Any]]:
+    """Fetch last model score per model_name for WebSocket initial state."""
+    if redis is None:
+        return []
+    try:
+        entries = await redis.xrevrange(MODEL_SCORE_STREAM, count=limit)
+        seen: set[str] = set()
+        messages: list[dict[str, Any]] = []
+        for _entry_id, fields in entries:
+            raw = fields.get(b"payload") or fields.get("payload")
+            if raw is None:
+                continue
+            if isinstance(raw, bytes):
+                raw = raw.decode()
+            data = json.loads(raw)
+            model_name = data.get("model_name", "")
+            if model_name in seen:
+                continue
+            seen.add(model_name)
+            event = ModelScoreEventV1.model_validate(data)
+            messages.append(model_score_to_ws_message(event))
+        return messages
+    except Exception as exc:
+        logger.warning("Failed to read model scores: %s", exc)
+        return []

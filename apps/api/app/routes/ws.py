@@ -11,7 +11,11 @@ from apps.api.app.telemetry.mqtt_client import (
     get_initial_robot_messages,
     get_initial_sensor_messages,
 )
-from apps.api.app.telemetry.websocket_manager import ws_manager
+from apps.api.app.telemetry.redis_streams import get_last_model_scores_by_name
+from apps.api.app.telemetry.websocket_manager import (
+    AWAITING_MODEL_SCORES_MESSAGE,
+    ws_manager,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,3 +70,19 @@ async def ws_health(websocket: WebSocket) -> None:
         await _hold_connection("health", websocket)
     finally:
         await ws_manager.disconnect("health", websocket)
+
+
+@router.websocket("/ws/v1/model-scores")
+async def ws_model_scores(websocket: WebSocket) -> None:
+    redis = websocket.app.state.redis
+    await ws_manager.connect("model-scores", websocket)
+    try:
+        initial = await get_last_model_scores_by_name(redis, limit=10)
+        if initial:
+            for message in initial:
+                await ws_manager.send_json(websocket, message)
+        else:
+            await ws_manager.send_json(websocket, AWAITING_MODEL_SCORES_MESSAGE)
+        await _hold_connection("model-scores", websocket)
+    finally:
+        await ws_manager.disconnect("model-scores", websocket)

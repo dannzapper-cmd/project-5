@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "axon"
-version = "0.2.0"
+version = "0.3.0"
 description = "AXON - Bio-Robotics Edge Command System"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -34,7 +34,11 @@ dev = [
     "ruff>=0.8.0",
     "httpx>=0.27.0",
 ]
-edge-ai = []     # Phase 2: onnxruntime, numpy
+edge-ai = [
+    "onnxruntime>=1.17.0,<2.0.0",
+    "onnx>=1.14.0,<2.0.0",
+    "numpy>=1.26.0",
+]
 agents = []      # Phase 3: langgraph, langchain
 mlops = []       # Phase 4: mlflow, training tooling
 ros2 = []        # Phase 5+: ROS2 bridge dependencies
@@ -45,8 +49,8 @@ observability = []  # Phase 7: opentelemetry SDK/exporters
 axon-dev-check = "scripts.dev_check:main"
 
 [tool.setuptools.packages.find]
-where = [".", "services/sensor-generators"]
-include = ["apps*", "scripts*", "axon_generators*"]
+where = [".", "services/sensor-generators", "services/edge-inference"]
+include = ["apps*", "scripts*", "axon_generators*", "edge_inference*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -56,7 +60,7 @@ addopts = "-q"
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-src = ["apps", "scripts", "tests", "services/sensor-generators", "replay"]
+src = ["apps", "scripts", "tests", "services/sensor-generators", "services/edge-inference", "replay"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

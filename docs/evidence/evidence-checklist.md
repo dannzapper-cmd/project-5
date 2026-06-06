@@ -27,10 +27,13 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 
 ## Phase 2 — Edge AI Core
 
-- [ ] Model latency benchmark
-- [ ] ONNX Runtime inference proof
-- [ ] Sensor fusion confidence screenshot
-- [ ] Data quality and missing-data scenario proof
+- [ ] ONNX model files generated (`make models-generate`)
+- [ ] Model metadata files present (`models/metadata/`)
+- [ ] Benchmark report generated (`docs/evidence/phase2-inference-benchmark.md`)
+- [ ] Model score stream has events (`XLEN axon:v1:stream:model_scores`)
+- [ ] Dashboard shows model score panels
+- [ ] Latency p50/p95 captured in benchmark report
+- [ ] No medical claims in labels/UI/docs review
 
 ## Phase 3 — Agents + Safety
 

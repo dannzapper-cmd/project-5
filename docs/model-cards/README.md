@@ -2,31 +2,31 @@
 
 Model cards document purpose, limitations, and evidence for each AXON edge model.
 
-## Phase 0 Status
+## Phase 2 Models
 
-No trained models exist. Placeholder cards will be added as models are developed.
+| Model | Card | Purpose |
+|-------|------|---------|
+| emg_anomaly v0 | [emg-anomaly-v0.md](emg-anomaly-v0.md) | Anomaly-like operational score from synthetic EMG |
+| imu_movement v0 | [imu-movement-v0.md](imu-movement-v0.md) | Movement-risk-like score from synthetic IMU |
 
-## Planned Model Cards
+## Future Model Cards
 
 | Model | Phase | Purpose |
 |-------|-------|---------|
-| EMG anomaly / tiny classifier | 2 | Detect anomalous EMG patterns in synthetic stream |
-| ECG-like autoencoder | 2 | Reconstruction-based anomaly signal |
-| IMU movement anomaly classifier | 2 | Classify unusual motion during rehab sim |
-| SpO2-proxy rules/confidence model | 2 | Rule + confidence hybrid for proxy signal |
-| Robot state model | 2 | Robot state deviation detection |
+| ECG-like autoencoder | 2+ | Reconstruction-based anomaly signal |
+| SpO2-proxy rules/confidence model | 2+ | Rule + confidence hybrid for proxy signal |
+| Robot state model | 2+ | Robot state deviation detection |
 
-## Template (Future)
+## Template
 
 Each model card must include:
 
 - Model name and version
 - Intended use (simulation only)
-- Training data (synthetic sources)
 - Metrics and benchmarks
 - Limitations and failure modes
 - Biomedical disclaimer (no clinical validity)
-- Evidence links (MLflow run, latency benchmark)
+- Evidence links (latency benchmark)
 
 ## Related Documents
 
