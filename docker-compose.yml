@@ -1,51 +1,27 @@
 # AXON - Bio-Robotics Edge Command System
-# Phase 0: skeleton services and profile scaffolding.
-# Profiles prevent all systems from running at once.
+# Phase 1: Telemetry spine (core profile)
 
 name: axon
 
 x-placeholder-command: &placeholder-command
   - /bin/sh
   - -c
-  - echo "AXON placeholder: $${AXON_PLACEHOLDER_MESSAGE:-Not implemented in Phase 0}" && sleep infinity
+  - echo "AXON placeholder: $${AXON_PLACEHOLDER_MESSAGE:-Not implemented yet}" && sleep infinity
 
 services:
-  # --- Phase 0 / Phase 1+ core ---
-  api:
+  mosquitto:
     profiles: [core, full]
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    image: eclipse-mosquitto:2
     ports:
-      - "${API_PORT:-8000}:8000"
-    environment:
-      AXON_ENV: ${AXON_ENV:-development}
-      AXON_PHASE: ${AXON_PHASE:-0}
-      AXON_VERSION: ${AXON_VERSION:-0.1.0}
-      REDIS_URL: redis://redis:6379/0
-      MQTT_HOST: mosquitto
-      MQTT_PORT: 1883
-    depends_on:
-      redis:
-        condition: service_started
-      mosquitto:
-        condition: service_started
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-
-  dashboard:
-    profiles: [core, full]
-    image: nginx:alpine
-    ports:
-      - "${DASHBOARD_PORT:-8080}:80"
+      - "${MQTT_PORT:-1883}:1883"
     volumes:
-      - ./apps/dashboard:/usr/share/nginx/html:ro
-    depends_on:
-      - api
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_pub -h localhost -p 1883 -t axon/healthcheck -m ok || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redis:
     profiles: [core, full]
@@ -55,14 +31,68 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
-  mosquitto:
+  api:
     profiles: [core, full]
-    image: eclipse-mosquitto:2
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     ports:
-      - "${MQTT_PORT:-1883}:1883"
+      - "${API_PORT:-8000}:8000"
+    environment:
+      AXON_ENV: ${AXON_ENV:-development}
+      AXON_PHASE: ${AXON_PHASE:-1}
+      AXON_VERSION: ${AXON_VERSION:-0.2.0}
+      REDIS_URL: redis://redis:6379/0
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  sensor-generators:
+    profiles: [core, full]
+    build:
+      context: .
+      dockerfile: services/sensor-generators/Dockerfile
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+      AXON_SCENARIO: ${AXON_SCENARIO:-normal_session}
+      AXON_NODE_ID: ${AXON_NODE_ID:-rehab-node-01}
+      AXON_ROBOT_ID: ${AXON_ROBOT_ID:-rehab-robot-01}
+      AXON_PUBLISH_INTERVAL: ${AXON_PUBLISH_INTERVAL:-1.0}
+      AXON_SEED: ${AXON_SEED:-42}
+      AXON_TRACE_ID: ${AXON_TRACE_ID:-session-synthetic-001}
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+
+  dashboard:
+    profiles: [core, full]
+    image: python:3.12-slim
+    working_dir: /dashboard
     volumes:
-      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./apps/dashboard:/dashboard:ro
+    command: ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
+    ports:
+      - "${DASHBOARD_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_started
 
   # --- Phase 4+ learning ---
   mlflow-placeholder:
@@ -108,20 +138,20 @@ services:
       AXON_PLACEHOLDER_MESSAGE: "ROS2 Nav2 + SLAM MiniLab — Phase 5.5 (mandatory advanced)"
     command: *placeholder-command
 
-  # --- Phase 1+ simulation ---
+  # --- Optional extended simulation profile (Phase 1 uses sensor-generators in core) ---
   sim-placeholder:
     profiles: [sim, full]
     image: alpine:3.20
     environment:
-      AXON_PLACEHOLDER_MESSAGE: "Sensor simulation orchestrator — Phase 1+ (Telemetry Spine)"
+      AXON_PLACEHOLDER_MESSAGE: "Extended simulation orchestrator — future phases"
     command: *placeholder-command
 
-  # --- Phase 3+ LLM copilot (optional, not always-on) ---
+  # --- Phase 3+ LLM copilot (optional) ---
   llm-copilot-placeholder:
     profiles: [llm, full]
     image: alpine:3.20
     environment:
-      AXON_PLACEHOLDER_MESSAGE: "LLM copilot layer — Phase 3+ (optional profile, no local always-on LLM required)"
+      AXON_PLACEHOLDER_MESSAGE: "LLM copilot layer — Phase 3+ (optional profile)"
     command: *placeholder-command
 
 volumes:

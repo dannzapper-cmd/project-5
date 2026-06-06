@@ -1,26 +1,31 @@
 # AXON Tests
 
-## Phase 0 Scope
+## Phase 1 Scope
 
-Phase 0 tests validate **contracts only** — no Docker, Redis, MQTT, or frontend required.
+Unit tests validate contracts and telemetry spine logic without Docker, MQTT, or Redis.
 
 | Test file | Coverage |
 |-----------|----------|
 | `test_schemas.py` | Pydantic v2 event schema validation |
+| `test_generators.py` | Synthetic sensor event generation |
+| `test_topic_router.py` | MQTT topic → Redis stream mapping |
+| `test_websocket_format.py` | WebSocket payload serialization |
+| `test_replay_jsonl.py` | Pre-generated replay scenario files |
 
 ## Running Tests
 
 ```bash
 make test
-# or
-pytest tests/
+```
+
+Regenerate replay files before testing if scenarios change:
+
+```bash
+make replay-generate
 ```
 
 ## Future Phases
 
-- Phase 1: MQTT ingest, Redis Streams, WebSocket integration tests
-- Phase 2: ONNX inference latency benchmarks
+- Phase 2: ONNX inference benchmarks
 - Phase 3: Agent trace contract tests
-- Phase 7: Observability exporter smoke tests
-
-Integration tests that require external services should be marked and run under appropriate Docker Compose profiles.
+- Integration tests with Docker Compose profile markers

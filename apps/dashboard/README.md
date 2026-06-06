@@ -2,32 +2,54 @@
 
 Live operations dashboard for simulated rehabilitation robot operations.
 
-## Phase 0 Status
+## Phase 1 Status
 
-Static HTML placeholder (`index.html`) served via nginx in the `core` Docker Compose profile.
+**Live telemetry dashboard** served as static HTML/JS on port **3000**.
 
-No live charts, WebSocket clients, or digital twin rendering yet.
+### Features
 
-## Future Implementation (Phase 1+)
+- Connection status (API, WebSocket sensors, WebSocket robot state)
+- Live cards for EMG, ECG-like, IMU, SpO2-proxy, robot_state
+- Sparkline per signal
+- Latest value, quality, timestamp
+- Event counter and last 20 events table
+- Scenario and mode labels from event metadata
+- Disabled placeholders for Phase 2+ panels
 
-Planned stack options (to be decided in Phase 1):
+### WebSocket Configuration
 
-- React or Next.js for UI
-- WebSocket client for real-time channels
-- Three.js or similar for digital twin (Phase 5)
+Browser connects to **host-accessible** URLs (not Docker internal names):
 
-## Future Sections
+- Default: `ws://localhost:8000` (see `config.js`)
+- Override via `window.AXON_CONFIG.wsBase` if needed
 
-- Live telemetry panels
-- Robot state and session view
-- Model scores and fusion confidence
-- Agent trace timeline
-- Safety / HITL confirmation UI
-- Evidence Center integration
+## URLs
 
-## Local Preview
+| Service | URL |
+|---------|-----|
+| Dashboard | http://localhost:3000 |
+| API health | http://localhost:8000/health |
+| Telemetry status | http://localhost:8000/telemetry/status |
+
+## Run
 
 ```bash
 make compose-core
-# Dashboard: http://localhost:8080
+# Open http://localhost:3000
 ```
+
+Or serve locally:
+
+```bash
+cd apps/dashboard && python -m http.server 3000
+```
+
+## Safety Label
+
+Dashboard displays: *Synthetic biomedical-inspired signals only. Not medical data.*
+
+## Future (Phase 2+)
+
+- Model scores, fusion confidence
+- Agent traces, HITL UI
+- Digital twin (Phase 5)

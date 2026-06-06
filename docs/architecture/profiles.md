@@ -19,10 +19,10 @@ AXON uses profiles to prevent all systems from running simultaneously. Activate 
 
 ### `core`
 
-- **Purpose:** Minimal runnable stack for API and infrastructure contracts
-- **Services:** `api`, `dashboard`, `redis`, `mosquitto`
-- **When to activate:** Default for Phase 0–1 development
-- **Evidence:** Health check, compose config validation, dashboard placeholder screenshot
+- **Purpose:** Phase 1 telemetry spine — live synthetic data path
+- **Services:** `api`, `dashboard`, `redis`, `mosquitto`, `sensor-generators`
+- **When to activate:** Default for Phase 1 development and demos
+- **Evidence:** Live dashboard screenshot, telemetry status JSON, Redis XLEN proof
 - **Do not run by default:** MLflow, ROS2, full observability stack
 
 ### `obs`
