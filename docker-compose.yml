@@ -6,7 +6,7 @@ name: axon
 x-placeholder-command: &placeholder-command
   - /bin/sh
   - -c
-  - echo "AXON placeholder: $${AXON_PLACEHOLDER_MESSAGE:-Not implemented yet}" && sleep infinity
+  - 'echo "AXON placeholder: $${AXON_PLACEHOLDER_MESSAGE:-Not implemented yet}" && sleep infinity'
 
 services:
   mosquitto:

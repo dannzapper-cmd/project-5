@@ -88,7 +88,8 @@ async def mqtt_subscriber_loop(host: str, port: int, redis: Redis | None) -> Non
             async with aiomqtt.Client(hostname=host, port=port) as client:
                 telemetry_state.mqtt_connected = True
                 attempt = 0
-                await client.subscribe(MQTT_SUBSCRIBE_TOPICS)
+                for topic in MQTT_SUBSCRIBE_TOPICS:
+                    await client.subscribe(topic)
                 logger.info("MQTT subscribed topics=%s", MQTT_SUBSCRIBE_TOPICS)
                 async for message in client.messages:
                     await handle_mqtt_message(str(message.topic), message.payload, redis)
