@@ -1,0 +1,47 @@
+---
+description: AXON phase boundaries and contributor policy
+globs:
+alwaysApply: true
+---
+
+# AXON Phase Policy
+
+## Current Baseline
+
+- **Phase 0** establishes contracts, docs, and skeleton services only.
+- Always respect the current phase declared in `PROJECT_CONTEXT.md` and `ROADMAP.md`.
+
+## Non-Negotiable Rules
+
+1. **Never claim future phases are implemented** during earlier phases.
+2. **Do not collapse AXON into a chatbot**, a single dashboard, or a generic CRUD application.
+3. **Do not remove mandatory roadmap phases** unless the human owner explicitly changes project direction.
+4. **Do not add heavyweight always-on dependencies** (local LLM, full ROS2 stack, MLflow, etc.) to default installs.
+5. **Do not add real patient data** or biomedical datasets with clinical provenance.
+6. **Do not use medical claims** — synthetic signals only; no diagnosis or treatment advice.
+7. **Keep profile-based execution** — use Docker Compose profiles; do not require all services at once.
+8. **Keep evidence-driven development** — every feature needs visible output and Evidence Center artifacts.
+9. **Prefer small, testable PR-sized changes** aligned to one roadmap phase.
+10. **Ask before changing architecture direction** — update ADRs when decisions change.
+
+## Documentation Honesty
+
+- Do not write documentation that claims Phase 1+ functionality is already working during Phase 0.
+- Label placeholders clearly; never fake working capabilities.
+
+## Technology Boundaries
+
+- LangGraph = main agent orchestration runtime (Phase 3+)
+- LangChain = tools, RAG, retrievers, research/model-call layer (Phase 3+)
+- ONNX Runtime = edge inference (Phase 2+)
+- Redis Streams = buffering/replay (Phase 1+), not Kafka as core
+- ROS2 Nav2 + SLAM MiniLab = mandatory Phase 5.5 advanced profile
+
+## AI Tool Behavior
+
+When implementing features:
+
+- Read `PROJECT_CONTEXT.md` first.
+- Match existing conventions and schema contracts.
+- Add tests for real behavior; skip tests for unimplemented placeholders.
+- Update evidence checklist when delivering demonstrable output.
