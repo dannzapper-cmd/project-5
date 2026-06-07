@@ -256,7 +256,7 @@ VERIFIED BY:
   rebuilt `ros2_nav_slam`, then `timeout 15 ros2 topic hz /scan` (~12.0 Hz)
   and `timeout 15 ros2 topic hz /odom` (~24.9 Hz).
 COMMIT:
-  Pending final QA fix commit.
+  17d1fc7
 ---
 
 ---
@@ -279,5 +279,5 @@ VERIFIED BY:
   returned `accepted=True`, `/axon/nav/status` emitted `navigating -> reached`,
   and backend status included goal/path/status.
 COMMIT:
-  Pending final QA fix commit.
+  17d1fc7
 ---
