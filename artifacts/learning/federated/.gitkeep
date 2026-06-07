@@ -1,0 +1,3 @@
+# Phase 6A federated learning artifacts are written here on demand by
+# `make learning-fl-run`. Runtime outputs are gitignored; this keeps the
+# directory present. Synthetic simulation only. No real patient data.
