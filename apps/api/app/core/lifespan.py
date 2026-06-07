@@ -17,6 +17,7 @@ from apps.api.app.telemetry.model_score_watcher import watch_model_scores
 from apps.api.app.telemetry.mqtt_client import mqtt_subscriber_loop
 from apps.api.app.telemetry.state import telemetry_state
 from apps.api.app.telemetry.websocket_manager import ws_manager
+from apps.api.app.twin.service import twin_broadcast_loop
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     model_score_task: asyncio.Task | None = None
     agent_task: asyncio.Task | None = None
     drift_task: asyncio.Task | None = None
+    twin_task: asyncio.Task | None = None
 
     try:
         redis = Redis.from_url(settings.redis_url, decode_responses=False)
@@ -60,9 +62,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     drift_task = asyncio.create_task(drift_detector_loop(redis))
     logger.info("Drift detector task started")
 
+    twin_task = asyncio.create_task(twin_broadcast_loop(redis, ws_manager))
+    logger.info("Phase 5 digital twin broadcast task started")
+
     yield
 
-    for task in (mqtt_task, model_score_task, agent_task, drift_task):
+    for task in (mqtt_task, model_score_task, agent_task, drift_task, twin_task):
         if task is not None:
             task.cancel()
             try:

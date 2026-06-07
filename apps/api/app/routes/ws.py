@@ -129,3 +129,22 @@ async def ws_safety(websocket: WebSocket) -> None:
         await _hold_connection("safety", websocket)
     finally:
         await ws_manager.disconnect("safety", websocket)
+
+
+@router.websocket("/ws/v1/twin")
+async def ws_twin(websocket: WebSocket) -> None:
+    from apps.api.app.twin.service import build_twin_state, get_latest_twin_state
+
+    redis = websocket.app.state.redis
+    await ws_manager.connect("twin", websocket)
+    try:
+        latest = get_latest_twin_state()
+        if latest is None:
+            latest = await build_twin_state(redis)
+        await ws_manager.send_json(
+            websocket,
+            {"type": "twin_state", "state": latest.model_dump(mode="json")},
+        )
+        await _hold_connection("twin", websocket)
+    finally:
+        await ws_manager.disconnect("twin", websocket)

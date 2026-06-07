@@ -1,29 +1,11 @@
-# Digital Twin
+# AXON Digital Twin (Phase 5)
 
-## Purpose
+Implemented in Phase 5 — not a placeholder.
 
-Live 3D/visual mirror of robot state, sensor overlays, and operational context for the dashboard.
+- **Schema:** `DigitalTwinStateV1` in `apps/api/app/schemas/twin.py`
+- **Service:** `apps/api/app/twin/service.py` (consumes existing Redis/agent pipeline)
+- **WebSocket:** `/ws/v1/twin`
+- **REST:** `GET /api/v1/twin/state`, `POST /api/v1/twin/command`
+- **Dashboard:** SVG live mirror in `apps/dashboard/`
 
-## Future Phase
-
-Phase 5 — Digital Twin + ROS2 Core
-
-## Expected Inputs
-
-- Robot state events
-- Fusion confidence and alerts
-- Session timeline
-
-## Expected Outputs
-
-- WebSocket-fed visual state for dashboard
-- Screenshot/video evidence of live mirroring
-
-## Evidence to Collect
-
-- Digital twin live state mirror video
-- Sync latency measurements
-
-## Current Phase 0 Status
-
-**Placeholder only.** No 3D visualization or state mirroring implemented.
+See `docs/evidence/phase-5-digital-twin-ros2.md` for QA checklist.

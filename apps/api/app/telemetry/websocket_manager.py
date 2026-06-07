@@ -36,6 +36,7 @@ class WebSocketManager:
             "agents": set(),
             "decisions": set(),
             "safety": set(),
+            "twin": set(),
         }
         self._lock = asyncio.Lock()
 

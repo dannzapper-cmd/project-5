@@ -38,11 +38,11 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 4 — MLOps + Fine-tuning + Continual Learning**
+**Phase 5 — Digital Twin + ROS2 Core**
 
-Delivered: Phase 1–3 (telemetry, edge AI, LangGraph agents, HITL, copilot) plus synthetic dataset pipeline, v1 vs v2 candidate evaluation, optional MLflow (learning profile), local artifact fallback, drift detector, manual promotion workflow, dashboard MLOps panel.
+Delivered: Phases 1–4 plus `DigitalTwinStateV1`, twin service (Redis/agent integration), live SVG digital twin dashboard, WebSocket `/ws/v1/twin`, safe twin commands, ROS2 thin adapter (`ros2` profile) with `/axon/twin/state` and `/axon/command`.
 
-Not delivered: sensor fusion, ROS2, digital twin 3D, federated learning.
+Not delivered: Nav2, SLAM (Phase 5.5), federated learning, full 3D physics simulation.
 
 ## Forbidden Claims
 

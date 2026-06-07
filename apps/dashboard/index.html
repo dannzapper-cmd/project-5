@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AXON Dashboard — Phase 4 MLOps + Agents</title>
+  <title>AXON Dashboard — Phase 5 Digital Twin</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,8 +12,8 @@
       <p class="tagline">Perceive. Decide. Learn. Operate.</p>
       <h1>AXON — Bio-Robotics Edge Command System</h1>
       <div class="badges">
-        <span class="badge">Phase 3 — Agents + Safety</span>
-        <span class="badge">Phase 4 — MLOps Loop</span>
+        <span class="badge">Phase 5 — Digital Twin</span>
+        <span class="badge">ROS2 Core</span>
         <span class="badge mode" id="mode-label">Mode: awaiting</span>
         <span class="badge scenario" id="scenario-label">Scenario: —</span>
       </div>
@@ -34,6 +34,7 @@
         <div class="status-item"><span id="ws-agents-status" class="dot offline"></span> WebSocket Agents</div>
         <div class="status-item"><span id="ws-decisions-status" class="dot offline"></span> WebSocket Decisions</div>
         <div class="status-item"><span id="ws-safety-status" class="dot offline"></span> WebSocket Safety</div>
+        <div class="status-item"><span id="ws-twin-status" class="dot offline"></span> WebSocket Twin</div>
       </div>
       <p class="event-counter">Sensor events received: <strong id="event-counter">0</strong></p>
       <p class="event-counter">Model scores received: <strong id="model-score-counter">0</strong></p>
@@ -174,9 +175,69 @@
       <p class="sub" id="mlops-review-id"></p>
     </section>
 
-    <section class="future-panel disabled">
-      <h2>Future Panels (not implemented)</h2>
-      <p class="muted">Sensor fusion, digital twin — Phase 5+</p>
+    <section id="digital-twin-panel">
+      <h2>Digital Twin — Live State Mirror</h2>
+      <p class="muted">Synthetic rehab robot mirror fed by live telemetry, fusion, agents, and safety state.</p>
+      <div class="twin-layout">
+        <div class="twin-canvas-wrap">
+          <svg id="twin-svg" viewBox="0 0 420 320" class="twin-svg" aria-label="Digital twin visualization">
+            <defs>
+              <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <rect x="0" y="0" width="420" height="320" rx="12" class="twin-bg"/>
+            <g id="twin-sensor-emg" class="twin-sensor" transform="translate(60,60)">
+              <circle r="22" class="sensor-node"/><text y="5" text-anchor="middle" class="sensor-label">EMG</text>
+            </g>
+            <g id="twin-sensor-ecg" class="twin-sensor" transform="translate(360,60)">
+              <circle r="22" class="sensor-node"/><text y="5" text-anchor="middle" class="sensor-label">ECG</text>
+            </g>
+            <g id="twin-sensor-imu" class="twin-sensor" transform="translate(60,260)">
+              <circle r="22" class="sensor-node"/><text y="5" text-anchor="middle" class="sensor-label">IMU</text>
+            </g>
+            <g id="twin-sensor-spo2" class="twin-sensor" transform="translate(360,260)">
+              <circle r="22" class="sensor-node"/><text y="5" text-anchor="middle" class="sensor-label">SpO2</text>
+            </g>
+            <g id="twin-robot" transform="translate(210,160)">
+              <rect x="-35" y="-70" width="70" height="90" rx="8" class="robot-torso"/>
+              <rect x="-55" y="-50" width="18" height="55" rx="6" class="robot-arm" id="twin-arm-left"/>
+              <rect x="37" y="-50" width="18" height="55" rx="6" class="robot-arm" id="twin-arm-right"/>
+              <circle cx="0" cy="-85" r="18" class="robot-head"/>
+              <line x1="0" y1="20" x2="0" y2="55" class="robot-leg"/>
+              <text y="75" text-anchor="middle" class="robot-mode-label" id="twin-robot-mode">idle</text>
+            </g>
+            <g id="twin-risk-overlay" transform="translate(210,24)">
+              <text text-anchor="middle" class="twin-overlay-title">Risk / Confidence</text>
+              <text y="18" text-anchor="middle" id="twin-risk-text" class="twin-overlay-value">—</text>
+            </g>
+          </svg>
+        </div>
+        <div class="twin-sidebar">
+          <div class="twin-meta">
+            <div>Robot mode: <strong id="twin-mode">—</strong></div>
+            <div>Global confidence: <strong id="twin-confidence">—</strong></div>
+            <div>Risk level: <strong id="twin-risk-level">—</strong></div>
+            <div>Active agent: <strong id="twin-agent">—</strong></div>
+            <div>Last action: <strong id="twin-action">—</strong></div>
+            <div>Trace: <strong id="twin-trace">—</strong></div>
+            <div>HITL: <strong id="twin-hitl">—</strong></div>
+            <div>Safety: <strong id="twin-safety">—</strong></div>
+            <div>ROS2 bridge: <strong id="twin-ros2">—</strong></div>
+          </div>
+          <div class="twin-commands">
+            <h3>Twin Commands</h3>
+            <button id="twin-cmd-pause">Pause</button>
+            <button id="twin-cmd-resume">Resume</button>
+            <button id="twin-cmd-safety-stop" class="danger-btn">Safety Stop</button>
+            <select id="twin-assist-mode">
+              <option value="assist_low">Assist Low</option>
+              <option value="assist_medium" selected>Assist Medium</option>
+              <option value="assist_high">Assist High</option>
+            </select>
+            <button id="twin-cmd-assist">Set Assist Mode</button>
+            <p class="sub" id="twin-cmd-result">—</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section>

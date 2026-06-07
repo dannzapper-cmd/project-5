@@ -1,0 +1,9 @@
+string command
+string requested_by
+string reason
+string assist_mode
+---
+string status
+string message
+string trace_id
+bool success

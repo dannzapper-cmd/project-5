@@ -2,7 +2,8 @@
 	telemetry-up telemetry-down telemetry-logs replay-generate \
 	replay-normal replay-fatigue replay-dropout replay-spike replay-multi api-status \
 	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status \
-	test-phase-regression evidence-phase3 mlops-pipeline verify-phase4 compose-learning
+	test-phase-regression evidence-phase3 mlops-pipeline verify-phase4 compose-learning \
+	compose-ros2 twin-status ros2-logs
 
 SYSTEM_PYTHON ?= python3.12
 VENV ?= .venv
@@ -105,3 +106,15 @@ verify-phase4: ## Run Phase 4 verification script
 
 compose-learning: ## Validate Docker Compose learning profile
 	docker compose --profile learning config
+
+compose-ros2: ## Validate Docker Compose ros2 profile configuration
+	docker compose --profile core --profile ros2 config
+
+twin-status: ## Fetch digital twin service status
+	curl -s http://localhost:8000/api/v1/twin/status | python3 -m json.tool
+
+ros2-up: ## Start core + ROS2 bridge profiles
+	docker compose --profile core --profile ros2 up --build
+
+ros2-logs: ## Tail ROS2 bridge logs
+	docker compose --profile ros2 logs -f ros2_bridge

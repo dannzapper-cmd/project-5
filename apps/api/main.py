@@ -1,4 +1,4 @@
-"""AXON API gateway entrypoint (Phase 4: agents + MLOps)."""
+"""AXON API gateway entrypoint (Phase 5: digital twin + ROS2 core)."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +9,7 @@ from apps.api.app.routes.agents import router as agents_router
 from apps.api.app.routes.health import router as health_router
 from apps.api.app.routes.mlops import router as mlops_router
 from apps.api.app.routes.telemetry import router as telemetry_router
+from apps.api.app.routes.twin import router as twin_router
 from apps.api.app.routes.ws import router as ws_router
 
 app = FastAPI(
@@ -37,4 +38,5 @@ app.include_router(health_router)
 app.include_router(telemetry_router)
 app.include_router(agents_router)
 app.include_router(mlops_router)
+app.include_router(twin_router)
 app.include_router(ws_router)

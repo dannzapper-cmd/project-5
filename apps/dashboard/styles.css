@@ -135,3 +135,38 @@ button.danger-btn:hover:not(:disabled) { border-color: var(--danger); color: var
 .drift-badge.amber { background: rgba(240, 180, 41, 0.2); color: var(--warn); }
 .drift-badge.gray { background: rgba(159, 176, 208, 0.15); color: var(--muted); }
 .mlops-safety { margin-bottom: 0.75rem; }
+
+/* Phase 5 Digital Twin */
+.twin-layout { display: grid; grid-template-columns: 1fr 260px; gap: 1rem; }
+@media (max-width: 800px) { .twin-layout { grid-template-columns: 1fr; } }
+.twin-canvas-wrap { background: var(--surface2); border-radius: 10px; padding: 0.5rem; border: 1px solid var(--border); }
+.twin-svg { width: 100%; height: auto; display: block; }
+.twin-bg { fill: #0f1728; }
+.sensor-node { fill: #1a2a44; stroke: var(--accent); stroke-width: 2; transition: stroke 0.3s, fill 0.3s; }
+.sensor-label { fill: var(--text); font-size: 10px; font-weight: 600; }
+.twin-sensor.status-active .sensor-node { stroke: var(--ok); fill: rgba(127, 217, 98, 0.15); }
+.twin-sensor.status-stale .sensor-node { stroke: var(--warn); fill: rgba(240, 180, 41, 0.12); }
+.twin-sensor.status-dropout .sensor-node { stroke: var(--danger); fill: rgba(240, 113, 120, 0.12); }
+.twin-sensor.status-degraded .sensor-node,
+.twin-sensor.status-corrupt .sensor-node { stroke: var(--warn); fill: rgba(240, 180, 41, 0.18); }
+.robot-torso, .robot-arm, .robot-head, .robot-leg { fill: #243456; stroke: var(--accent); stroke-width: 2; transition: stroke 0.3s, fill 0.3s; }
+.twin-svg.mode-assisting .robot-torso { stroke: var(--ok); fill: rgba(127, 217, 98, 0.12); }
+.twin-svg.mode-paused .robot-torso,
+.twin-svg.mode-alert .robot-torso { stroke: var(--danger); fill: rgba(240, 113, 120, 0.15); }
+.twin-svg.mode-degraded .robot-torso,
+.twin-svg.mode-warning .robot-torso { stroke: var(--warn); fill: rgba(240, 180, 41, 0.12); }
+.twin-svg.mode-recovery .robot-torso { stroke: #a78bfa; }
+.robot-mode-label { fill: var(--muted); font-size: 11px; }
+.twin-overlay-title { fill: var(--muted); font-size: 10px; }
+.twin-overlay-value { fill: var(--accent); font-size: 12px; font-weight: 700; }
+.twin-sidebar { display: flex; flex-direction: column; gap: 0.75rem; }
+.twin-meta { font-size: 0.85rem; display: grid; gap: 0.35rem; }
+.twin-commands h3 { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.twin-commands { display: flex; flex-direction: column; gap: 0.4rem; }
+.twin-commands select {
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+}
