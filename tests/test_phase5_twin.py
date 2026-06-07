@@ -100,6 +100,27 @@ def test_robot_mode_degrades_on_low_confidence_and_stale_sensor() -> None:
     assert mode == "degraded"
 
 
+def test_robot_mode_degrades_on_dropout_even_with_high_confidence() -> None:
+    nodes = _sample_sensor_nodes(emg_status="dropout")
+    mode = twin_service._derive_robot_mode(0.95, nodes, "medium", None)
+    assert mode == "degraded"
+
+
+def test_dropout_overrides_nominal_decision_risk() -> None:
+    nodes = _sample_sensor_nodes(emg_status="dropout")
+    risk = twin_service._derive_risk_level(
+        0.95,
+        nodes,
+        {"risk_level": "nominal"},
+        {"high_risk": False},
+    )
+    assert risk == "medium"
+
+
+def test_stable_motion_model_label_is_nominal() -> None:
+    assert "stable_motion" in twin_service.NOMINAL_MODEL_LABELS
+
+
 def test_pause_command_accepted() -> None:
     twin_service._session_paused = False
     twin_service._safety_stop_active = False

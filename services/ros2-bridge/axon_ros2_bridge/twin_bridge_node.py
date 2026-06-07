@@ -24,7 +24,7 @@ class TwinBridgeNode(Node):
         self.heartbeat_pub = self.create_publisher(String, "/axon/bridge/heartbeat", 10)
         self.timer = self.create_timer(1.0 / self.poll_hz, self._poll_twin_state)
         self.srv = self.create_service(TwinCommand, "/axon/command", self._handle_command)
-        self.get_logger().info("AXON twin bridge started — API %s", self.api_base)
+        self.get_logger().info(f"AXON twin bridge started - API {self.api_base}")
 
     def _poll_twin_state(self) -> None:
         try:

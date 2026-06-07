@@ -69,6 +69,7 @@ SENSOR_KEY_MAP: dict[str, SensorNodeKey] = {
     "imu": "imu",
     "spo2_proxy": "spo2",
 }
+NOMINAL_MODEL_LABELS = {"normal", "nominal", "stable_motion"}
 
 TWIN_BROADCAST_HZ = max(2, min(10, int(os.getenv("TWIN_BROADCAST_HZ", "5"))))
 SENSOR_STALE_TTL_SECONDS = max(3, min(10, int(os.getenv("SENSOR_STALE_TTL_SECONDS", "5"))))
@@ -221,13 +222,23 @@ def _derive_risk_level(
     decision: dict | None,
     safety: dict[str, Any],
 ) -> str:
-    if decision and decision.get("risk_level"):
-        return str(decision["risk_level"])
     if safety.get("high_risk"):
         return "high"
-    stale_or_dropout = any(n.status in ("stale", "dropout") for n in sensor_nodes.values())
-    if global_confidence < 0.4 and stale_or_dropout:
+    decision_risk = str(decision["risk_level"]) if decision and decision.get("risk_level") else None
+    if decision_risk in ("high", "critical"):
+        return decision_risk
+    if any(n.status in ("dropout", "corrupt") for n in sensor_nodes.values()):
         return "medium"
+    if global_confidence < 0.4 and any(
+        n.status in ("stale", "dropout") for n in sensor_nodes.values()
+    ):
+        return "medium"
+    if decision_risk == "medium":
+        return decision_risk
+    if any(n.status in ("stale", "degraded") for n in sensor_nodes.values()):
+        return "low"
+    if decision_risk:
+        return decision_risk
     if global_confidence < settings.axon_safety_low_confidence_threshold:
         return "low"
     return "nominal"
@@ -243,6 +254,8 @@ def _derive_robot_mode(
         return "paused"
     if decision and decision.get("status") == "pending_human_confirmation":
         return "paused"
+    if any(n.status in ("dropout", "corrupt") for n in sensor_nodes.values()):
+        return "degraded"
     stale_or_dropout = any(n.status in ("stale", "dropout") for n in sensor_nodes.values())
     if global_confidence < 0.4 and stale_or_dropout:
         return "degraded"
@@ -390,7 +403,7 @@ async def build_twin_state(redis: Redis | None) -> DigitalTwinStateV1:
             anomalies.append(f"{key}_degraded")
     for score in model_scores.values():
         label = score.get("output_label", "")
-        if label and label not in ("normal", "nominal"):
+        if label and label not in NOMINAL_MODEL_LABELS:
             anomalies.append(f"model:{score.get('model_name')}:{label}")
 
     robot_snap = snapshots.get("robot_state", {})

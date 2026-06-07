@@ -192,9 +192,6 @@ services:
       AXON_API_BASE: http://api:8000
       ROS2_TWIN_POLL_HZ: ${ROS2_TWIN_POLL_HZ:-2}
       ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-42}
-    depends_on:
-      api:
-        condition: service_healthy
 
   # --- Phase 5.5 mandatory advanced ROS2 ---
   ros2-nav-slam-minilab-placeholder:

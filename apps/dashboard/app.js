@@ -508,7 +508,7 @@ function updateTwinPanel(twin) {
   state.twin = twin;
   const mode = twin.robot_state?.mode || "idle";
   const svg = document.getElementById("twin-svg");
-  svg.className = "twin-svg mode-" + mode;
+  svg.setAttribute("class", "twin-svg mode-" + mode);
 
   document.getElementById("twin-mode").textContent = mode;
   document.getElementById("twin-confidence").textContent =
@@ -538,7 +538,7 @@ function updateTwinPanel(twin) {
     const el = document.getElementById(elId);
     if (!el || !twin.sensor_nodes?.[key]) continue;
     const status = twin.sensor_nodes[key].status || "dropout";
-    el.className = "twin-sensor " + (SENSOR_STATUS_CLASS[status] || "status-dropout");
+    el.setAttribute("class", "twin-sensor " + (SENSOR_STATUS_CLASS[status] || "status-dropout"));
     el.setAttribute("title", `${key}: ${twin.sensor_nodes[key].latest_value_summary}`);
   }
 

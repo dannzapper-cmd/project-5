@@ -7,7 +7,6 @@
   <maintainer email="axon@example.com">AXON Contributors</maintainer>
   <license>MIT</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>ament_cmake_python</buildtool_depend>
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <build_depend>rosidl_default_generators</build_depend>
