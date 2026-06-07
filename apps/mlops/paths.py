@@ -20,8 +20,8 @@ def discover_protected_paths() -> list[str]:
 
 def refresh_protected_paths() -> None:
     """Refresh module-level protected path list from disk."""
-    global PROTECTED_MODEL_PATHS
-    PROTECTED_MODEL_PATHS = discover_protected_paths()
+    PROTECTED_MODEL_PATHS.clear()
+    PROTECTED_MODEL_PATHS.extend(discover_protected_paths())
 
 
 def assert_not_protected(path: str) -> None:
