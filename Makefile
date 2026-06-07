@@ -4,8 +4,9 @@
 	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status \
 	test-phase-regression evidence-phase3 mlops-pipeline verify-phase4 compose-learning
 
-PYTHON ?= python3.12
+SYSTEM_PYTHON ?= python3.12
 VENV ?= .venv
+PYTHON ?= $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 PYTEST := $(VENV)/bin/pytest
 RUFF := $(VENV)/bin/ruff
@@ -16,7 +17,7 @@ help: ## Show available commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
 install: ## Install package with dev, edge-ai, agents, and mlops dependencies
-	$(PYTHON) -m venv $(VENV)
+	$(SYSTEM_PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -e ".[dev,edge-ai,agents,mlops]"
 
