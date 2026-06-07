@@ -10,7 +10,7 @@ COPY pyproject.toml README.md ./
 COPY apps ./apps
 COPY scripts ./scripts
 
-RUN pip install --upgrade pip && pip install .
+RUN pip install --upgrade pip && pip install ".[agents]"
 
 EXPOSE 8000
 

@@ -33,6 +33,53 @@ SignalType = Literal[
     "environment",
 ]
 
+RiskLevel = Literal["nominal", "low", "medium", "high", "critical"]
+
+RecommendedAction = Literal[
+    "continue_session",
+    "reduce_intensity",
+    "pause_simulation",
+    "request_operator_check",
+    "escalate_simulated_alert",
+    "ignore_corrupt_event",
+    "hold_for_more_data",
+]
+
+DecisionStatus = Literal[
+    "proposed",
+    "pending_human_confirmation",
+    "confirmed",
+    "rejected",
+    "simulated_executed",
+    "expired",
+]
+
+AgentName = Literal[
+    "perception_agent",
+    "triage_agent",
+    "safety_agent",
+    "action_recommendation_agent",
+    "operator_copilot",
+    "research_rag_agent",
+]
+
+AgentStage = Literal[
+    "started",
+    "completed",
+    "skipped",
+    "failed",
+    "interrupted_for_human",
+]
+
+
+class HumanResponseV1(BaseModel):
+    """Operator human-in-the-loop response."""
+
+    operator_id: str
+    response: Literal["confirmed", "rejected"]
+    note: str = ""
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
 
 class SensorEventV1(_EventBase):
     """Synthetic sensor telemetry event."""
@@ -59,17 +106,30 @@ class SensorEventV1(_EventBase):
 
 
 class DecisionEventV1(_EventBase):
-    """Agent or rules-engine decision event."""
+    """Agent orchestration decision event (Phase 3)."""
 
-    decision_type: str
-    risk_level: Literal["low", "medium", "high", "critical"]
+    decision_id: str = Field(default_factory=lambda: str(uuid4()))
+    session_id: str
+    source_service: str = "axon-api"
+    input_window_start: datetime
+    input_window_end: datetime
+    risk_level: RiskLevel
+    recommended_action: RecommendedAction
     confidence: float = Field(ge=0.0, le=1.0)
-    recommended_action: str
     requires_human_confirmation: bool
+    status: DecisionStatus = "proposed"
     rationale: str
-    related_event_ids: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    contributing_signals: list[str] = Field(default_factory=list)
+    model_score_refs: list[str] = Field(default_factory=list)
+    safety_constraints: list[str] = Field(default_factory=list)
+    llm_used: bool = False
+    llm_mode: str = "mock"
+    llm_provider: str = "mock"
+    created_by_agent: str = "action_recommendation_agent"
+    human_response: HumanResponseV1 | None = None
 
-    @field_validator("decision_type", "recommended_action", "rationale")
+    @field_validator("rationale", "session_id", "source_service")
     @classmethod
     def decision_strings_not_empty(cls, value: str) -> str:
         if not value or not value.strip():
@@ -98,18 +158,24 @@ class ModelScoreEventV1(_EventBase):
 
 
 class AgentTraceEventV1(_EventBase):
-    """LangGraph agent step trace event."""
+    """LangGraph agent step trace event (Phase 3)."""
 
-    agent_name: str
-    step_name: str
-    input_summary: str
+    span_id: str = Field(default_factory=lambda: str(uuid4()))
+    parent_span_id: str | None = None
+    session_id: str
+    agent_name: AgentName
+    stage: AgentStage
+    input_refs: list[str] = Field(default_factory=list)
     output_summary: str
-    confidence: float = Field(ge=0.0, le=1.0)
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    risk_level: str | None = None
     tool_calls: list[str] = Field(default_factory=list)
-    requires_human_review: bool
-    related_event_ids: list[str] = Field(default_factory=list)
+    llm_used: bool = False
+    duration_ms: float = Field(ge=0.0, default=0.0)
+    error: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
-    @field_validator("agent_name", "step_name", "input_summary", "output_summary")
+    @field_validator("output_summary", "session_id")
     @classmethod
     def trace_strings_not_empty(cls, value: str) -> str:
         if not value or not value.strip():

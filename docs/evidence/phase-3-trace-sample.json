@@ -1,0 +1,43 @@
+{
+  "description": "HITL branch graph execution (high simulated risk)",
+  "trace_id": "trace-evidence-hitl",
+  "requires_human_confirmation": false,
+  "decision_status": "proposed",
+  "agent_traces": [
+    {
+      "agent_name": "perception_agent",
+      "stage": "completed",
+      "confidence": null,
+      "risk_level": null,
+      "duration_ms": 0.005249999958323315
+    },
+    {
+      "agent_name": "triage_agent",
+      "stage": "completed",
+      "confidence": 0.2,
+      "risk_level": "low",
+      "duration_ms": 0.004542001988738775
+    },
+    {
+      "agent_name": "safety_agent",
+      "stage": "completed",
+      "confidence": 0.2,
+      "risk_level": "low",
+      "duration_ms": 4.58154100124375
+    },
+    {
+      "agent_name": "action_recommendation_agent",
+      "stage": "completed",
+      "confidence": 0.2,
+      "risk_level": "low",
+      "duration_ms": 0.016833000699989498
+    },
+    {
+      "agent_name": "operator_copilot",
+      "stage": "completed",
+      "confidence": null,
+      "risk_level": null,
+      "duration_ms": 0.004167002771282569
+    }
+  ]
+}

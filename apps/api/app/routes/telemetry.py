@@ -15,7 +15,7 @@ router = APIRouter(tags=["telemetry"])
 def telemetry_status() -> dict:
     """Return Phase 2 telemetry + edge AI counters and configuration."""
     return {
-        "phase": "Phase 2 - Edge AI Core",
+        "phase": "Phase 3 - Agents + Safety",
         "service": settings.service_name,
         "version": settings.version,
         "counters": {

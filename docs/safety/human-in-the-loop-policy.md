@@ -5,41 +5,39 @@ AXON agents may recommend simulated operational actions but must not act as clin
 ## Core Rules
 
 1. **High-risk or low-confidence actions require operator confirmation** before execution in simulation.
-2. **Safety thresholds must be documented** in code and runbooks (Phase 3+).
-3. **Agent recommendations must be traceable** via `DecisionEventV1` and `AgentTraceEventV1` with `trace_id`.
-4. **LLM/copilot output is explanatory, not authoritative** — decisions flow through LangGraph state and safety policies.
-5. **Future implementation must include audit logs** for safety decisions and operator responses.
+2. **Safety thresholds are documented** in `.env.example` and `apps/api/app/agents/safety.py`.
+3. **Agent recommendations are traceable** via `DecisionEventV1` and `AgentTraceEventV1` with `trace_id`.
+4. **LLM/copilot output is explanatory, not authoritative** — Safety Agent verdict fields cannot be modified by copilot.
+5. **Pending decisions stored in Redis** (`axon:v1:pending_decisions`) with TTL expiry.
 
 ## Risk Levels
 
 | Risk Level | Example Actions | HITL Required |
 |------------|-----------------|---------------|
-| Low | Continue session, log anomaly | No (default) |
-| Medium | Reduce robot velocity | Configurable |
-| High | Pause rehab session | Yes |
-| Critical | Emergency stop simulation | Yes + explicit operator ack |
+| Nominal / Low | Continue simulated session | No (unless stale warning) |
+| Medium | Reduce intensity | Yes if low confidence |
+| High | Pause simulation | Yes |
+| Critical | Escalate simulated alert | Yes |
 
-## Confidence Thresholds (Future)
+## Confidence Thresholds (Phase 3)
 
-Thresholds will be defined in Phase 3 implementation. Until then:
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `AXON_SAFETY_LOW_CONFIDENCE_THRESHOLD` | 0.55 | Hold / HITL on elevated risk |
+| `AXON_SAFETY_HIGH_RISK_THRESHOLD` | 0.75 | Used in triage scoring context |
+| `AXON_HITL_EXPIRY_SECONDS` | 120 | Pending decisions expire |
 
-- Document placeholder thresholds in agent configuration
-- Never auto-execute high-risk actions without `requires_human_confirmation=true` in decision events
+## Operator UI (Phase 3)
 
-## Operator UI (Future)
+Dashboard presents:
 
-Dashboard must present:
+- Recommended action and rationale (synthetic / operational language)
+- Evidence refs and contributing signals
+- Confirm / reject controls with optional operator note
+- Decision timeline with status changes
 
-- Recommended action and rationale
-- Related event IDs and trace link
-- Confirm / reject controls with audit trail
+## Audit Trail
 
-## Audit Requirements (Future Phases)
-
-- Timestamped operator decisions
-- Agent trace correlation
-- Immutable log export for Evidence Center
-
-## Phase 0 Note
-
-Policy is defined; HITL workflows are not implemented until Phase 3.
+- Confirm/reject writes updated `DecisionEventV1` to Redis decisions stream
+- `human_response` object records operator_id, response, note, timestamp
+- Agent traces retained in `axon:v1:stream:agent_traces`

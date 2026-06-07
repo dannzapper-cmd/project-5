@@ -46,11 +46,24 @@ services:
       - "${API_PORT:-8000}:8000"
     environment:
       AXON_ENV: ${AXON_ENV:-development}
-      AXON_PHASE: ${AXON_PHASE:-2}
-      AXON_VERSION: ${AXON_VERSION:-0.3.0}
+      AXON_PHASE: ${AXON_PHASE:-3}
+      AXON_VERSION: ${AXON_VERSION:-0.4.0}
       REDIS_URL: redis://redis:6379/0
       MQTT_HOST: mosquitto
       MQTT_PORT: 1883
+      AXON_LLM_MODE: ${AXON_LLM_MODE:-mock}
+      AXON_LLM_PROVIDER: ${AXON_LLM_PROVIDER:-mock}
+      AXON_LLM_MODEL: ${AXON_LLM_MODEL:-mock-operator-copilot-v1}
+      AXON_COPILOT_ENABLED: ${AXON_COPILOT_ENABLED:-true}
+      AXON_RAG_ENABLED: ${AXON_RAG_ENABLED:-true}
+      AXON_AGENT_LOOP_INTERVAL_SECONDS: ${AXON_AGENT_LOOP_INTERVAL_SECONDS:-5}
+      AXON_HITL_EXPIRY_SECONDS: ${AXON_HITL_EXPIRY_SECONDS:-120}
+      AXON_SAFETY_HIGH_RISK_THRESHOLD: ${AXON_SAFETY_HIGH_RISK_THRESHOLD:-0.75}
+      AXON_SAFETY_LOW_CONFIDENCE_THRESHOLD: ${AXON_SAFETY_LOW_CONFIDENCE_THRESHOLD:-0.55}
+      AXON_STALE_TELEMETRY_SECONDS: ${AXON_STALE_TELEMETRY_SECONDS:-5}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
     depends_on:
       mosquitto:
         condition: service_healthy
@@ -170,12 +183,12 @@ services:
       AXON_PLACEHOLDER_MESSAGE: "Extended simulation orchestrator — future phases"
     command: *placeholder-command
 
-  # --- Phase 3+ LLM copilot (optional) ---
+  # --- Phase 3+ LLM copilot (optional env override on api service) ---
   llm-copilot-placeholder:
     profiles: [llm, full]
     image: alpine:3.20
     environment:
-      AXON_PLACEHOLDER_MESSAGE: "LLM copilot layer — Phase 3+ (optional profile)"
+      AXON_PLACEHOLDER_MESSAGE: "Real LLM mode — set OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_API_KEY and AXON_LLM_MODE=real on api service"
     command: *placeholder-command
 
 volumes:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "axon"
-version = "0.3.0"
+version = "0.4.0"
 description = "AXON - Bio-Robotics Edge Command System"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -39,7 +39,11 @@ edge-ai = [
     "onnx>=1.14.0,<2.0.0",
     "numpy>=1.26.0",
 ]
-agents = []      # Phase 3: langgraph, langchain
+agents = [
+    "langgraph>=0.4,<0.5",
+    "langchain-core>=0.3,<0.4",
+    "langchain-community>=0.3,<0.4",
+]
 mlops = []       # Phase 4: mlflow, training tooling
 ros2 = []        # Phase 5+: ROS2 bridge dependencies
 learning = []    # Phase 6: flower, gymnasium, stable-baselines3

@@ -86,3 +86,46 @@ async def ws_model_scores(websocket: WebSocket) -> None:
         await _hold_connection("model-scores", websocket)
     finally:
         await ws_manager.disconnect("model-scores", websocket)
+
+
+@router.websocket("/ws/v1/agents")
+async def ws_agents(websocket: WebSocket) -> None:
+    from apps.api.app.agents.service import get_recent_traces
+
+    await ws_manager.connect("agents", websocket)
+    try:
+        for trace in get_recent_traces(20):
+            await ws_manager.send_json(websocket, {"type": "agent_trace", "event": trace})
+        await _hold_connection("agents", websocket)
+    finally:
+        await ws_manager.disconnect("agents", websocket)
+
+
+@router.websocket("/ws/v1/decisions")
+async def ws_decisions(websocket: WebSocket) -> None:
+    from apps.api.app.agents.service import get_current_decision, get_decision_history
+
+    await ws_manager.connect("decisions", websocket)
+    try:
+        current = get_current_decision()
+        if current:
+            await ws_manager.send_json(websocket, {"type": "decision", "event": current})
+        for decision in get_decision_history(10):
+            await ws_manager.send_json(websocket, {"type": "decision", "event": decision})
+        await _hold_connection("decisions", websocket)
+    finally:
+        await ws_manager.disconnect("decisions", websocket)
+
+
+@router.websocket("/ws/v1/safety")
+async def ws_safety(websocket: WebSocket) -> None:
+    from apps.api.app.agents.service import get_safety_status
+
+    await ws_manager.connect("safety", websocket)
+    try:
+        await ws_manager.send_json(
+            websocket, {"type": "safety_status", "status": get_safety_status()}
+        )
+        await _hold_connection("safety", websocket)
+    finally:
+        await ws_manager.disconnect("safety", websocket)

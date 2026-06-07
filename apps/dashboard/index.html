@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AXON Dashboard — Phase 2 Edge AI</title>
+  <title>AXON Dashboard — Phase 3 Agents + Safety</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,14 +12,14 @@
       <p class="tagline">Perceive. Decide. Learn. Operate.</p>
       <h1>AXON — Bio-Robotics Edge Command System</h1>
       <div class="badges">
-        <span class="badge">Phase 2 — Edge AI Core</span>
+        <span class="badge">Phase 3 — Agents + Safety</span>
         <span class="badge mode" id="mode-label">Mode: awaiting</span>
         <span class="badge scenario" id="scenario-label">Scenario: —</span>
       </div>
       <p class="safety-banner">
         ⚠ Synthetic biomedical-inspired signals only.
-        Not medical data. Not for diagnosis or treatment.
-        Operational simulation scores only.
+        Simulated rehab session — operational simulation scores only.
+        Operator recommendations require human confirmation when flagged.
       </p>
     </header>
 
@@ -30,9 +30,64 @@
         <div class="status-item"><span id="ws-sensors-status" class="dot offline"></span> WebSocket Sensors</div>
         <div class="status-item"><span id="ws-robot-status" class="dot offline"></span> WebSocket Robot State</div>
         <div class="status-item"><span id="ws-model-scores-status" class="dot offline"></span> WebSocket Model Scores</div>
+        <div class="status-item"><span id="ws-agents-status" class="dot offline"></span> WebSocket Agents</div>
+        <div class="status-item"><span id="ws-decisions-status" class="dot offline"></span> WebSocket Decisions</div>
+        <div class="status-item"><span id="ws-safety-status" class="dot offline"></span> WebSocket Safety</div>
       </div>
       <p class="event-counter">Sensor events received: <strong id="event-counter">0</strong></p>
       <p class="event-counter">Model scores received: <strong id="model-score-counter">0</strong></p>
+    </section>
+
+    <section>
+      <h2>Current Decision</h2>
+      <div class="decision-panel" id="current-decision">
+        <div class="status-grid">
+          <div>Risk: <strong id="decision-risk">—</strong></div>
+          <div>Action: <strong id="decision-action">—</strong></div>
+          <div>Confidence: <strong id="decision-confidence">—</strong></div>
+          <div>Status: <strong id="decision-status">—</strong></div>
+          <div>HITL: <strong id="decision-hitl">—</strong></div>
+        </div>
+        <p class="sub">Rationale: <span id="decision-rationale">—</span></p>
+        <p class="sub">Evidence: <span id="decision-evidence">—</span></p>
+        <p class="sub">Signals: <span id="decision-signals">—</span></p>
+        <p class="sub">Copilot: <span id="decision-copilot">—</span></p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Safety Panel</h2>
+      <div class="status-grid">
+        <div>Mode: <strong id="safety-mode">deterministic</strong></div>
+        <div>Stale telemetry: <strong id="safety-stale">—</strong></div>
+        <div>Missing signals: <strong id="safety-missing">—</strong></div>
+        <div>Low confidence: <strong id="safety-low-conf">—</strong></div>
+        <div>High risk: <strong id="safety-high-risk">—</strong></div>
+        <div>LLM authority: <strong id="safety-llm">advisory only</strong></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Human-in-the-Loop</h2>
+      <p class="muted">Requires operator confirmation for high simulated risk or low confidence.</p>
+      <div class="hitl-controls">
+        <input type="text" id="hitl-note" placeholder="Operator note (optional)" />
+        <button id="hitl-confirm" disabled>Confirm Decision</button>
+        <button id="hitl-reject" class="danger-btn" disabled>Reject Decision</button>
+      </div>
+      <p class="sub">Pending decision ID: <span id="hitl-decision-id">none</span></p>
+    </section>
+
+    <section>
+      <h2>Failure Injection (Simulated)</h2>
+      <div class="injection-controls">
+        <button data-scenario="sensor_dropout">Sensor Dropout</button>
+        <button data-scenario="corrupt_event">Corrupt Event</button>
+        <button data-scenario="model_low_confidence">Low Confidence</button>
+        <button data-scenario="stale_telemetry">Stale Telemetry</button>
+        <button id="injection-reset">Reset</button>
+      </div>
+      <p class="sub">Active: <span id="active-injections">none</span></p>
     </section>
 
     <section>
@@ -55,9 +110,44 @@
       <div class="cards" id="model-score-cards"></div>
     </section>
 
-    <section class="future-panel disabled">
-      <h2>Future Panels (not implemented)</h2>
-      <p class="muted">Sensor fusion, agent traces, digital twin — Phase 3+</p>
+    <section>
+      <h2>Agent Traces</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Agent</th>
+              <th>Stage</th>
+              <th>Confidence</th>
+              <th>Risk</th>
+              <th>Duration (ms)</th>
+              <th>LLM</th>
+              <th>Tools</th>
+            </tr>
+          </thead>
+          <tbody id="traces-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Decision Timeline</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Decision ID</th>
+              <th>Risk</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>HITL</th>
+            </tr>
+          </thead>
+          <tbody id="decisions-table"></tbody>
+        </table>
+      </div>
     </section>
 
     <section>
@@ -101,9 +191,9 @@
     </section>
 
     <footer>
-      Synthetic biomedical-inspired signals only. Not medical data. Not for diagnosis or treatment.
-      Scores are operational simulation outputs, not diagnosis.
-      Simulated rehab session — virtual subject telemetry.
+      Synthetic biomedical-inspired signals only. Simulated rehab session.
+      Operational simulation scores — not for diagnosis or treatment.
+      LLM copilot is advisory only and cannot authorize critical actions.
     </footer>
   </div>
 

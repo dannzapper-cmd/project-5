@@ -63,6 +63,21 @@ Validation occurs **before** inference:
 2. Quality/confidence bounds check
 3. Missing/corrupt data flagged — never silently repaired without lowering confidence
 
+## Phase 3 Runtime (Implemented)
+
+Agent orchestration path under `core` profile (mock LLM default):
+
+1. Agent loop in `api` lifespan reads telemetry + model score snapshots from Redis
+2. LangGraph `StateGraph` executes: perception → triage → safety → action → (copilot if no HITL)
+3. Safety Agent applies deterministic rules; LLM cannot override verdict fields
+4. `AgentTraceEventV1` appended to `axon:v1:stream:agent_traces` per step
+5. `DecisionEventV1` appended to `axon:v1:stream:decisions`
+6. HITL pending decisions stored in Redis keys; confirm/reject via REST
+7. WebSocket broadcast: `/ws/v1/agents`, `/ws/v1/decisions`, `/ws/v1/safety`
+8. Dashboard shows traces, current decision, safety panel, HITL controls
+
+Not yet implemented: sensor fusion, MLflow, ROS2, digital twin 3D.
+
 ## Phase 2 Runtime (Implemented)
 
 The following path is live under the `core` Docker Compose profile:
@@ -76,6 +91,21 @@ The following path is live under the `core` Docker Compose profile:
 7. Dashboard shows live telemetry and model score panels
 
 Not yet implemented: sensor fusion, agents, decision events.
+
+## Phase 3 Agent Flow
+
+```mermaid
+flowchart TD
+    T[Telemetry + Model Scores] --> P[Perception Agent]
+    P --> TR[Triage Agent]
+    TR --> S[Safety Agent]
+    S --> A[Action Recommendation Agent]
+    A -->|requires_human_confirmation| HITL[END - Pending HITL]
+    A -->|else| C[Operator Copilot]
+    C --> END2[END]
+    HITL --> Redis[(Redis Pending + Decisions Stream)]
+    C --> Redis
+```
 
 ## Phase 1 Runtime (Implemented)
 

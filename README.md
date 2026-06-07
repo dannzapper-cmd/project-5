@@ -78,18 +78,59 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 2 — Edge AI Core**
+**Phase 3 — Agents + Safety**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
 | Phase 1 telemetry spine (MQTT → Redis → WebSocket) | Sensor fusion |
-| ONNX Runtime CPU inference (emg_anomaly, imu_movement) | LangGraph agents |
-| Edge inference service consuming Redis Streams | Digital twin, ROS2 |
-| ModelScoreEventV1 → model_scores stream | MLflow, observability stack |
-| Dashboard model score panels + latency metrics | Full Redis replay consumers |
-| Lightweight inference benchmark report | |
+| Phase 2 ONNX edge inference + model scores | Digital twin, ROS2 |
+| LangGraph StateGraph agent orchestration | MLflow, observability stack |
+| LangChain tools, keyword RAG, mock/real LLM copilot | Full Redis replay consumers |
+| DecisionEventV1 + AgentTraceEventV1 streams | |
+| Redis durable HITL + dashboard agent panels | |
+| Failure injection scenarios | |
 
-**Next phase:** [Phase 3 — Agents + Safety](ROADMAP.md#phase-3-agents--safety)
+**Next phase:** [Phase 4 — MLOps + Fine-tuning](ROADMAP.md)
+
+---
+
+## Phase 3 — Agents + Safety Quickstart
+
+```bash
+make install
+make models-generate
+docker compose --profile core up --build
+
+# Verify agents
+curl http://localhost:8000/api/v1/agents/traces
+curl http://localhost:8000/api/v1/decisions/current
+curl http://localhost:8000/api/v1/safety/status
+redis-cli XLEN axon:v1:stream:agent_traces
+
+# Failure injection demo
+curl -X POST http://localhost:8000/api/v1/failure-injection/model_low_confidence
+curl -X POST http://localhost:8000/api/v1/failure-injection/reset
+
+# Evidence + regression
+make evidence-phase3
+make test-phase-regression
+```
+
+Dashboard: http://localhost:3000 — telemetry, model scores, agent traces, HITL.
+
+### Core Mode (default — no API keys)
+
+Mock LLM is default. Core profile runs without `OPENAI_API_KEY` or provider packages.
+
+### Real LLM Mode (optional portfolio demo)
+
+```bash
+export AXON_LLM_MODE=real
+export AXON_LLM_PROVIDER=openai
+export AXON_LLM_MODEL=gpt-4o-mini
+export OPENAI_API_KEY=your-key-here
+docker compose --profile core --profile llm up --build
+```
 
 ---
 

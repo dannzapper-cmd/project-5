@@ -1,10 +1,11 @@
-"""AXON API gateway entrypoint (Phase 2: telemetry + edge AI)."""
+"""AXON API gateway entrypoint (Phase 3: agents + safety)."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from apps.api.app.core.config import settings
 from apps.api.app.core.lifespan import lifespan
+from apps.api.app.routes.agents import router as agents_router
 from apps.api.app.routes.health import router as health_router
 from apps.api.app.routes.telemetry import router as telemetry_router
 from apps.api.app.routes.ws import router as ws_router
@@ -33,4 +34,5 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(telemetry_router)
+app.include_router(agents_router)
 app.include_router(ws_router)

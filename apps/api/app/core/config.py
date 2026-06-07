@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     axon_env: str = "development"
-    axon_phase: int = 2
-    axon_version: str = "0.3.0"
+    axon_phase: int = 3
+    axon_version: str = "0.4.0"
     axon_service_name: str = "axon-api"
 
     api_host: str = "0.0.0.0"
@@ -20,6 +20,30 @@ class Settings(BaseSettings):
     mqtt_host: str = "localhost"
     mqtt_port: int = 1883
     mqtt_topic_prefix: str = "axon/v1"
+
+    # Phase 3 — LLM / Copilot
+    axon_llm_mode: str = "mock"
+    axon_llm_provider: str = "mock"
+    axon_llm_model: str = "mock-operator-copilot-v1"
+    axon_copilot_enabled: bool = True
+    axon_rag_enabled: bool = True
+    axon_llm_timeout_seconds: int = 15
+    axon_llm_max_tokens: int = 500
+
+    # Phase 3 — Safety thresholds
+    axon_safety_high_risk_threshold: float = 0.75
+    axon_safety_low_confidence_threshold: float = 0.55
+    axon_stale_telemetry_seconds: int = 5
+
+    # Phase 3 — Agent loop
+    axon_agent_loop_interval_seconds: int = 5
+    axon_hitl_expiry_seconds: int = 120
+    axon_failure_injection_auto_reset_seconds: int = 30
+
+    # Optional real LLM keys (empty by default)
+    openai_api_key: str = ""
+    anthropic_api_key: str = ""
+    google_api_key: str = ""
 
     @property
     def service_name(self) -> str:

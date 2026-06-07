@@ -33,6 +33,9 @@ class WebSocketManager:
             "robot-state": set(),
             "health": set(),
             "model-scores": set(),
+            "agents": set(),
+            "decisions": set(),
+            "safety": set(),
         }
         self._lock = asyncio.Lock()
 

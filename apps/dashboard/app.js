@@ -18,6 +18,10 @@ const config = window.AXON_CONFIG || { apiBase: "http://localhost:8000", wsBase:
 const state = {
   events: [],
   modelScores: [],
+  traces: [],
+  decisions: [],
+  currentDecisionId: null,
+  safety: {},
   counters: Object.fromEntries(SIGNALS.map((s) => [s.key, 0])),
   sparkHistory: Object.fromEntries(SIGNALS.map((s) => [s.key, []])),
   latestScores: {},
@@ -218,6 +222,137 @@ function handleModelScoreMessage(msg) {
   }
 }
 
+function pushTrace(event) {
+  state.traces.unshift(event);
+  if (state.traces.length > 30) state.traces.pop();
+  renderTracesTable();
+}
+
+function pushDecision(event) {
+  state.decisions.unshift(event);
+  if (state.decisions.length > 30) state.decisions.pop();
+  updateDecisionPanel(event);
+  renderDecisionsTable();
+  refreshCurrentDecision();
+}
+
+function updateDecisionPanel(d) {
+  document.getElementById("decision-risk").textContent = d.risk_level || "—";
+  document.getElementById("decision-action").textContent = d.recommended_action || "—";
+  document.getElementById("decision-confidence").textContent =
+    d.confidence != null ? d.confidence.toFixed(2) : "—";
+  document.getElementById("decision-status").textContent = d.status || "—";
+  document.getElementById("decision-hitl").textContent =
+    d.requires_human_confirmation ? "requires operator confirmation" : "not required";
+  document.getElementById("decision-rationale").textContent = d.rationale || "—";
+  document.getElementById("decision-evidence").textContent =
+    (d.evidence_refs || []).join(", ") || "—";
+  document.getElementById("decision-signals").textContent =
+    (d.contributing_signals || []).join(", ") || "all present";
+}
+
+function updateSafetyPanel(s) {
+  state.safety = s;
+  document.getElementById("safety-mode").textContent = s.safety_mode || "deterministic";
+  document.getElementById("safety-stale").textContent = String(s.stale_telemetry ?? "—");
+  document.getElementById("safety-missing").textContent =
+    (s.missing_signals || []).join(", ") || "none";
+  document.getElementById("safety-low-conf").textContent = String(s.low_confidence ?? "—");
+  document.getElementById("safety-high-risk").textContent = String(s.high_risk ?? "—");
+  document.getElementById("safety-llm").textContent = s.llm_authority || "advisory only";
+  document.getElementById("active-injections").textContent =
+    (s.active_injections || []).join(", ") || "none";
+}
+
+function renderTracesTable() {
+  const tbody = document.getElementById("traces-table");
+  tbody.innerHTML = state.traces
+    .map((t) => `<tr>
+      <td>${new Date(t.timestamp).toLocaleTimeString()}</td>
+      <td>${t.agent_name}</td>
+      <td>${t.stage}</td>
+      <td>${t.confidence != null ? t.confidence.toFixed(2) : "—"}</td>
+      <td>${t.risk_level || "—"}</td>
+      <td>${t.duration_ms != null ? t.duration_ms.toFixed(1) : "—"}</td>
+      <td>${t.llm_used ? "yes" : "no"}</td>
+      <td>${(t.tool_calls || []).join(", ") || "—"}</td>
+    </tr>`)
+    .join("");
+}
+
+function renderDecisionsTable() {
+  const tbody = document.getElementById("decisions-table");
+  tbody.innerHTML = state.decisions
+    .map((d) => `<tr>
+      <td>${new Date(d.timestamp).toLocaleTimeString()}</td>
+      <td>${(d.decision_id || "").slice(0, 8)}…</td>
+      <td>${d.risk_level}</td>
+      <td>${d.recommended_action}</td>
+      <td>${d.status}</td>
+      <td>${d.requires_human_confirmation ? "yes" : "no"}</td>
+    </tr>`)
+    .join("");
+}
+
+async function refreshCurrentDecision() {
+  try {
+    const res = await fetch(`${config.apiBase}/api/v1/decisions/current`);
+    const data = await res.json();
+    const id = data.decision_id;
+    state.currentDecisionId = id || null;
+    document.getElementById("hitl-decision-id").textContent = id || "none";
+    const pending = data.status === "pending_human_confirmation";
+    document.getElementById("hitl-confirm").disabled = !pending;
+    document.getElementById("hitl-reject").disabled = !pending;
+    if (data.decision_id) updateDecisionPanel(data);
+  } catch (_) {
+    document.getElementById("hitl-confirm").disabled = true;
+    document.getElementById("hitl-reject").disabled = true;
+  }
+}
+
+async function hitlAction(action) {
+  if (!state.currentDecisionId) return;
+  const note = document.getElementById("hitl-note").value || "";
+  const url = `${config.apiBase}/api/v1/decisions/${state.currentDecisionId}/${action}`;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operator_id: "dashboard-operator", note }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      pushDecision(data);
+      state.currentDecisionId = null;
+      document.getElementById("hitl-decision-id").textContent = "none";
+      document.getElementById("hitl-confirm").disabled = true;
+      document.getElementById("hitl-reject").disabled = true;
+    }
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+async function triggerInjection(scenario) {
+  try {
+    await fetch(`${config.apiBase}/api/v1/failure-injection/${scenario}`, { method: "POST" });
+    const res = await fetch(`${config.apiBase}/api/v1/safety/status`);
+    if (res.ok) updateSafetyPanel(await res.json());
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+async function resetInjection() {
+  try {
+    await fetch(`${config.apiBase}/api/v1/failure-injection/reset`, { method: "POST" });
+    document.getElementById("active-injections").textContent = "none";
+  } catch (_) {
+    /* ignore */
+  }
+}
+
 function connectWs(path, statusId, filterFn, handler) {
   const ws = new WebSocket(`${config.wsBase}${path}`);
   ws.onopen = () => setDot(statusId, true);
@@ -269,3 +404,31 @@ connectWs("/ws/v1/robot-state", "ws-robot-status", (msg) => {
 }, handleWsMessage);
 
 connectWs("/ws/v1/model-scores", "ws-model-scores-status", null, handleModelScoreMessage);
+
+connectWs("/ws/v1/agents", "ws-agents-status", null, (msg) => {
+  if (msg.type === "agent_trace" && msg.event) pushTrace(msg.event);
+});
+
+connectWs("/ws/v1/decisions", "ws-decisions-status", null, (msg) => {
+  if (msg.type === "decision" && msg.event) {
+    pushDecision(msg.event);
+    refreshCurrentDecision();
+  }
+});
+
+connectWs("/ws/v1/safety", "ws-safety-status", null, (msg) => {
+  if (msg.type === "safety_status" && msg.status) updateSafetyPanel(msg.status);
+});
+
+document.getElementById("hitl-confirm").addEventListener("click", () => hitlAction("confirm"));
+document.getElementById("hitl-reject").addEventListener("click", () => hitlAction("reject"));
+document.querySelectorAll("[data-scenario]").forEach((btn) => {
+  btn.addEventListener("click", () => triggerInjection(btn.dataset.scenario));
+});
+document.getElementById("injection-reset").addEventListener("click", resetInjection);
+
+refreshCurrentDecision();
+fetch(`${config.apiBase}/api/v1/safety/status`)
+  .then((r) => r.json())
+  .then(updateSafetyPanel)
+  .catch(() => {});
