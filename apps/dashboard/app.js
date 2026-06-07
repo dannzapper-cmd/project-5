@@ -1,4 +1,4 @@
-/** AXON Phase 2 live telemetry + model score dashboard (vanilla JS). */
+/** AXON Phase 5 live telemetry, model scores, and digital twin dashboard. */
 
 const SIGNALS = [
   { key: "emg", label: "EMG" },
@@ -28,6 +28,15 @@ const state = {
   latencyHistory: [],
   scenario: "—",
   mode: "awaiting",
+  twin: null,
+};
+
+const SENSOR_STATUS_CLASS = {
+  active: "status-active",
+  stale: "status-stale",
+  dropout: "status-dropout",
+  degraded: "status-degraded",
+  corrupt: "status-corrupt",
 };
 
 function setDot(id, online, waiting = false) {
@@ -493,3 +502,85 @@ document.getElementById("mlops-promote-btn").addEventListener("click", async () 
 
 pollMlopsStatus();
 setInterval(pollMlopsStatus, 10000);
+
+function updateTwinPanel(twin) {
+  if (!twin) return;
+  state.twin = twin;
+  const mode = twin.robot_state?.mode || "idle";
+  const svg = document.getElementById("twin-svg");
+  svg.setAttribute("class", "twin-svg mode-" + mode);
+
+  document.getElementById("twin-mode").textContent = mode;
+  document.getElementById("twin-confidence").textContent =
+    twin.fusion?.global_confidence != null ? twin.fusion.global_confidence.toFixed(2) : "—";
+  document.getElementById("twin-risk-level").textContent = twin.fusion?.risk_level || "—";
+  document.getElementById("twin-agent").textContent = twin.agents?.active_agent || "—";
+  document.getElementById("twin-action").textContent = twin.agents?.last_action || "—";
+  document.getElementById("twin-trace").textContent =
+    (twin.agents?.trace_id || "").slice(0, 16) + (twin.agents?.trace_id ? "…" : "");
+  document.getElementById("twin-hitl").textContent =
+    twin.agents?.hitl_pending ? "PENDING" : "clear";
+  document.getElementById("twin-safety").textContent =
+    twin.safety?.blocked_reason || twin.safety?.envelope_status || "—";
+  document.getElementById("twin-ros2").textContent = twin.ros2_bridge?.status || "offline";
+  document.getElementById("twin-robot-mode").textContent = mode;
+  document.getElementById("twin-risk-text").textContent =
+    `${twin.fusion?.risk_level || "—"} / ${twin.fusion?.global_confidence?.toFixed(2) ?? "—"}`;
+
+  const joint = twin.robot_state?.joint_angle_deg ?? 30;
+  const armRight = document.getElementById("twin-arm-right");
+  if (armRight) {
+    armRight.setAttribute("transform", `rotate(${joint - 30}, 46, -22)`);
+  }
+
+  const sensorMap = { emg: "twin-sensor-emg", ecg: "twin-sensor-ecg", imu: "twin-sensor-imu", spo2: "twin-sensor-spo2" };
+  for (const [key, elId] of Object.entries(sensorMap)) {
+    const el = document.getElementById(elId);
+    if (!el || !twin.sensor_nodes?.[key]) continue;
+    const status = twin.sensor_nodes[key].status || "dropout";
+    el.setAttribute("class", "twin-sensor " + (SENSOR_STATUS_CLASS[status] || "status-dropout"));
+    el.setAttribute("title", `${key}: ${twin.sensor_nodes[key].latest_value_summary}`);
+  }
+
+  const robotG = document.getElementById("twin-robot");
+  if (robotG && twin.robot_state?.pose) {
+    const ox = (twin.robot_state.pose.orientation_deg || 0) * 0.3;
+    robotG.setAttribute("transform", `translate(${210 + ox}, 160)`);
+  }
+}
+
+async function sendTwinCommand(command, extra = {}) {
+  try {
+    const res = await fetch(`${config.apiBase}/api/v1/twin/command`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        schema_version: "v1",
+        command,
+        requested_by: "dashboard-operator",
+        ...extra,
+      }),
+    });
+    const data = await res.json();
+    document.getElementById("twin-cmd-result").textContent =
+      `${data.status}: ${data.reason || data.command} (trace ${(data.trace_id || "").slice(0, 12)}…)`;
+    return data;
+  } catch (e) {
+    document.getElementById("twin-cmd-result").textContent = "Command failed";
+    return null;
+  }
+}
+
+connectWs("/ws/v1/twin", "ws-twin-status", null, (msg) => {
+  if (msg.type === "twin_state" && msg.state) updateTwinPanel(msg.state);
+});
+
+document.getElementById("twin-cmd-pause").addEventListener("click", () => sendTwinCommand("pause"));
+document.getElementById("twin-cmd-resume").addEventListener("click", () => sendTwinCommand("resume"));
+document.getElementById("twin-cmd-safety-stop").addEventListener("click", () =>
+  sendTwinCommand("request_safety_stop")
+);
+document.getElementById("twin-cmd-assist").addEventListener("click", () => {
+  const mode = document.getElementById("twin-assist-mode").value;
+  sendTwinCommand("set_assist_mode", { assist_mode: mode });
+});

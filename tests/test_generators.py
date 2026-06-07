@@ -41,6 +41,14 @@ def test_scenario_names_are_supported() -> None:
         assert profile.name == name
 
 
+def test_fatigue_event_produces_degraded_quality_for_replay_warning() -> None:
+    config = GeneratorConfig(axon_scenario="fatigue_event", axon_seed=1100)
+    batch = generate_event_batch(config, tick=0, mode="replay", seed=1100)
+    qualities = [event.quality for _, event in batch]
+    assert qualities
+    assert max(qualities) < 0.6
+
+
 def test_generate_event_batch_has_five_streams() -> None:
     config = GeneratorConfig(axon_seed=7)
     batch = generate_event_batch(config, tick=0, seed=7)

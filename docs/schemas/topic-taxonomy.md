@@ -53,7 +53,8 @@ AXON uses versioned naming across MQTT, Redis Streams, WebSockets, and future RO
 |---------|----------------------|
 | `/ws/v1/sensors` | `SensorEventV1` |
 | `/ws/v1/robot-state` | `SensorEventV1` (robot_state) |
-| `/ws/v1/fusion` | Fusion state |
+| `/ws/v1/fusion` | Fusion state (stream mirror; Phase 5 uses `/ws/v1/twin`) |
+| `/ws/v1/twin` | `DigitalTwinStateV1` (Phase 5) |
 | `/ws/v1/decisions` | `DecisionEventV1` |
 | `/ws/v1/agents` | `AgentTraceEventV1` |
 | `/ws/v1/alerts` | Alerts |

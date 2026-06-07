@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     axon_hitl_expiry_seconds: int = 120
     axon_failure_injection_auto_reset_seconds: int = 30
 
+    # Phase 5 — Digital Twin timing contracts
+    twin_broadcast_hz: int = 5
+    sensor_stale_ttl_seconds: int = 5
+    sensor_dropout_ttl_seconds: int = 15
+
     # Optional real LLM keys (empty by default)
     openai_api_key: str = ""
     anthropic_api_key: str = ""

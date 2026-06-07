@@ -1,28 +1,33 @@
-# ROS2 Bridge
+# AXON ROS2 Thin Adapter (Phase 5)
 
-## Purpose
+Real `rclpy` bridge isolated in the `ros2` Docker Compose profile.
 
-Thin adapter between AXON event contracts and ROS2 topics, services, and actions.
+## Behavior
 
-## Future Phase
+- Polls `GET /api/v1/twin/state` from AXON API
+- Publishes JSON twin snapshots on `/axon/twin/state` (`std_msgs/String`)
+- Publishes `/axon/bridge/heartbeat`
+- Service `/axon/command` (`axon_ros2_bridge/srv/TwinCommand`) forwards to `POST /api/v1/twin/command`
+- Posts heartbeat to `POST /api/v1/twin/ros2-heartbeat`
 
-Phase 5 — Digital Twin + ROS2 Core
+## Run
 
-## Expected Inputs
+Requires `core` profile (API + Redis + telemetry):
 
-- AXON events (fusion, decisions, alerts)
-- ROS2 domain configuration
+```bash
+docker compose --profile core --profile ros2 up --build
+make ros2-up   # equivalent shortcut
+```
 
-## Expected Outputs
+## Verify
 
-- ROS2 topic publishes (`/axon/sensors/*`, `/axon/robot/state`, etc.)
-- Service/action handlers for safety and navigation hooks
+```bash
+docker compose --profile ros2 exec ros2_bridge ros2 topic list
+docker compose --profile ros2 exec ros2_bridge ros2 topic echo /axon/twin/state
+docker compose --profile ros2 exec ros2_bridge ros2 service list
+docker compose --profile ros2 exec ros2_bridge ros2 service call /axon/command axon_ros2_bridge/srv/TwinCommand "{command: 'pause', requested_by: 'ros2-qa', reason: 'demo', assist_mode: ''}"
+```
 
-## Evidence to Collect
+## Not in Phase 5
 
-- ROS2 topic echo screenshots
-- Service/action invocation proof
-
-## Current Phase 0 Status
-
-**Placeholder only.** No ROS2 nodes implemented.
+Nav2, SLAM, Gazebo, hardware drivers, navigation actions (Phase 5.5+).

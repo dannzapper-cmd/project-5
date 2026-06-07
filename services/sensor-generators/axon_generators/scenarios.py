@@ -45,7 +45,7 @@ SCENARIO_PROFILES: dict[ScenarioName, ScenarioProfile] = {
     ),
     "fatigue_event": ScenarioProfile(
         name="fatigue_event",
-        quality_multiplier=0.85,
+        quality_multiplier=0.60,
         emg_burst_factor=1.4,
         imu_spike_factor=0.7,
         spo2_offset=-2.0,

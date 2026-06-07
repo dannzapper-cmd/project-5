@@ -78,18 +78,56 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 4 — MLOps + Fine-tuning + Continual Learning**
+**Phase 5 — Digital Twin + ROS2 Core**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Phase 1–3: telemetry, ONNX edge AI, LangGraph agents, HITL, copilot | Sensor fusion |
-| Synthetic dataset pipeline + data cards | Digital twin, ROS2 |
-| v1 vs v2 candidate offline evaluation | Federated learning (Flower) |
-| Optional MLflow (learning profile) + local artifact fallback | Full observability stack |
-| Sliding-window drift detector + manual promotion workflow | |
-| Dashboard MLOps panel (polling) | |
+| Phases 1–4: telemetry, edge AI, agents, HITL, MLOps | Nav2, SLAM (Phase 5.5) |
+| `DigitalTwinStateV1` schema + twin service | Federated learning (Flower) |
+| Live SVG digital twin dashboard mirror | Full observability stack |
+| WebSocket `/ws/v1/twin` + `POST /api/v1/twin/command` | Gazebo / Isaac / Omniverse |
+| ROS2 thin adapter (`ros2` profile): `/axon/twin/state`, `/axon/command` | Hardware integration |
 
-**Next phase:** [Phase 5 — Digital Twin + ROS2 Core](ROADMAP.md#phase-5-digital-twin--ros2-core)
+**Next phase:** [Phase 5.5 — Nav2 + SLAM MiniLab](ROADMAP.md)
+
+---
+
+## Phase 5 — Digital Twin + ROS2 Quickstart
+
+```bash
+make install
+make test
+make models-generate
+docker compose --profile core up --build -d
+
+# Dashboard digital twin: http://localhost:3000
+curl -s http://localhost:8000/api/v1/twin/state | python3 -m json.tool
+curl -s http://localhost:8000/health | python3 -m json.tool
+
+# Live generators (QA-LIVE-1)
+# Twin updates via /ws/v1/twin within ~200ms at 5 Hz
+
+# Replay scenarios (QA-LIVE-3)
+make replay-normal
+make replay-fatigue
+make replay-dropout
+
+# Staleness demo (QA-LIVE-2): stop sensor-generators, wait for stale/dropout TTLs
+docker compose --profile core stop sensor-generators
+
+# Safe commands
+curl -X POST http://localhost:8000/api/v1/twin/command \
+  -H 'Content-Type: application/json' \
+  -d '{"schema_version":"v1","command":"pause","requested_by":"qa"}'
+
+# ROS2 profile (requires core API running)
+docker compose --profile core --profile ros2 up --build -d
+docker compose --profile ros2 exec ros2_bridge ros2 topic echo /axon/twin/state
+```
+
+**What Phase 5 does not do:** medical diagnosis, real patient data, Nav2, SLAM, navigation stack, heavy simulation.
+
+Evidence checklist: [docs/evidence/phase-5-digital-twin-ros2.md](docs/evidence/phase-5-digital-twin-ros2.md)
 
 ---
 
