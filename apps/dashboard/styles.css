@@ -170,3 +170,26 @@ button.danger-btn:hover:not(:disabled) { border-color: var(--danger); color: var
   background: var(--surface2);
   color: var(--text);
 }
+
+/* Phase 5.5 Nav2 + SLAM MiniLab */
+.badge.phase55 { background: rgba(167, 139, 250, 0.18); color: #c4b5fd; }
+.nav-slam-layout { display: grid; grid-template-columns: 1fr 280px; gap: 1rem; }
+@media (max-width: 860px) { .nav-slam-layout { grid-template-columns: 1fr; } }
+.nav-slam-map-wrap { background: var(--surface2); border-radius: 10px; padding: 0.5rem; border: 1px solid var(--border); }
+.nav-slam-svg { width: 100%; height: auto; display: block; transition: opacity 0.3s; }
+.nav-slam-svg.offline { opacity: 0.45; }
+.nav-slam-bg { fill: #0f1728; }
+.nav-slam-wall { stroke: var(--accent); stroke-width: 2; opacity: 0.6; }
+.nav-slam-obstacle { fill: rgba(159, 176, 208, 0.18); stroke: var(--muted); stroke-width: 1; }
+.nav-slam-path { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4; opacity: 0.85; }
+.nav-slam-goal { fill: rgba(127, 217, 98, 0.25); stroke: var(--ok); stroke-width: 2; }
+.nav-slam-robot-body { fill: rgba(61, 214, 198, 0.25); stroke: var(--accent); stroke-width: 2; }
+.nav-slam-robot-heading { stroke: var(--accent); stroke-width: 2; }
+.nav-slam-overlay { fill: var(--accent); font-size: 13px; font-weight: 700; }
+.nav-slam-sidebar { display: flex; flex-direction: column; gap: 0.75rem; }
+.nav-slam-meta { font-size: 0.85rem; display: grid; gap: 0.35rem; }
+.nav-slam-commands { display: flex; flex-direction: column; gap: 0.4rem; }
+.nav-slam-commands h3 { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.online-badge { background: rgba(127, 217, 98, 0.2); color: var(--ok); }
+.degraded-badge { background: rgba(240, 180, 41, 0.2); color: var(--warn); }
+.offline-badge { background: rgba(159, 176, 208, 0.15); color: var(--muted); }

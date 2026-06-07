@@ -14,6 +14,7 @@
       <div class="badges">
         <span class="badge">Phase 5 — Digital Twin</span>
         <span class="badge">ROS2 Core</span>
+        <span class="badge phase55">Phase 5.5 — Nav2 + SLAM MiniLab</span>
         <span class="badge mode" id="mode-label">Mode: awaiting</span>
         <span class="badge scenario" id="scenario-label">Scenario: —</span>
       </div>
@@ -235,6 +236,57 @@
             </select>
             <button id="twin-cmd-assist">Set Assist Mode</button>
             <p class="sub" id="twin-cmd-result">—</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="nav-slam-panel">
+      <h2>ROS2 Nav2 + SLAM MiniLab <span class="badge phase55">Phase 5.5</span></h2>
+      <p class="muted">
+        Simulated robotics navigation/mapping lab (isolated <code>ros2-nav-slam</code> profile).
+        No physical robot. No clinical autonomy. No medical claims. Degrades to
+        <em>offline</em> when the MiniLab profile is not running.
+      </p>
+      <div class="nav-slam-layout">
+        <div class="nav-slam-map-wrap">
+          <svg id="nav-slam-svg" viewBox="0 0 600 400" class="nav-slam-svg"
+               aria-label="Nav2/SLAM MiniLab occupancy map">
+            <rect x="0" y="0" width="600" height="400" rx="10" class="nav-slam-bg"/>
+            <g id="nav-slam-walls"></g>
+            <g id="nav-slam-obstacles"></g>
+            <path id="nav-slam-path" class="nav-slam-path" d=""/>
+            <circle id="nav-slam-goal" class="nav-slam-goal" r="7" cx="-100" cy="-100"/>
+            <g id="nav-slam-robot" transform="translate(-100,-100)">
+              <circle r="9" class="nav-slam-robot-body"/>
+              <line x1="0" y1="0" x2="14" y2="0" class="nav-slam-robot-heading"/>
+            </g>
+            <text id="nav-slam-overlay" x="300" y="24" text-anchor="middle"
+                  class="nav-slam-overlay">MiniLab — offline</text>
+          </svg>
+        </div>
+        <div class="nav-slam-sidebar">
+          <div class="nav-slam-meta">
+            <div>Bridge: <strong id="nav-slam-bridge" class="badge offline-badge">offline</strong></div>
+            <div>Navigation: <strong id="nav-slam-nav-status">—</strong></div>
+            <div>Reason: <strong id="nav-slam-reason">—</strong></div>
+            <div>Active demo: <strong id="nav-slam-demo">—</strong></div>
+            <div>SLAM status: <strong id="nav-slam-slam-status">—</strong></div>
+            <div>Map coverage: <strong id="nav-slam-coverage">—</strong></div>
+            <div>Map updates: <strong id="nav-slam-map-updates">—</strong></div>
+            <div>Robot pose: <strong id="nav-slam-pose">—</strong></div>
+            <div>Goal: <strong id="nav-slam-goal-text">—</strong></div>
+            <div>Path: <strong id="nav-slam-path-text">—</strong></div>
+            <div>Last update: <strong id="nav-slam-updated">—</strong></div>
+          </div>
+          <div class="nav-slam-commands">
+            <h3>MiniLab Commands</h3>
+            <button id="nav-slam-cmd-mapping">Start Mapping</button>
+            <button id="nav-slam-cmd-goal">Send Nav Goal</button>
+            <button id="nav-slam-cmd-blocked" class="danger-btn">Blocked Goal Demo</button>
+            <button id="nav-slam-cmd-reset">Reset</button>
+            <p class="sub" id="nav-slam-cmd-result">—</p>
+            <p class="sub muted">Commands queue for the ROS2 bridge to forward to the MiniLab.</p>
           </div>
         </div>
       </div>
