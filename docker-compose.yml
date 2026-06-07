@@ -1,5 +1,12 @@
 # AXON - Bio-Robotics Edge Command System
-# Phase 2: Telemetry spine + Edge AI inference (core profile)
+# Phase 3: Telemetry + Edge AI + Agents (core profile)
+#
+# Core profile services (all start with --profile core):
+#   mosquitto, redis, api, sensor-generators, edge-inference, dashboard
+#
+# Startup order: mosquitto + redis (healthcheck ~10s) → api → dashboard/edge-inference
+# Foreground `up` logs are dominated by Mosquitto PUBLISH lines and sensor traffic.
+# Use `docker compose --profile core up --build -d` then `logs api dashboard edge-inference`.
 
 name: axon
 
