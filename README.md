@@ -78,17 +78,23 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 5.5 — Full ROS2 Nav2 + SLAM MiniLab (mandatory advanced)**
+**Phase 6A — Federated Learning Simulation (Flower + FedAvg, synthetic, on-demand)**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Phases 1–5: telemetry, edge AI, agents, HITL, MLOps, digital twin + ROS2 core | Federated learning (Flower) — Phase 6 |
-| Isolated `ros2-nav-slam` profile (headless) | RL (Gymnasium/SB3) — Phase 6 |
-| `axon_nav_slam_minilab` + `axon_nav_slam_interfaces` ROS2 packages | Hardware integration — Phase 8 |
-| Real SLAM Toolbox (online_async) + Nav2 navigation stack | Gazebo / Isaac / Omniverse / RViz |
-| `NavSlam*` schemas, `/api/v1/nav-slam/*`, `/ws/v1/nav-slam`, dashboard panel | Cloud deployment / Kubernetes |
+| Phases 1–5.5: telemetry, edge AI, agents, HITL, MLOps, digital twin, ROS2 core, Nav2 + SLAM MiniLab | RL / Gymnasium / SB3 — Phase 6B |
+| Phase 6A: Flower FedAvg federated simulation (3–5 synthetic edge clients) | Observability (OTel/Prometheus/Grafana) — Phase 7 |
+| `AxonFLModelV1` tiny CPU MLP, deterministic synthetic non-IID data | Hardware integration — Phase 8 |
+| Local MLflow logging, `/api/learning/federated/*`, dashboard FL panel | Gazebo / Isaac / Omniverse / RViz |
+| Isolated `learning` profile (`fl-runner`), deps out of core | Cloud deployment / Kubernetes |
 
-**Next phase:** [Phase 6 — Federated Learning + RL](ROADMAP.md)
+**Next phase:** [Phase 6B — RL](ROADMAP.md) (not started)
+
+See [docs/evidence/phase-6a-federated-learning.md](docs/evidence/phase-6a-federated-learning.md)
+for the full Phase 6A overview and reproduction steps.
+
+> **Phase 6A is a synthetic federated learning simulation. No real patient data.
+> No medical claims.**
 
 ---
 
