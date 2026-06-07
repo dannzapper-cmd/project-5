@@ -2,9 +2,9 @@
 	telemetry-up telemetry-down telemetry-logs replay-generate \
 	replay-normal replay-fatigue replay-dropout replay-spike replay-multi api-status \
 	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status \
-	test-phase-regression evidence-phase3
+	test-phase-regression evidence-phase3 mlops-pipeline verify-phase4 compose-learning
 
-PYTHON ?= python3
+PYTHON ?= python3.12
 VENV ?= .venv
 PIP := $(VENV)/bin/pip
 PYTEST := $(VENV)/bin/pytest
@@ -15,10 +15,10 @@ COMPOSE := docker compose --profile core
 help: ## Show available commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install package with dev, edge-ai, and agents dependencies
+install: ## Install package with dev, edge-ai, agents, and mlops dependencies
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -e ".[dev,edge-ai,agents]"
+	$(PIP) install -e ".[dev,edge-ai,agents,mlops]"
 
 test: ## Run unit tests (no Docker/MQTT/Redis required)
 	$(PYTEST) tests/
@@ -95,3 +95,12 @@ clean: ## Remove caches and build artifacts
 	rm -rf .pytest_cache .ruff_cache htmlcov .coverage
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name '*.pyc' -delete 2>/dev/null || true
+
+mlops-pipeline: ## Run Phase 4 MLOps pipeline (smoke mode)
+	AXON_MLOPS_SMOKE=true $(PYTHON) scripts/run_mlops_pipeline.py --smoke
+
+verify-phase4: ## Run Phase 4 verification script
+	bash scripts/verify_phase4.sh
+
+compose-learning: ## Validate Docker Compose learning profile
+	docker compose --profile learning config

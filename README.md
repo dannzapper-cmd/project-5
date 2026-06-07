@@ -78,19 +78,36 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 3 — Agents + Safety**
+**Phase 4 — MLOps + Fine-tuning + Continual Learning**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Phase 1 telemetry spine (MQTT → Redis → WebSocket) | Sensor fusion |
-| Phase 2 ONNX edge inference + model scores | Digital twin, ROS2 |
-| LangGraph StateGraph agent orchestration | MLflow, observability stack |
-| LangChain tools, keyword RAG, mock/real LLM copilot | Full Redis replay consumers |
-| DecisionEventV1 + AgentTraceEventV1 streams | |
-| Redis durable HITL + dashboard agent panels | |
-| Failure injection scenarios | |
+| Phase 1–3: telemetry, ONNX edge AI, LangGraph agents, HITL, copilot | Sensor fusion |
+| Synthetic dataset pipeline + data cards | Digital twin, ROS2 |
+| v1 vs v2 candidate offline evaluation | Federated learning (Flower) |
+| Optional MLflow (learning profile) + local artifact fallback | Full observability stack |
+| Sliding-window drift detector + manual promotion workflow | |
+| Dashboard MLOps panel (polling) | |
 
-**Next phase:** [Phase 4 — MLOps + Fine-tuning](ROADMAP.md)
+**Next phase:** [Phase 5 — Digital Twin + ROS2 Core](ROADMAP.md#phase-5-digital-twin--ros2-core)
+
+---
+
+## Phase 4 — MLOps Quickstart
+
+```bash
+make install
+make models-generate
+make mlops-pipeline      # smoke dataset + train/eval
+make verify-phase4       # full Phase 4 verification
+
+# Optional MLflow UI (learning profile)
+docker compose --profile learning up -d mlflow
+# http://localhost:5001
+AXON_MLOPS_BACKEND=mlflow make mlops-pipeline
+```
+
+API: `GET /api/v1/mlops/status` · Dashboard MLOps panel polls every 10s.
 
 ---
 
@@ -116,7 +133,7 @@ make evidence-phase3
 make test-phase-regression
 ```
 
-Dashboard: http://localhost:3000 — telemetry, model scores, agent traces, HITL.
+Dashboard: http://localhost:3000 — telemetry, model scores, agent traces, HITL, MLOps.
 
 ### Core Mode (default — no API keys)
 

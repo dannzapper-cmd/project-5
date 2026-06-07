@@ -198,3 +198,29 @@ class HealthEventV1(_EventBase):
         if not value or not value.strip():
             raise ValueError("must not be empty")
         return value.strip()
+
+
+class DriftEventV1(_EventBase):
+    """Sliding-window confidence drift event (Phase 4)."""
+
+    session_id: str
+    signal_type: Literal["emg", "imu", "fusion", "all"]
+    detector_version: str = "sliding_window_v1"
+    drift_score: float | None = None
+    threshold: float
+    drift_status: Literal["nominal", "drift_detected", "insufficient_data"]
+    evidence_window: int
+    mean_confidence: float | None = None
+    recommendation: Literal["continue_monitoring", "evaluate_candidate_model"]
+    synthetic_only: bool = True
+    safety_notes: str = (
+        "Simulated drift detection on synthetic signals. "
+        "No clinical inference. No automatic model replacement."
+    )
+
+    @field_validator("session_id")
+    @classmethod
+    def session_not_empty(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("session_id must not be empty")
+        return value.strip()
