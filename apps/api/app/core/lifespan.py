@@ -1,4 +1,4 @@
-"""FastAPI lifespan: Redis + background MQTT subscriber + model score watcher."""
+"""FastAPI lifespan: Redis + background tasks + Phase 3 agent loop."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from redis.asyncio import Redis
 
+from apps.api.app.agents.service import agent_loop
 from apps.api.app.core.config import settings
 from apps.api.app.telemetry.model_score_watcher import watch_model_scores
 from apps.api.app.telemetry.mqtt_client import mqtt_subscriber_loop
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     redis: Redis | None = None
     mqtt_task: asyncio.Task | None = None
     model_score_task: asyncio.Task | None = None
+    agent_task: asyncio.Task | None = None
 
     try:
         redis = Redis.from_url(settings.redis_url, decode_responses=False)
@@ -47,9 +49,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     model_score_task = asyncio.create_task(watch_model_scores(ws_manager, redis))
     logger.info("Model score watcher task started")
 
+    agent_task = asyncio.create_task(agent_loop(redis, ws_manager))
+    logger.info(
+        "Phase 3 agent loop task started (interval=%ss)",
+        settings.axon_agent_loop_interval_seconds,
+    )
+
     yield
 
-    for task in (mqtt_task, model_score_task):
+    for task in (mqtt_task, model_score_task, agent_task):
         if task is not None:
             task.cancel()
             try:

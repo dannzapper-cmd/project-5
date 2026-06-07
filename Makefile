@@ -1,7 +1,8 @@
 .PHONY: help install test lint dev-check api compose-config compose-core clean \
 	telemetry-up telemetry-down telemetry-logs replay-generate \
 	replay-normal replay-fatigue replay-dropout replay-spike replay-multi api-status \
-	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status
+	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status \
+	test-phase-regression evidence-phase3
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -14,10 +15,10 @@ COMPOSE := docker compose --profile core
 help: ## Show available commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install package with dev and edge-ai dependencies
+install: ## Install package with dev, edge-ai, and agents dependencies
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -e ".[dev,edge-ai]"
+	$(PIP) install -e ".[dev,edge-ai,agents]"
 
 test: ## Run unit tests (no Docker/MQTT/Redis required)
 	$(PYTEST) tests/
@@ -53,6 +54,12 @@ edge-ai-logs: ## Tail logs for edge inference and API
 
 model-status: ## Fetch model score status from local API
 	curl -s http://localhost:8000/model-scores/status | python3 -m json.tool
+
+test-phase-regression: ## Run Phase 1+2+3 regression test gate
+	bash scripts/test_phase_regression.sh
+
+evidence-phase3: ## Generate Phase 3 evidence artifacts (graph, trace, benchmarks)
+	$(PYTHON) scripts/generate_phase3_evidence.py
 
 telemetry-up: ## Start Phase 2 core stack in background
 	$(COMPOSE) up --build -d

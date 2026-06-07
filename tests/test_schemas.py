@@ -1,4 +1,6 @@
-"""Phase 0 schema validation tests (no external services)."""
+"""Phase 0/3 schema validation tests (no external services)."""
+
+from datetime import UTC, datetime
 
 import pytest
 from apps.api.app.schemas.events import (
@@ -51,20 +53,44 @@ def test_invalid_confidence_or_quality() -> None:
         )
 
 
-def test_valid_decision_event_with_human_confirmation() -> None:
+def test_valid_decision_event_v1() -> None:
+    now = datetime.now(UTC)
     event = DecisionEventV1(
         trace_id="trace-004",
-        source="agent-orchestrator",
-        decision_type="session_pause",
+        source="axon-api",
+        session_id="session-synthetic-001",
+        input_window_start=now,
+        input_window_end=now,
         risk_level="high",
         confidence=0.62,
-        recommended_action="pause_rehab_session",
+        recommended_action="pause_simulation",
         requires_human_confirmation=True,
-        rationale="Elevated anomaly score with low fusion confidence.",
-        related_event_ids=["evt-1", "evt-2"],
+        status="pending_human_confirmation",
+        rationale="Elevated operational simulation score with low fusion confidence.",
+        evidence_refs=["trace:trace-004"],
+        contributing_signals=["emg"],
     )
     assert event.requires_human_confirmation is True
     assert event.risk_level == "high"
+    data = event.model_dump(mode="json")
+    assert data["schema_version"] == "v1"
+
+
+def test_decision_event_invalid_confidence() -> None:
+    now = datetime.now(UTC)
+    with pytest.raises(ValidationError):
+        DecisionEventV1(
+            trace_id="trace-bad",
+            source="axon-api",
+            session_id="session-001",
+            input_window_start=now,
+            input_window_end=now,
+            risk_level="low",
+            confidence=1.5,
+            recommended_action="continue_session",
+            requires_human_confirmation=False,
+            rationale="bad confidence",
+        )
 
 
 def test_valid_model_score_event_v1() -> None:
@@ -85,16 +111,33 @@ def test_valid_model_score_event_v1() -> None:
 def test_valid_agent_trace_event_v1() -> None:
     event = AgentTraceEventV1(
         trace_id="trace-006",
-        source="langgraph-runtime",
-        agent_name="safety-coordinator",
-        step_name="evaluate_risk",
-        input_summary="Fusion confidence below threshold.",
-        output_summary="Recommend operator confirmation.",
+        source="axon-api",
+        session_id="session-synthetic-001",
+        agent_name="safety_agent",
+        stage="completed",
+        input_refs=["telemetry:emg"],
+        output_summary="Safety verdict: pause_simulation, HITL=True",
         confidence=0.71,
-        tool_calls=["fetch_fusion_state", "check_safety_policy"],
-        requires_human_review=True,
+        risk_level="high",
+        tool_calls=["lookup_safety_policy"],
+        llm_used=False,
+        duration_ms=12.5,
     )
-    assert event.requires_human_review is True
+    assert event.agent_name == "safety_agent"
+    data = event.model_dump(mode="json")
+    assert "span_id" in data
+
+
+def test_agent_trace_invalid_enum() -> None:
+    with pytest.raises(ValidationError):
+        AgentTraceEventV1(
+            trace_id="trace-bad",
+            source="axon-api",
+            session_id="session-001",
+            agent_name="not_a_real_agent",  # type: ignore[arg-type]
+            stage="completed",
+            output_summary="test",
+        )
 
 
 def test_valid_health_event_v1() -> None:

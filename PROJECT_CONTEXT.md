@@ -38,11 +38,11 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 2 — Edge AI Core**
+**Phase 3 — Agents + Safety**
 
-Delivered: Phase 1 telemetry spine plus ONNX Runtime inference, edge-inference service, ModelScoreEventV1 stream, dashboard model score panels, inference benchmark.
+Delivered: Phase 2 edge AI plus LangGraph agent orchestration, LangChain tools/RAG, DecisionEventV1, AgentTraceEventV1, Redis HITL, mock/real LLM copilot, dashboard agent panels, failure injection.
 
-Not delivered: sensor fusion, agents, ML training, ROS2, digital twin 3D, full Redis replay consumers.
+Not delivered: sensor fusion, ML training, ROS2, digital twin 3D, full Redis replay consumers.
 
 ## Forbidden Claims
 
