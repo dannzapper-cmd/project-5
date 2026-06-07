@@ -38,11 +38,11 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 3 — Agents + Safety**
+**Phase 4 — MLOps + Fine-tuning + Continual Learning**
 
-Delivered: Phase 2 edge AI plus LangGraph agent orchestration, LangChain tools/RAG, DecisionEventV1, AgentTraceEventV1, Redis HITL, mock/real LLM copilot, dashboard agent panels, failure injection.
+Delivered: Phase 1–3 (telemetry, edge AI, LangGraph agents, HITL, copilot) plus synthetic dataset pipeline, v1 vs v2 candidate evaluation, optional MLflow (learning profile), local artifact fallback, drift detector, manual promotion workflow, dashboard MLOps panel.
 
-Not delivered: sensor fusion, ML training, ROS2, digital twin 3D, full Redis replay consumers.
+Not delivered: sensor fusion, ROS2, digital twin 3D, federated learning.
 
 ## Forbidden Claims
 

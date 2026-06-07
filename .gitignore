@@ -72,6 +72,15 @@ models/
 *.pkl
 *.joblib
 
+# Phase 4 MLOps runtime artifacts
+artifacts/mlops/datasets/
+artifacts/mlops/models/
+artifacts/mlops/mlruns/
+artifacts/mlops/promotion_reviews/
+artifacts/mlops/evals/
+artifacts/mlops/runs/
+artifacts/mlops/latest_eval.json
+
 # IDE
 .idea/
 .vscode/

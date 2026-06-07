@@ -432,3 +432,64 @@ fetch(`${config.apiBase}/api/v1/safety/status`)
   .then((r) => r.json())
   .then(updateSafetyPanel)
   .catch(() => {});
+
+function setDriftBadge(status) {
+  const el = document.getElementById("mlops-drift-badge");
+  el.textContent = status || "—";
+  el.className = "drift-badge " + (
+    status === "nominal" ? "green" : status === "drift_detected" ? "amber" : "gray"
+  );
+}
+
+async function pollMlopsStatus() {
+  try {
+    const res = await fetch(`${config.apiBase}/api/v1/mlops/status`);
+    if (!res.ok) return;
+    const data = await res.json();
+    document.getElementById("mlops-active-emg").textContent =
+      data.active_model_version?.emg || "—";
+    document.getElementById("mlops-candidate-emg").textContent =
+      data.candidate_model_version?.emg || "—";
+    document.getElementById("mlops-promotion-emg").textContent =
+      data.candidate_promotion_status?.emg || "—";
+    setDriftBadge(data.drift?.status);
+    document.getElementById("mlops-last-eval").textContent =
+      data.last_eval_at || "No evaluation run yet";
+    document.getElementById("mlops-empty").style.display =
+      data.has_eval_run ? "none" : "block";
+    if (data.latest_eval) {
+      const ev = data.latest_eval;
+      document.getElementById("mlops-v1-acc").textContent =
+        ev.v1?.accuracy != null ? ev.v1.accuracy.toFixed(4) : "—";
+      document.getElementById("mlops-v2-acc").textContent =
+        ev.v2_candidate?.accuracy != null ? ev.v2_candidate.accuracy.toFixed(4) : "—";
+      document.getElementById("mlops-rec").textContent =
+        ev.improvement?.recommendation || "—";
+    }
+    document.getElementById("mlops-artifacts").textContent =
+      "Artifacts: " + (data.artifact_paths?.artifacts_root || "—");
+    if (data.safety_notice) {
+      document.getElementById("mlops-safety-notice").textContent = data.safety_notice;
+    }
+  } catch (_) {
+    /* graceful empty state */
+  }
+}
+
+document.getElementById("mlops-promote-btn").addEventListener("click", async () => {
+  try {
+    const res = await fetch(`${config.apiBase}/api/v1/mlops/promote-candidate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signal_type: "emg", dry_run: true, operator_note: "dashboard-simulated-review" }),
+    });
+    const data = await res.json();
+    document.getElementById("mlops-review-id").textContent =
+      data.review_record_id ? `Review record: ${data.review_record_id}` : "";
+  } catch (_) {
+    document.getElementById("mlops-review-id").textContent = "Promotion dry-run failed (API unavailable)";
+  }
+});
+
+pollMlopsStatus();
+setInterval(pollMlopsStatus, 10000);

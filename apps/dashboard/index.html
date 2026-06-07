@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AXON Dashboard — Phase 3 Agents + Safety</title>
+  <title>AXON Dashboard — Phase 4 MLOps + Agents</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -13,6 +13,7 @@
       <h1>AXON — Bio-Robotics Edge Command System</h1>
       <div class="badges">
         <span class="badge">Phase 3 — Agents + Safety</span>
+        <span class="badge">Phase 4 — MLOps Loop</span>
         <span class="badge mode" id="mode-label">Mode: awaiting</span>
         <span class="badge scenario" id="scenario-label">Scenario: —</span>
       </div>
@@ -148,6 +149,34 @@
           <tbody id="decisions-table"></tbody>
         </table>
       </div>
+    </section>
+
+    <section>
+      <h2>MLOps — Continual Learning</h2>
+      <p class="safety-banner mlops-safety" id="mlops-safety-notice">
+        Synthetic simulation only. No medical diagnosis. No treatment advice. No clinical claims.
+      </p>
+      <div class="status-grid" id="mlops-status-grid">
+        <div class="status-item">Active EMG: <strong id="mlops-active-emg">—</strong></div>
+        <div class="status-item">Candidate EMG: <strong id="mlops-candidate-emg">—</strong></div>
+        <div class="status-item">Promotion: <strong id="mlops-promotion-emg">—</strong></div>
+        <div class="status-item">Drift: <span id="mlops-drift-badge" class="drift-badge gray">—</span></div>
+        <div class="status-item">Last eval: <strong id="mlops-last-eval">—</strong></div>
+        <div class="status-item">v1 acc: <strong id="mlops-v1-acc">—</strong></div>
+        <div class="status-item">v2 acc: <strong id="mlops-v2-acc">—</strong></div>
+        <div class="status-item">Recommendation: <strong id="mlops-rec">—</strong></div>
+      </div>
+      <p class="sub" id="mlops-artifacts">Artifacts: —</p>
+      <p class="sub" id="mlops-empty">No evaluation run yet</p>
+      <button type="button" id="mlops-promote-btn" class="mlops-btn">
+        Manual Review Only — Simulated (dry-run)
+      </button>
+      <p class="sub" id="mlops-review-id"></p>
+    </section>
+
+    <section class="future-panel disabled">
+      <h2>Future Panels (not implemented)</h2>
+      <p class="muted">Sensor fusion, digital twin — Phase 5+</p>
     </section>
 
     <section>

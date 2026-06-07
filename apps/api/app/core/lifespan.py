@@ -1,4 +1,4 @@
-"""FastAPI lifespan: Redis + background tasks + Phase 3 agent loop."""
+"""FastAPI lifespan: Redis + background tasks + Phase 3 agent loop + Phase 4 drift."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from redis.asyncio import Redis
 
 from apps.api.app.agents.service import agent_loop
 from apps.api.app.core.config import settings
+from apps.api.app.mlops.drift_watcher import drift_detector_loop
 from apps.api.app.telemetry.model_score_watcher import watch_model_scores
 from apps.api.app.telemetry.mqtt_client import mqtt_subscriber_loop
 from apps.api.app.telemetry.state import telemetry_state
@@ -27,6 +28,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     mqtt_task: asyncio.Task | None = None
     model_score_task: asyncio.Task | None = None
     agent_task: asyncio.Task | None = None
+    drift_task: asyncio.Task | None = None
 
     try:
         redis = Redis.from_url(settings.redis_url, decode_responses=False)
@@ -55,9 +57,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         settings.axon_agent_loop_interval_seconds,
     )
 
+    drift_task = asyncio.create_task(drift_detector_loop(redis))
+    logger.info("Drift detector task started")
+
     yield
 
-    for task in (mqtt_task, model_score_task, agent_task):
+    for task in (mqtt_task, model_score_task, agent_task, drift_task):
         if task is not None:
             task.cancel()
             try:

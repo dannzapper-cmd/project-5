@@ -113,3 +113,25 @@ button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent);
 button:disabled { opacity: 0.45; cursor: not-allowed; }
 button.danger-btn:hover:not(:disabled) { border-color: var(--danger); color: var(--danger); }
 .decision-panel { background: var(--surface2); border-radius: 8px; padding: 0.75rem; }
+.mlops-btn {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.mlops-btn:hover { border-color: var(--accent); }
+.drift-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.drift-badge.green { background: rgba(127, 217, 98, 0.2); color: var(--ok); }
+.drift-badge.amber { background: rgba(240, 180, 41, 0.2); color: var(--warn); }
+.drift-badge.gray { background: rgba(159, 176, 208, 0.15); color: var(--muted); }
+.mlops-safety { margin-bottom: 0.75rem; }

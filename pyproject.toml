@@ -44,9 +44,17 @@ agents = [
     "langchain-core>=0.3,<0.4",
     "langchain-community>=0.3,<0.4",
 ]
-mlops = []       # Phase 4: mlflow, training tooling
+mlops = [
+    "scikit-learn>=1.4,<2.0",
+    "skl2onnx>=1.16,<2.0",
+    "onnxruntime>=1.17.0,<2.0.0",
+    "onnx>=1.14.0,<2.0.0",
+    "numpy>=1.26.0",
+]
 ros2 = []        # Phase 5+: ROS2 bridge dependencies
-learning = []    # Phase 6: flower, gymnasium, stable-baselines3
+learning = [
+    "mlflow>=2.13,<3.1",
+]
 observability = []  # Phase 7: opentelemetry SDK/exporters
 
 [project.scripts]
