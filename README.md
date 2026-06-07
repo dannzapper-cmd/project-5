@@ -78,17 +78,57 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 5 — Digital Twin + ROS2 Core**
+**Phase 5.5 — Full ROS2 Nav2 + SLAM MiniLab (mandatory advanced)**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Phases 1–4: telemetry, edge AI, agents, HITL, MLOps | Nav2, SLAM (Phase 5.5) |
-| `DigitalTwinStateV1` schema + twin service | Federated learning (Flower) |
-| Live SVG digital twin dashboard mirror | Full observability stack |
-| WebSocket `/ws/v1/twin` + `POST /api/v1/twin/command` | Gazebo / Isaac / Omniverse |
-| ROS2 thin adapter (`ros2` profile): `/axon/twin/state`, `/axon/command` | Hardware integration |
+| Phases 1–5: telemetry, edge AI, agents, HITL, MLOps, digital twin + ROS2 core | Federated learning (Flower) — Phase 6 |
+| Isolated `ros2-nav-slam` profile (headless) | RL (Gymnasium/SB3) — Phase 6 |
+| `axon_nav_slam_minilab` + `axon_nav_slam_interfaces` ROS2 packages | Hardware integration — Phase 8 |
+| Real SLAM Toolbox (online_async) + Nav2 navigation stack | Gazebo / Isaac / Omniverse / RViz |
+| `NavSlam*` schemas, `/api/v1/nav-slam/*`, `/ws/v1/nav-slam`, dashboard panel | Cloud deployment / Kubernetes |
 
-**Next phase:** [Phase 5.5 — Nav2 + SLAM MiniLab](ROADMAP.md)
+**Next phase:** [Phase 6 — Federated Learning + RL](ROADMAP.md)
+
+---
+
+## Phase 5.5 — Nav2 + SLAM MiniLab Quickstart
+
+Headless, isolated, reproducible. **No physical robot. No medical claims.**
+`core` is unaffected and does not depend on this profile.
+
+```bash
+make install && make test && make lint
+make compose-config        # core profile valid
+make compose-nav-slam      # ros2-nav-slam profile valid
+
+# Core stays independent
+docker compose --profile core up --build -d
+
+# Start the MiniLab (heavy image: Nav2 + SLAM Toolbox on ros:humble-ros-base)
+docker compose --profile ros2-nav-slam up --build -d
+make nav-slam-ps
+make nav-slam-nodes
+make nav-slam-topics
+
+# Synthetic data rates (B3): /scan >= 10 Hz, /odom >= 20 Hz
+docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 topic hz /scan
+docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 topic hz /odom
+docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 run tf2_tools view_frames  # map->odom->base_link
+
+# Demos
+make nav-slam-map-demo      # SLAM mapping from synthetic scan/odom/TF
+make nav-slam-goal-demo     # reachable goal -> planning -> navigating -> reached
+make nav-slam-blocked-demo  # goal inside obstacle -> blocked (honest)
+make nav-slam-status        # AXON-side status; dashboard panel http://localhost:3000
+make nav-slam-down
+```
+
+**What Phase 5.5 does not do:** medical diagnosis, real patient data, hardware,
+cloud deployment, Gazebo/RViz, federated learning, RL, Kubernetes.
+
+Evidence checklist: [docs/evidence/phase-5-5-nav2-slam-minilab.md](docs/evidence/phase-5-5-nav2-slam-minilab.md)
+· ADRs: [ADR-009](docs/adr/ADR-009-nav2-slam-minilab-scope.md), [ADR-010](docs/adr/ADR-010-headless-minisim-no-gazebo-rviz.md)
 
 ---
 
