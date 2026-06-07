@@ -232,6 +232,9 @@ def test_compose_nav_slam_publish_rate_env():
     env = svc["environment"]
     for key in ("SCAN_HZ", "ODOM_HZ", "TF_HZ", "NAV_SLAM_HEARTBEAT_HZ"):
         assert key in env
+    assert int(env["SCAN_HZ"].split(":-", 1)[1].rstrip("}")) >= 12
+    assert int(env["ODOM_HZ"].split(":-", 1)[1].rstrip("}")) >= 25
+    assert int(env["TF_HZ"].split(":-", 1)[1].rstrip("}")) >= 25
 
 
 def test_env_example_declares_publish_rates():
@@ -351,6 +354,21 @@ def test_nav_state_machine_reachable_goal():
     # Robot arrives -> reached (no fake success before arrival).
     assert sm.update(5.0, 1.8) in ("navigating", "reached")
     assert sm.update(5.0, 1.0) == "reached"
+
+
+def test_nav_state_machine_reachable_demo_detours_around_obstacle():
+    world = WorldModel()
+    sm = NavStateMachine(world)
+    status = sm.plan((0.678, 0.6), 5.0, 1.0, demo="nav_goal_demo")
+    assert status == "navigating"
+    assert sm.reason == "Navigating detour to goal."
+    assert sm.path[0] == (0.678, 0.6)
+    assert sm.path[-1] == (5.0, 1.0)
+    assert len(sm.path) > 2
+    assert all(
+        sm._line_blocked(x1, y1, x2, y2) is None
+        for (x1, y1), (x2, y2) in zip(sm.path, sm.path[1:], strict=False)
+    )
 
 
 def test_nav_state_machine_blocked_goal_inside_obstacle():

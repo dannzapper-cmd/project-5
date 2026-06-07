@@ -55,6 +55,7 @@ class NavGoalRunner(Node):
 
         self._robot_xy = (width / 2.0, height / 2.0)
         self._mapping_active = False
+        self._drive_waypoints: list[tuple[float, float]] = []
 
         self.status_pub = self.create_publisher(String, "/axon/nav/status", 10)
         self.goal_pub = self.create_publisher(PoseStamped, "/axon/nav/goal", 10)
@@ -91,7 +92,10 @@ class NavGoalRunner(Node):
         self._publish_goal(request.x, request.y, request.theta_deg)
         self._publish_path()
         if response.accepted:
-            self._publish_drive_goal(request.x, request.y)
+            self._drive_waypoints = self.sm.path[1:] if len(self.sm.path) > 1 else []
+            self._publish_next_drive_waypoint()
+        else:
+            self._drive_waypoints = []
         self._publish_status()
         self.get_logger().info(
             f"send_goal ({request.x:.2f},{request.y:.2f}) -> {status}: {self.sm.reason}"
@@ -114,6 +118,7 @@ class NavGoalRunner(Node):
         self, request: Trigger.Request, response: Trigger.Response
     ) -> Trigger.Response:
         self.sm.reset()
+        self._drive_waypoints = []
         self._publish_status()
         response.success = True
         response.message = "MiniLab navigation state reset to idle."
@@ -140,6 +145,12 @@ class NavGoalRunner(Node):
         msg.pose.orientation.w = 1.0
         self.drive_pub.publish(msg)
 
+    def _publish_next_drive_waypoint(self) -> None:
+        if not self._drive_waypoints:
+            return
+        x, y = self._drive_waypoints[0]
+        self._publish_drive_goal(x, y)
+
     def _publish_path(self) -> None:
         path = Path()
         path.header.stamp = self.get_clock().now().to_msg()
@@ -155,6 +166,11 @@ class NavGoalRunner(Node):
 
     def _tick(self) -> None:
         rx, ry = self._robot_xy
+        if self._drive_waypoints:
+            wx, wy = self._drive_waypoints[0]
+            if math.hypot(wx - rx, wy - ry) <= self.sm.goal_tolerance_m:
+                self._drive_waypoints.pop(0)
+                self._publish_next_drive_waypoint()
         self.sm.update(rx, ry, dt=1.0 / self.status_hz)
         self._publish_status()
 

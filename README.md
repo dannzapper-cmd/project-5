@@ -111,7 +111,8 @@ make nav-slam-ps
 make nav-slam-nodes
 make nav-slam-topics
 
-# Synthetic data rates (B3): /scan >= 10 Hz, /odom >= 20 Hz
+# Synthetic data rates (B3): defaults target /scan 12 Hz, /odom 25 Hz
+# Hard gates remain /scan >= 10 Hz, /odom >= 20 Hz.
 docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 topic hz /scan
 docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 topic hz /odom
 docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 run tf2_tools view_frames  # map->odom->base_link

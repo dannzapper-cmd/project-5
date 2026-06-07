@@ -31,9 +31,10 @@ RUN . /opt/ros/humble/setup.sh && \
 ENV AXON_API_BASE=http://api:8000
 ENV ROS_DOMAIN_ID=42
 # Synthetic data publish rates (B3) — overridable via compose env.
-ENV SCAN_HZ=10
-ENV ODOM_HZ=20
-ENV TF_HZ=20
+# Defaults include runtime margin over the QA gates (/scan >=10 Hz, /odom >=20 Hz).
+ENV SCAN_HZ=12
+ENV ODOM_HZ=25
+ENV TF_HZ=25
 ENV NAV_SLAM_HEARTBEAT_HZ=1
 
 CMD ["/bin/bash", "-c", "source /opt/ros/humble/setup.sh && source /ros2_ws/install/setup.bash && ros2 launch axon_nav_slam_minilab nav_slam_minilab.launch.py"]

@@ -206,9 +206,9 @@ services:
     environment:
       AXON_API_BASE: ${AXON_API_BASE:-http://api:8000}
       ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-42}
-      SCAN_HZ: ${SCAN_HZ:-10}
-      ODOM_HZ: ${ODOM_HZ:-20}
-      TF_HZ: ${TF_HZ:-20}
+      SCAN_HZ: ${SCAN_HZ:-12}
+      ODOM_HZ: ${ODOM_HZ:-25}
+      TF_HZ: ${TF_HZ:-25}
       NAV_SLAM_HEARTBEAT_HZ: ${NAV_SLAM_HEARTBEAT_HZ:-1}
       NAV_STATUS_HZ: ${NAV_STATUS_HZ:-2}
       NAV_SLAM_INGEST_HZ: ${NAV_SLAM_INGEST_HZ:-2}

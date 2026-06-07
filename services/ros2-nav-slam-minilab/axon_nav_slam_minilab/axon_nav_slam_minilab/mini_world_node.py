@@ -5,9 +5,9 @@ Publishes deterministic synthetic sensor + TF data so SLAM Toolbox (and, where
 feasible, Nav2) have real inputs to consume — no Gazebo, no RViz, no GUI.
 
 Publishes:
-  - /scan                       sensor_msgs/LaserScan   (>= SCAN_HZ, default 10 Hz)
-  - /odom                       nav_msgs/Odometry       (>= ODOM_HZ, default 20 Hz)
-  - /tf  (odom -> base_link)    tf2_msgs/TFMessage      (>= TF_HZ, default 20 Hz)
+  - /scan                       sensor_msgs/LaserScan   (>= SCAN_HZ, default 12 Hz)
+  - /odom                       nav_msgs/Odometry       (>= ODOM_HZ, default 25 Hz)
+  - /tf  (odom -> base_link)    tf2_msgs/TFMessage      (>= TF_HZ, default 25 Hz)
   - /tf_static (map -> odom)    tf2_msgs/TFMessage      (latched, optional)
   - /axon/nav_slam/heartbeat    std_msgs/String         (NAV_SLAM_HEARTBEAT_HZ, default 1 Hz)
 
@@ -50,9 +50,9 @@ def _yaw_to_quat(yaw: float) -> tuple[float, float, float, float]:
 class MiniWorldNode(Node):
     def __init__(self) -> None:
         super().__init__("mini_world_node")
-        self.scan_hz = float(os.getenv("SCAN_HZ", "10"))
-        self.odom_hz = float(os.getenv("ODOM_HZ", "20"))
-        self.tf_hz = float(os.getenv("TF_HZ", "20"))
+        self.scan_hz = float(os.getenv("SCAN_HZ", "12"))
+        self.odom_hz = float(os.getenv("ODOM_HZ", "25"))
+        self.tf_hz = float(os.getenv("TF_HZ", "25"))
         self.heartbeat_hz = float(os.getenv("NAV_SLAM_HEARTBEAT_HZ", "1"))
         self.scan_readings = int(os.getenv("SCAN_READINGS", "180"))
         self.publish_static_map_odom = (
