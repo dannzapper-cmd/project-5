@@ -80,6 +80,7 @@ artifacts/mlops/promotion_reviews/
 artifacts/mlops/evals/
 artifacts/mlops/runs/
 artifacts/mlops/latest_eval.json
+artifacts/mlops/model_registry.json
 
 # IDE
 .idea/
