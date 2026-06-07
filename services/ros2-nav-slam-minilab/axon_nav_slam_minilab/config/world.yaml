@@ -1,0 +1,52 @@
+# AXON Phase 5.5 — MiniLab synthetic world layout (documentation + reference).
+#
+# This file documents the deterministic rehab-lab world simulated by
+# mini_world_node (see axon_nav_slam_minilab/world_model.py). The node builds
+# the same geometry in code; this YAML is the human-readable source of truth.
+#
+# Simulated robotics lab only. No physical robot. No patient data.
+world:
+  name: axon_rehab_minilab
+  units: meters
+  width: 6.0
+  height: 4.0
+  range_min_m: 0.12
+  range_max_m: 8.0
+
+  # Four bounding walls (axis-aligned room edges) + interior obstacles.
+  obstacles:
+    - name: treadmill
+      x_min: 1.0
+      y_min: 0.4
+      x_max: 1.8
+      y_max: 1.4
+    - name: parallel_bars
+      x_min: 3.8
+      y_min: 0.5
+      x_max: 4.6
+      y_max: 2.2
+    - name: mat_stack
+      x_min: 0.5
+      y_min: 2.8
+      x_max: 1.6
+      y_max: 3.4
+    - name: pillar
+      x_min: 2.8
+      y_min: 2.9
+      x_max: 3.2
+      y_max: 3.3
+    - name: storage_cart
+      x_min: 4.9
+      y_min: 2.9
+      x_max: 5.5
+      y_max: 3.5
+
+  # Robot patrols a rounded-rectangle loop (margin 0.6 m) at 0.35 m/s.
+  patrol:
+    speed_mps: 0.35
+    margin_m: 0.6
+
+  # Deterministic demo goals (map frame).
+  demo_goals:
+    nav_goal_demo: { x: 5.0, y: 1.0, theta_deg: 0.0 }   # open floor, reachable
+    blocked_goal_demo: { x: 4.2, y: 1.3, theta_deg: 0.0 }  # inside parallel_bars -> blocked
