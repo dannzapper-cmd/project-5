@@ -295,6 +295,14 @@ def _update_safety_status(state: AXONAgentState) -> None:
     )
 
 
+def _llm_used_from_traces(traces: list[dict]) -> bool:
+    """Return llm_used from the operator_copilot trace, if present."""
+    for trace in reversed(traces):
+        if trace.get("agent_name") == "operator_copilot":
+            return bool(trace.get("llm_used"))
+    return False
+
+
 async def run_agent_graph(redis: Redis | None, ws_manager: Any) -> None:
     """Execute one agent graph cycle."""
     session_id = os.getenv("AXON_TRACE_ID", "session-synthetic-001")
@@ -342,7 +350,7 @@ async def run_agent_graph(redis: Redis | None, ws_manager: Any) -> None:
             decision.rationale = (
                 f"{decision.rationale} | Copilot: {result['copilot_explanation'][:200]}"
             )
-            decision.llm_used = settings.axon_llm_mode != "mock"
+            decision.llm_used = _llm_used_from_traces(result.get("trace_events", []))
         await append_decision_stream(redis, decision)
         await append_alert_stream(redis, decision)
 

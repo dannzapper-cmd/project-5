@@ -166,6 +166,35 @@ def test_graph_nominal_continue(compiled_graph):
     assert result["decision_event"] is not None
     assert result["decision_event"]["recommended_action"] == "continue_session"
     assert result["risk_level"] in ("nominal", "low")
+    assert set(result["decision_event"]["contributing_signals"]) == {
+        "emg",
+        "ecg_like",
+        "imu",
+        "spo2_proxy",
+    }
+
+
+def test_contributing_signals_excludes_missing(compiled_graph):
+    reset_injections()
+    activate_injection("sensor_dropout")
+    state = build_nominal_test_state()
+    result = compiled_graph.invoke(state)
+    contributing = result["decision_event"]["contributing_signals"]
+    missing = result["missing_signals"]
+    assert not set(contributing) & set(missing)
+    assert len(contributing) < 4
+    reset_injections()
+
+
+def test_llm_used_false_in_mock_mode(compiled_graph):
+    state = build_nominal_test_state()
+    result = compiled_graph.invoke(state)
+    assert result["decision_event"]["llm_used"] is False
+    copilot_traces = [
+        t for t in result.get("trace_events", []) if t.get("agent_name") == "operator_copilot"
+    ]
+    assert copilot_traces
+    assert copilot_traces[0]["llm_used"] is False
 
 
 def test_graph_low_confidence_hitl(compiled_graph):

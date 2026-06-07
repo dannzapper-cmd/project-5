@@ -21,6 +21,18 @@ from apps.api.app.langchain.tools import (
 from apps.api.app.schemas.events import AgentTraceEventV1, DecisionEventV1
 
 SOURCE = "axon-api"
+EXPECTED_CONTRIBUTING_SIGNALS = ("emg", "ecg_like", "imu", "spo2_proxy")
+
+
+def _contributing_signals(state: AXONAgentState) -> list[str]:
+    """Return synthetic signals present in telemetry and used in analysis."""
+    missing = set(state.get("missing_signals") or [])
+    telemetry = state.get("telemetry_snapshot") or {}
+    return [
+        signal
+        for signal in EXPECTED_CONTRIBUTING_SIGNALS
+        if signal in telemetry and signal not in missing
+    ]
 
 
 def _now_iso() -> str:
@@ -211,7 +223,7 @@ def action_recommendation_agent(state: AXONAgentState) -> dict:
         status=status,  # type: ignore[arg-type]
         rationale=rationale,
         evidence_refs=[f"trace:{state['trace_id']}"],
-        contributing_signals=list(state.get("missing_signals") or []),
+        contributing_signals=_contributing_signals(state),
         model_score_refs=list(state.get("model_score_snapshot", {}).keys()),
         safety_constraints=safety_constraints if isinstance(safety_constraints, list) else [],
         llm_used=False,
@@ -264,6 +276,7 @@ def operator_copilot(state: AXONAgentState) -> dict:
                 response = model.invoke(prompt)
                 explanation = response.content if hasattr(response, "content") else str(response)
             except Exception as exc:
+                llm_used = False
                 fallback = draft_operator_explanation(dict(state))
                 explanation = f"[Copilot error] {exc}. Fallback: {fallback}"
 
