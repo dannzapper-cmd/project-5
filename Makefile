@@ -3,7 +3,9 @@
 	replay-normal replay-fatigue replay-dropout replay-spike replay-multi api-status \
 	models-generate benchmark-inference edge-ai-up edge-ai-logs model-status \
 	test-phase-regression evidence-phase3 mlops-pipeline verify-phase4 compose-learning \
-	compose-ros2 twin-status ros2-logs
+	compose-ros2 twin-status ros2-logs \
+	compose-nav-slam nav-slam-up nav-slam-down nav-slam-logs nav-slam-ps nav-slam-status \
+	nav-slam-map-demo nav-slam-goal-demo nav-slam-blocked-demo nav-slam-nodes nav-slam-topics
 
 SYSTEM_PYTHON ?= python3.12
 VENV ?= .venv
@@ -118,3 +120,41 @@ ros2-up: ## Start core + ROS2 bridge profiles
 
 ros2-logs: ## Tail ROS2 bridge logs
 	docker compose --profile ros2 logs -f ros2_bridge
+
+# --- Phase 5.5 Nav2 + SLAM MiniLab (isolated ros2-nav-slam profile) ---
+NAVSLAM := docker compose --profile ros2-nav-slam
+NAVSLAM_SVC := ros2_nav_slam
+NAVSLAM_EXEC := $(NAVSLAM) exec $(NAVSLAM_SVC) bash -lc 'source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash &&
+
+compose-nav-slam: ## Validate Docker Compose ros2-nav-slam profile configuration
+	docker compose --profile ros2-nav-slam config
+
+nav-slam-up: ## Start Nav2 + SLAM MiniLab (ros2-nav-slam profile)
+	$(NAVSLAM) up --build -d
+
+nav-slam-down: ## Stop Nav2 + SLAM MiniLab profile
+	$(NAVSLAM) down
+
+nav-slam-logs: ## Tail MiniLab logs (last 200 lines)
+	$(NAVSLAM) logs --tail=200 -f $(NAVSLAM_SVC)
+
+nav-slam-ps: ## Show MiniLab service status
+	$(NAVSLAM) ps
+
+nav-slam-nodes: ## List ROS2 nodes in the MiniLab
+	$(NAVSLAM_EXEC) ros2 node list'
+
+nav-slam-topics: ## List ROS2 topics in the MiniLab
+	$(NAVSLAM_EXEC) ros2 topic list'
+
+nav-slam-status: ## Fetch Nav2/SLAM MiniLab status from local API
+	curl -s http://localhost:8000/api/v1/nav-slam/status | python3 -m json.tool
+
+nav-slam-map-demo: ## Start SLAM mapping demo (synthetic scan/odom/TF -> /map)
+	$(NAVSLAM_EXEC) ros2 service call /axon/nav_slam/start_mapping std_srvs/srv/Trigger {}'
+
+nav-slam-goal-demo: ## Send a reachable navigation goal (open floor)
+	$(NAVSLAM_EXEC) ros2 service call /axon/nav_slam/send_goal axon_nav_slam_interfaces/srv/SendNavGoal "{x: 5.0, y: 1.0, theta_deg: 0.0, demo: nav_goal_demo, trace_id: qa-goal}"'
+
+nav-slam-blocked-demo: ## Send a goal inside an obstacle (expect blocked state)
+	$(NAVSLAM_EXEC) ros2 service call /axon/nav_slam/send_goal axon_nav_slam_interfaces/srv/SendNavGoal "{x: 4.2, y: 1.3, theta_deg: 0.0, demo: blocked_goal_demo, trace_id: qa-blocked}"'
