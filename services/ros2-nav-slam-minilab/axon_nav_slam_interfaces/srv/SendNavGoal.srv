@@ -1,0 +1,12 @@
+# Request: a simple 2D navigation goal in the map frame.
+float64 x
+float64 y
+float64 theta_deg
+string demo
+string trace_id
+---
+# Response: acceptance + resulting MiniLab navigation status.
+bool accepted
+string status
+string message
+string trace_id

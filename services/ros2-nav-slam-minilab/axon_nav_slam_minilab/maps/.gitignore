@@ -1,0 +1,6 @@
+# Generated SLAM maps are produced live at runtime, not committed.
+*.pgm
+*.yaml
+*.posegraph
+*.data
+!../config/*.yaml

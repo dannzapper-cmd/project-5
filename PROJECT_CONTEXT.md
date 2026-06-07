@@ -38,11 +38,18 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 5 — Digital Twin + ROS2 Core**
+**Phase 5.5 — Full ROS2 Nav2 + SLAM MiniLab (mandatory advanced)**
 
-Delivered: Phases 1–4 plus `DigitalTwinStateV1`, twin service (Redis/agent integration), live SVG digital twin dashboard, WebSocket `/ws/v1/twin`, safe twin commands, ROS2 thin adapter (`ros2` profile) with `/axon/twin/state` and `/axon/command`.
+Delivered: Phases 1–5 plus the isolated `ros2-nav-slam` profile — headless ROS2
+MiniLab (`axon_nav_slam_minilab` + `axon_nav_slam_interfaces`) with
+`mini_world_node`, `nav_goal_runner`, `slam_status_node`, `axon_nav_slam_bridge`,
+real SLAM Toolbox (online_async) and Nav2 navigation stack on `ros:humble-ros-base`,
+versioned `NavSlam*` schemas, `/api/v1/nav-slam/*` endpoints, `/ws/v1/nav-slam`,
+and a lightweight dashboard MiniLab panel. Full Nav2/SLAM runtime is verified by
+local QA (no Docker/ROS2 in Cursor Web).
 
-Not delivered: Nav2, SLAM (Phase 5.5), federated learning, full 3D physics simulation.
+Not delivered: federated learning, RL (Phase 6), hardware, cloud deployment,
+full 3D physics simulation.
 
 ## Forbidden Claims
 

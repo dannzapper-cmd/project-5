@@ -193,13 +193,26 @@ services:
       ROS2_TWIN_POLL_HZ: ${ROS2_TWIN_POLL_HZ:-2}
       ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-42}
 
-  # --- Phase 5.5 mandatory advanced ROS2 ---
-  ros2-nav-slam-minilab-placeholder:
+  # --- Phase 5.5 mandatory advanced ROS2: Nav2 + SLAM MiniLab ---
+  # Headless, isolated. NOT part of the core profile. Does not start with core
+  # and core does not depend on it. Heavy image (Nav2 + SLAM Toolbox) — see
+  # "Resource requirements" in docs. The bridge reaches the AXON API only when
+  # the core profile is also running; otherwise it degrades gracefully.
+  ros2_nav_slam:
     profiles: [ros2-nav-slam, full]
-    image: alpine:3.20
+    build:
+      context: .
+      dockerfile: services/ros2-nav-slam-minilab/Dockerfile
     environment:
-      AXON_PLACEHOLDER_MESSAGE: "ROS2 Nav2 + SLAM MiniLab — Phase 5.5 (mandatory advanced)"
-    command: *placeholder-command
+      AXON_API_BASE: ${AXON_API_BASE:-http://api:8000}
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-42}
+      SCAN_HZ: ${SCAN_HZ:-12}
+      ODOM_HZ: ${ODOM_HZ:-25}
+      TF_HZ: ${TF_HZ:-25}
+      NAV_SLAM_HEARTBEAT_HZ: ${NAV_SLAM_HEARTBEAT_HZ:-1}
+      NAV_STATUS_HZ: ${NAV_STATUS_HZ:-2}
+      NAV_SLAM_INGEST_HZ: ${NAV_SLAM_INGEST_HZ:-2}
+      NAV_SLAM_COMMAND_POLL_HZ: ${NAV_SLAM_COMMAND_POLL_HZ:-2}
 
   # --- Optional extended simulation profile (Phase 1 uses sensor-generators in core) ---
   sim-placeholder:

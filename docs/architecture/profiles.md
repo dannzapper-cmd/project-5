@@ -9,8 +9,8 @@ AXON uses profiles to prevent all systems from running simultaneously. Activate 
 | `core` | API, dashboard placeholder, Redis, Mosquitto | Phase 0–1 local dev |
 | `obs` | Prometheus, Grafana placeholders | Phase 7 observability work |
 | `learning` | MLflow placeholder | Phase 4+ MLOps work |
-| `ros2` | ROS2 bridge placeholder | Phase 5 robotics integration |
-| `ros2-nav-slam` | Nav2 + SLAM MiniLab placeholder | Phase 5.5 mandatory advanced |
+| `ros2` | ROS2 bridge | Phase 5 robotics integration |
+| `ros2-nav-slam` | Nav2 + SLAM MiniLab (real, headless) | Phase 5.5 mandatory advanced |
 | `sim` | Simulation orchestrator placeholder | Phase 1+ sensor simulation |
 | `llm` | LLM copilot placeholder (optional) | Phase 3+ agent copilot experiments |
 | `full` | All services (staged union) | Integration demos only |
@@ -51,11 +51,17 @@ AXON uses profiles to prevent all systems from running simultaneously. Activate 
 
 ### `ros2-nav-slam`
 
-- **Purpose:** Mandatory advanced Nav2 + SLAM MiniLab
-- **Future services:** Nav2 stack, SLAM toolbox, simulated robot
+- **Purpose:** Mandatory advanced Nav2 + SLAM MiniLab (Phase 5.5)
+- **Service:** `ros2_nav_slam` (headless) — `mini_world_node`, `nav_goal_runner`,
+  `slam_status_node`, `axon_nav_slam_bridge`, real `slam_toolbox` (online_async)
+  + `nav2_bringup` navigation stack on `ros:humble-ros-base`
 - **When to activate:** Phase 5.5 (required advanced phase)
-- **Evidence:** Navigation demo video, map artifacts
-- **Do not run by default:** Heavy; isolated lab profile only
+- **Evidence:** `ros2 node/topic list`, `ros2 topic hz /scan /odom`, TF tree
+  `map->odom->base_link`, `/map` OccupancyGrid, dashboard MiniLab panel
+- **Isolation:** never starts with `core`; `core` does not depend on it; the
+  bridge degrades gracefully if the API is offline
+- **Do not run by default:** Heavy image (Nav2 + SLAM Toolbox); isolated lab only
+- See: ADR-009, ADR-010, `docs/evidence/phase-5-5-nav2-slam-minilab.md`
 
 ### `sim`
 

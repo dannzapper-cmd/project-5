@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from apps.api.app.core.config import settings
+from apps.api.app.nav_slam.service import get_service_status as get_nav_slam_service_status
 from apps.api.app.telemetry.state import telemetry_state
 from apps.api.app.telemetry.websocket_manager import ws_manager
 from apps.api.app.twin.service import get_latest_twin_state, get_twin_service_status
@@ -15,6 +16,7 @@ def health() -> dict[str, str | int | bool | dict]:
     """Return service health and Phase 1 runtime metadata."""
     twin = get_latest_twin_state()
     twin_status = get_twin_service_status()
+    nav_slam_status = get_nav_slam_service_status()
     ros2_status = "offline"
     if twin is not None:
         ros2_status = twin.ros2_bridge.status
@@ -42,5 +44,11 @@ def health() -> dict[str, str | int | bool | dict]:
                 if twin and twin.ros2_bridge.last_topic_publish
                 else None
             ),
+        },
+        "nav_slam_minilab": {
+            "bridge_status": nav_slam_status["bridge_status"],
+            "nav_status": nav_slam_status["nav_status"],
+            "slam_status": nav_slam_status["slam_status"],
+            "last_ingest_at": nav_slam_status["last_ingest_at"],
         },
     }

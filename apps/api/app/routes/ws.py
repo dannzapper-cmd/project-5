@@ -148,3 +148,19 @@ async def ws_twin(websocket: WebSocket) -> None:
         await _hold_connection("twin", websocket)
     finally:
         await ws_manager.disconnect("twin", websocket)
+
+
+@router.websocket("/ws/v1/nav-slam")
+async def ws_nav_slam(websocket: WebSocket) -> None:
+    from apps.api.app.nav_slam.service import get_nav_slam_state
+
+    await ws_manager.connect("nav-slam", websocket)
+    try:
+        state = get_nav_slam_state()
+        await ws_manager.send_json(
+            websocket,
+            {"type": "nav_slam_state", "state": state.model_dump(mode="json")},
+        )
+        await _hold_connection("nav-slam", websocket)
+    finally:
+        await ws_manager.disconnect("nav-slam", websocket)

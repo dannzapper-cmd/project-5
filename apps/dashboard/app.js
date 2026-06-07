@@ -41,6 +41,7 @@ const SENSOR_STATUS_CLASS = {
 
 function setDot(id, online, waiting = false) {
   const el = document.getElementById(id);
+  if (!el) return;
   el.className = "dot " + (online ? "online" : waiting ? "waiting" : "offline");
 }
 
@@ -584,3 +585,211 @@ document.getElementById("twin-cmd-assist").addEventListener("click", () => {
   const mode = document.getElementById("twin-assist-mode").value;
   sendTwinCommand("set_assist_mode", { assist_mode: mode });
 });
+
+/* ---------------- Phase 5.5 Nav2 + SLAM MiniLab panel ---------------- */
+// Static lab geometry (mirrors services/.../config/world.yaml). Scene only;
+// robot pose / goal / path / status come from live backend data.
+const NAV_SLAM_WORLD = { width: 6.0, height: 4.0 };
+const NAV_SLAM_OBSTACLES = [
+  { name: "treadmill", x: 1.0, y: 0.4, w: 0.8, h: 1.0 },
+  { name: "parallel_bars", x: 3.8, y: 0.5, w: 0.8, h: 1.7 },
+  { name: "mat_stack", x: 0.5, y: 2.8, w: 1.1, h: 0.6 },
+  { name: "pillar", x: 2.8, y: 2.9, w: 0.4, h: 0.4 },
+  { name: "storage_cart", x: 4.9, y: 2.9, w: 0.6, h: 0.6 },
+];
+const NAV_SLAM_SCALE_X = 600 / NAV_SLAM_WORLD.width;
+const NAV_SLAM_SCALE_Y = 400 / NAV_SLAM_WORLD.height;
+
+function navSlamSx(x) {
+  return x * NAV_SLAM_SCALE_X;
+}
+function navSlamSy(y) {
+  // Flip Y: world origin bottom-left, SVG origin top-left.
+  return 400 - y * NAV_SLAM_SCALE_Y;
+}
+
+function initNavSlamScene() {
+  const walls = document.getElementById("nav-slam-walls");
+  if (walls) {
+    walls.innerHTML = `<rect x="2" y="2" width="596" height="396" rx="6"
+      class="nav-slam-wall" fill="none"/>`;
+  }
+  const obs = document.getElementById("nav-slam-obstacles");
+  if (obs) {
+    obs.innerHTML = NAV_SLAM_OBSTACLES.map((o) => {
+      const x = navSlamSx(o.x);
+      const y = navSlamSy(o.y + o.h);
+      const w = o.w * NAV_SLAM_SCALE_X;
+      const h = o.h * NAV_SLAM_SCALE_Y;
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3"
+        class="nav-slam-obstacle"><title>${o.name}</title></rect>`;
+    }).join("");
+  }
+}
+
+function setNavSlamOffline() {
+  const svg = document.getElementById("nav-slam-svg");
+  if (svg) svg.classList.add("offline");
+  const robot = document.getElementById("nav-slam-robot");
+  const goal = document.getElementById("nav-slam-goal");
+  if (robot) robot.setAttribute("transform", "translate(-100,-100)");
+  if (goal) {
+    goal.setAttribute("cx", "-100");
+    goal.setAttribute("cy", "-100");
+  }
+  const path = document.getElementById("nav-slam-path");
+  if (path) path.setAttribute("d", "");
+  document.getElementById("nav-slam-overlay").textContent = "MiniLab — offline";
+  const bridge = document.getElementById("nav-slam-bridge");
+  bridge.textContent = "offline";
+  bridge.className = "badge offline-badge";
+}
+
+function updateNavSlamPanel(s) {
+  if (!s) return;
+  const bridgeStatus = s.bridge_status || "offline";
+  const bridgeEl = document.getElementById("nav-slam-bridge");
+  bridgeEl.textContent = bridgeStatus;
+  bridgeEl.className =
+    "badge " +
+    (bridgeStatus === "online"
+      ? "online-badge"
+      : bridgeStatus === "degraded"
+      ? "degraded-badge"
+      : "offline-badge");
+
+  const svg = document.getElementById("nav-slam-svg");
+  if (bridgeStatus === "offline") {
+    setNavSlamOffline();
+    document.getElementById("nav-slam-nav-status").textContent =
+      s.nav_status || "—";
+    return;
+  }
+  if (svg) svg.classList.remove("offline");
+
+  document.getElementById("nav-slam-nav-status").textContent = s.nav_status || "—";
+  document.getElementById("nav-slam-reason").textContent = s.nav_status_reason || "—";
+  document.getElementById("nav-slam-demo").textContent = s.active_demo || "—";
+  const slam = s.slam || {};
+  document.getElementById("nav-slam-slam-status").textContent = slam.status || "—";
+  document.getElementById("nav-slam-coverage").textContent =
+    slam.coverage_pct != null ? slam.coverage_pct.toFixed(1) + "%" : "—";
+  document.getElementById("nav-slam-map-updates").textContent =
+    slam.map_updates != null ? slam.map_updates : "—";
+
+  const pose = s.robot_pose || [0, 0, 0];
+  document.getElementById("nav-slam-pose").textContent =
+    `(${pose[0].toFixed(2)}, ${pose[1].toFixed(2)}) θ${(pose[2] || 0).toFixed(2)}`;
+  document.getElementById("nav-slam-updated").textContent = s.timestamp
+    ? new Date(s.timestamp).toLocaleTimeString()
+    : "—";
+
+  // Robot marker.
+  const robot = document.getElementById("nav-slam-robot");
+  if (robot) {
+    const deg = ((pose[2] || 0) * 180) / Math.PI;
+    robot.setAttribute(
+      "transform",
+      `translate(${navSlamSx(pose[0])},${navSlamSy(pose[1])}) rotate(${-deg})`
+    );
+  }
+
+  // Goal marker.
+  const goalEl = document.getElementById("nav-slam-goal");
+  if (s.goal) {
+    goalEl.setAttribute("cx", navSlamSx(s.goal.x));
+    goalEl.setAttribute("cy", navSlamSy(s.goal.y));
+    document.getElementById("nav-slam-goal-text").textContent =
+      `(${s.goal.x.toFixed(2)}, ${s.goal.y.toFixed(2)})`;
+  } else {
+    goalEl.setAttribute("cx", "-100");
+    goalEl.setAttribute("cy", "-100");
+    document.getElementById("nav-slam-goal-text").textContent = "—";
+  }
+
+  // Path.
+  const path = document.getElementById("nav-slam-path");
+  const wps = (s.path && s.path.waypoints) || [];
+  if (path && wps.length > 1) {
+    path.setAttribute(
+      "d",
+      wps
+        .map((w, i) => `${i === 0 ? "M" : "L"} ${navSlamSx(w[0])} ${navSlamSy(w[1])}`)
+        .join(" ")
+    );
+  } else if (path) {
+    path.setAttribute("d", "");
+  }
+  document.getElementById("nav-slam-path-text").textContent =
+    s.path && s.path.waypoint_count
+      ? `${s.path.waypoint_count} wp / ${(s.path.length_m || 0).toFixed(2)} m`
+      : "—";
+
+  document.getElementById("nav-slam-overlay").textContent =
+    `SLAM ${slam.status || "—"} · Nav ${s.nav_status || "—"}`;
+}
+
+async function sendNavSlamCommand(command, extra = {}) {
+  try {
+    const res = await fetch(`${config.apiBase}/api/v1/nav-slam/command`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        schema_version: "v1",
+        command,
+        requested_by: "dashboard-operator",
+        ...extra,
+      }),
+    });
+    const data = await res.json();
+    document.getElementById("nav-slam-cmd-result").textContent =
+      `${data.status}: ${data.reason || data.command} (trace ${(data.trace_id || "").slice(0, 12)}…)`;
+  } catch (_) {
+    document.getElementById("nav-slam-cmd-result").textContent =
+      "Command failed (MiniLab/API offline)";
+  }
+}
+
+async function pollNavSlamStatus() {
+  try {
+    const res = await fetch(`${config.apiBase}/api/v1/nav-slam/status`);
+    if (!res.ok) {
+      setNavSlamOffline();
+      return;
+    }
+    updateNavSlamPanel(await res.json());
+  } catch (_) {
+    setNavSlamOffline();
+  }
+}
+
+initNavSlamScene();
+setNavSlamOffline();
+connectWs("/ws/v1/nav-slam", "ws-nav-slam-status", null, (msg) => {
+  if (msg.type === "nav_slam_state" && msg.state) updateNavSlamPanel(msg.state);
+});
+pollNavSlamStatus();
+setInterval(pollNavSlamStatus, 5000);
+
+document
+  .getElementById("nav-slam-cmd-mapping")
+  .addEventListener("click", () => sendNavSlamCommand("start_mapping"));
+document
+  .getElementById("nav-slam-cmd-goal")
+  .addEventListener("click", () =>
+    sendNavSlamCommand("send_goal", {
+      goal: { schema_version: "v1", x: 5.0, y: 1.0, theta_deg: 0.0 },
+      demo: "nav_goal_demo",
+    })
+  );
+document
+  .getElementById("nav-slam-cmd-blocked")
+  .addEventListener("click", () =>
+    sendNavSlamCommand("send_goal", {
+      goal: { schema_version: "v1", x: 4.2, y: 1.3, theta_deg: 0.0 },
+      demo: "blocked_goal_demo",
+    })
+  );
+document
+  .getElementById("nav-slam-cmd-reset")
+  .addEventListener("click", () => sendNavSlamCommand("reset"));
