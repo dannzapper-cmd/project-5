@@ -4,10 +4,27 @@
 
 MLOps, fine-tuning, continual learning, federated learning (Flower), and RL micro-module training loops.
 
-## Future Phase
+## Phase
 
-- Phase 4 — MLOps + Fine-tuning + Continual Learning
-- Phase 6 — Federated Learning + RL
+- Phase 4 — MLOps + Fine-tuning + Continual Learning (delivered; see `apps/mlops/`)
+- Phase 6A — Federated Learning (Flower + FedAvg) — **delivered**
+- Phase 6B — RL — future
+
+## Phase 6A: Federated Learning runner
+
+This service provides the Docker `learning`-profile `fl-runner` (one-shot) image
+for the federated learning simulation. The FL logic lives in
+`apps/learning/federated/`; the runner image (`services/learning/Dockerfile`)
+installs the isolated `requirements-learning.txt` (Flower 1.x + CPU torch +
+MLflow) and executes `scripts/run_federated_learning.py`.
+
+```bash
+docker compose --profile learning run --build fl-runner   # one federated run
+# or locally:
+make learning-install && make learning-fl-run
+```
+
+Synthetic federated learning simulation. No real patient data. No medical claims.
 
 ## Expected Inputs
 
@@ -29,6 +46,7 @@ MLOps, fine-tuning, continual learning, federated learning (Flower), and RL micr
 - Flower convergence chart
 - RL reward curve
 
-## Current Phase 0 Status
+## Status
 
-**Placeholder only.** No MLflow, Flower, or RL environments implemented.
+MLflow (Phase 4) and Flower federated learning (Phase 6A) are implemented. RL
+(Phase 6B) is not yet implemented.

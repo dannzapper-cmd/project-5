@@ -82,6 +82,15 @@ artifacts/mlops/runs/
 artifacts/mlops/latest_eval.json
 artifacts/mlops/model_registry.json
 
+# Phase 6A Federated Learning runtime artifacts (regenerated on demand)
+artifacts/learning/federated/federated_report.json
+artifacts/learning/federated/client_distribution_summary.json
+artifacts/learning/federated/convergence.json
+artifacts/learning/federated/convergence.csv
+artifacts/learning/federated/model_card_axon_fl_v1.md
+artifacts/learning/federated/status.json
+artifacts/learning/federated/runs/
+
 # IDE
 .idea/
 .vscode/
