@@ -193,3 +193,10 @@ button.danger-btn:hover:not(:disabled) { border-color: var(--danger); color: var
 .online-badge { background: rgba(127, 217, 98, 0.2); color: var(--ok); }
 .degraded-badge { background: rgba(240, 180, 41, 0.2); color: var(--warn); }
 .offline-badge { background: rgba(159, 176, 208, 0.15); color: var(--muted); }
+
+/* Phase 6A Federated Learning */
+.badge.phase6a { background: rgba(61, 214, 198, 0.18); color: #7fe9dd; }
+.fl-safety { background: rgba(61, 214, 198, 0.10); border-color: rgba(61, 214, 198, 0.35); }
+.fl-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+@media (max-width: 860px) { .fl-tables { grid-template-columns: 1fr; } }
+.fl-subhead { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--muted); }
