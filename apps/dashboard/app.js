@@ -855,3 +855,55 @@ async function pollFederatedStatus() {
 
 pollFederatedStatus();
 setInterval(pollFederatedStatus, 10000);
+
+// --- Phase 6B RL Micro-module panel ---
+function updateRLPanel(data) {
+  if (!data) return;
+  const summary = data.summary || {};
+  const policy = data.policy_summary || {};
+  document.getElementById("rl-status").textContent = data.status || "idle";
+  document.getElementById("rl-env").textContent = data.env_name || "—";
+  document.getElementById("rl-algo").textContent = data.algorithm || "—";
+  document.getElementById("rl-mean-reward").textContent = fmtNum(data.mean_reward, 3);
+  document.getElementById("rl-baseline").textContent = fmtNum(data.baseline_reward, 3);
+  document.getElementById("rl-trained").textContent = fmtNum(data.trained_policy_reward, 3);
+  document.getElementById("rl-improvement").textContent = fmtNum(data.policy_improvement_ratio, 3);
+  document.getElementById("rl-unsafe").textContent = fmtNum(data.unsafe_action_rate, 3);
+  document.getElementById("rl-hitl").textContent = fmtNum(data.hitl_suggestion_rate, 3);
+  document.getElementById("rl-mlflow").textContent = data.mlflow_run_id || "—";
+  document.getElementById("rl-report-path").textContent =
+    "Report: " + (data.report_path || data.artifact_dir || "—");
+  document.getElementById("rl-empty").style.display = data.has_run ? "none" : "block";
+
+  if (data.disclaimer) {
+    document.getElementById("rl-disclaimer").textContent = data.disclaimer;
+  }
+}
+
+async function updateRLRewardCurve() {
+  try {
+    const res = await fetch(`${config.apiBase}/api/learning/rl/latest`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const body = document.getElementById("rl-reward-curve-table");
+    body.innerHTML = (data.reward_curve || [])
+      .map((p) => `<tr><td>${p.timesteps}</td><td>${fmtNum(p.mean_episode_reward, 3)}</td></tr>`)
+      .join("");
+  } catch (_) {
+    /* graceful empty state */
+  }
+}
+
+async function pollRLStatus() {
+  try {
+    const res = await fetch(`${config.apiBase}/api/learning/rl/status`);
+    if (!res.ok) return;
+    updateRLPanel(await res.json());
+    updateRLRewardCurve();
+  } catch (_) {
+    /* graceful empty state — panel keeps its disclaimer + idle defaults */
+  }
+}
+
+pollRLStatus();
+setInterval(pollRLStatus, 10000);
