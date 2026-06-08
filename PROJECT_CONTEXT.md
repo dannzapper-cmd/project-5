@@ -38,7 +38,26 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 6A — Federated Learning Simulation (Flower + FedAvg, synthetic, on-demand)**
+**Phase 6B — RL Micro-module (Gymnasium + Stable-Baselines3 PPO, synthetic, on-demand)**
+
+Delivered: Phases 1–6A (see below) plus Phase 6B — a lightweight reinforcement
+learning micro-module. A tiny Gymnasium environment (`AxonTriageEnvV1`, 10-dim
+`Box` observation, `Discrete(6)` actions) simulates *safe operational* triage
+decisions (alert prioritization, conservative threshold suggestions, simulated
+resource allocation, human-in-the-loop escalation). A short CPU PPO run
+(Stable-Baselines3) learns a policy that beats a random baseline under a
+transparent `REWARD_V1` reward. Runs log to a local file-based MLflow store
+(experiment `axon_rl_micro_module`), produce `rl_report.json` + reward curve +
+policy summary + safety envelope, and surface via `/api/learning/rl/*` and a
+dashboard RL panel. On-demand only (`learning` profile / `rl-runner`); Gymnasium,
+SB3, and torch are isolated from the core profile. The RL policy makes **no
+medical decisions**, controls **no real hardware**, and requires human review for
+high-risk/low-confidence situations.
+
+Phase 6B does NOT implement Phase 7, does NOT modify ROS2/Nav2/SLAM, and does NOT
+change Phase 6A federated learning.
+
+### Phase 6A — Federated Learning Simulation (Flower + FedAvg, synthetic, on-demand)
 
 Delivered: Phases 1–5.5 (telemetry, edge AI, agents/HITL, MLOps, digital twin +
 ROS2 core, and the isolated `ros2-nav-slam` Nav2 + SLAM MiniLab), plus Phase 6A —
@@ -51,9 +70,8 @@ and surface via `/api/learning/federated/*` and a dashboard FL panel. The FL
 experiment is on-demand only (Docker `learning` profile / `fl-runner`); Flower
 and torch are isolated from the core profile.
 
-Not delivered: RL (Phase 6B), Phase 7 observability, hardware, cloud deployment,
-full 3D physics simulation. Synthetic only — no real patient data, no medical
-claims.
+Not delivered: Phase 7 observability, hardware, cloud deployment, full 3D physics
+simulation. Synthetic only — no real patient data, no medical claims.
 
 ## Forbidden Claims
 
