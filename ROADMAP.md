@@ -279,7 +279,45 @@ not required for Phase 7 completion.
 
 ---
 
-## Phase 8: Cloud/VM + Hardware Path
+## Phase 8 — Integrated Mission Control System
+
+**Goal:** Unify prior phases into a mission control cockpit with end-to-end operational
+loop visibility, scenario runner, timeline, Evidence Center, and dashboard integration.
+
+**Required outputs:**
+- Mission API (`/mission/*`)
+- Deterministic scenario runner + `artifacts/phase8/` evidence
+- Dashboard Mission Control section
+- Phase 8 tests + verify script + ADR-013
+
+**What must be real:**
+- Mission status/timeline/evidence APIs with honest degradation
+- Scenario artifacts with required JSON fields (seed 42)
+- Evidence index with file existence checks
+
+**What can be simulated:**
+- ROS2/Nav2/SLAM runtime (artifact/status fallback)
+- FL/RL without retraining (existing artifacts)
+
+**Evidence to collect:**
+- `artifacts/phase8/phase8_mission_*.json`
+- Scenario summary + mission timeline artifact
+- Dashboard Mission Control panel (API-connected or fallback)
+
+**Acceptance criteria:**
+- `pytest tests/phase8/ -q` passes
+- `bash scripts/verify_phase8.sh` passes
+- Docker compose profiles validate (core, learning, ros2, ros2-nav-slam, obs)
+- No medical claims; no fake evidence
+
+**Next:** Phase 9 — final QA, repair, hardening before packaging.
+
+---
+
+## Phase 8 (legacy note) — Cloud/VM + Hardware Path
+
+*Superseded for portfolio delivery order — hardware/cost report may return in a later
+optional track. Phase 8 as shipped integrates mission control, not cloud packaging.*
 
 **Goal:** Document and optionally demonstrate cloud VM profiles and edge hardware paths.
 

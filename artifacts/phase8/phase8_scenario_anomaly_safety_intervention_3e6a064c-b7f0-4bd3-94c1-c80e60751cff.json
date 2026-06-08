@@ -1,0 +1,321 @@
+{
+  "run_id": "3e6a064c-b7f0-4bd3-94c1-c80e60751cff",
+  "scenario": "anomaly_safety_intervention",
+  "generated_at": "2026-06-08T04:40:17.071960+00:00",
+  "trace_id": "phase8-3e6a064c",
+  "phase": "phase_8",
+  "seed": 42,
+  "synthetic_data_only": true,
+  "no_medical_claims": true,
+  "status": "completed",
+  "timeline": [
+    {
+      "event_id": "c6f5153c-e539-4c8f-8a21-b1d3f47a2c82",
+      "timestamp": "2026-06-08T04:40:17+00:00",
+      "stage": "telemetry_received",
+      "title": "Synthetic telemetry received",
+      "summary": "MQTT/Redis synthetic ingest",
+      "source_component": "telemetry",
+      "status": "ok",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "aad77bb0-ae8a-48bf-b255-808f6977e60a",
+      "timestamp": "2026-06-08T04:40:18+00:00",
+      "stage": "edge_inference_scored",
+      "title": "Edge inference scored synthetic signals",
+      "summary": "ONNX Runtime edge inference",
+      "source_component": "edge_inference",
+      "status": "ok",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "648b378b-b3a0-44ad-86ad-3156e30366a8",
+      "timestamp": "2026-06-08T04:40:19+00:00",
+      "stage": "anomaly_status_evaluated",
+      "title": "Anomaly fusion evaluated",
+      "summary": "Safety fusion layer",
+      "source_component": "anomaly_safety",
+      "status": "warning",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "ad718fb1-153b-493e-9720-b2010e8d0c39",
+      "timestamp": "2026-06-08T04:40:20+00:00",
+      "stage": "agent_decision_generated",
+      "title": "Agent decision generated",
+      "summary": "LangGraph operational decision",
+      "source_component": "agents",
+      "status": "ok",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "cbba6968-c8b1-464f-933e-2d25d48a1432",
+      "timestamp": "2026-06-08T04:40:21+00:00",
+      "stage": "hitl_safety_gate_checked",
+      "title": "HITL safety gate checked",
+      "summary": "Human-in-the-loop gate",
+      "source_component": "safety_hitl",
+      "status": "blocked",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "83f39866-9c4c-4f62-9cf9-6ad039fcc761",
+      "timestamp": "2026-06-08T04:40:22+00:00",
+      "stage": "digital_twin_updated",
+      "title": "Digital twin state updated",
+      "summary": "Twin mirror from streams",
+      "source_component": "digital_twin",
+      "status": "simulated",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "06f9156a-b369-411e-8c56-5584e2c8c94e",
+      "timestamp": "2026-06-08T04:40:23+00:00",
+      "stage": "ros2_status_checked",
+      "title": "ROS2 bridge status checked",
+      "summary": "ROS2 thin adapter",
+      "source_component": "ros2",
+      "status": "skipped",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        },
+        "reason": "No live ROS2 runtime required for Phase 8"
+      }
+    },
+    {
+      "event_id": "0f4b9a3d-e112-421e-b365-a4a5baae231e",
+      "timestamp": "2026-06-08T04:40:24+00:00",
+      "stage": "nav_slam_status_checked",
+      "title": "Nav2/SLAM status checked",
+      "summary": "Nav2 SLAM MiniLab",
+      "source_component": "nav_slam",
+      "status": "skipped",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        },
+        "reason": "Nav2/SLAM MiniLab optional profile offline"
+      }
+    },
+    {
+      "event_id": "38d0af16-f408-4d5f-ae9a-7b36cbbe7182",
+      "timestamp": "2026-06-08T04:40:25+00:00",
+      "stage": "fl_evidence_loaded",
+      "title": "Federated learning evidence loaded",
+      "summary": "FL artifacts",
+      "source_component": "federated_learning",
+      "status": "simulated",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "0fdd7b38-fa37-4352-9c04-00c7313ef8f5",
+      "timestamp": "2026-06-08T04:40:26+00:00",
+      "stage": "rl_evidence_loaded",
+      "title": "RL evidence loaded",
+      "summary": "RL artifacts",
+      "source_component": "reinforcement_learning",
+      "status": "simulated",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "4b940dcd-ffad-4bed-ab25-1d6289b72ef7",
+      "timestamp": "2026-06-08T04:40:27+00:00",
+      "stage": "observability_checked",
+      "title": "Observability status checked",
+      "summary": "Phase 7 observability",
+      "source_component": "observability",
+      "status": "ok",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "d68e9f08-5efa-4019-898e-d847cfde9ed5",
+      "timestamp": "2026-06-08T04:40:28+00:00",
+      "stage": "reliability_checked",
+      "title": "Reliability status checked",
+      "summary": "Phase 7 reliability",
+      "source_component": "reliability",
+      "status": "ok",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": null,
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    },
+    {
+      "event_id": "1ea4f446-9c56-4346-99ed-6cf068f6db3c",
+      "timestamp": "2026-06-08T04:40:29+00:00",
+      "stage": "evidence_artifact_written",
+      "title": "Phase 8 evidence artifacts written",
+      "summary": "Mission scenario runner",
+      "source_component": "mission_scenario",
+      "status": "ok",
+      "trace_id": "phase8-3e6a064c",
+      "artifact_ref": "artifacts/phase8/phase8_scenario_anomaly_safety_intervention_3e6a064c-b7f0-4bd3-94c1-c80e60751cff.json",
+      "details": {
+        "seed": 42,
+        "telemetry": {
+          "emg": 0.97,
+          "ecg_like": 0.4125,
+          "imu": 0.92,
+          "spo2_proxy": 0.8812,
+          "robot_state": 0.7365
+        }
+      }
+    }
+  ],
+  "components_touched": [
+    "telemetry",
+    "edge_inference",
+    "anomaly_safety",
+    "agents",
+    "safety_hitl",
+    "digital_twin",
+    "observability",
+    "reliability",
+    "evidence_center",
+    "safety_hitl"
+  ],
+  "evidence_links": [
+    "artifacts/learning/federated/federated_report.json",
+    "artifacts/learning/federated/status.json",
+    "artifacts/learning/federated/convergence.json",
+    "artifacts/learning/federated/model_card_axon_fl_v1.md",
+    "artifacts/learning/rl/rl_report.json",
+    "artifacts/reliability/phase7a_reliability_report.json",
+    "artifacts/reliability/failure_replay_report.json",
+    "artifacts/reliability/service_status_snapshot.json",
+    "artifacts/observability/phase7b_observability_report.json",
+    "artifacts/observability/metrics_snapshot.txt",
+    "artifacts/observability/operational_status_snapshot.json",
+    "docs/evidence/phase-3-agent-graph.md"
+  ],
+  "limitations": [
+    "Synthetic operational simulation only \u2014 no real hardware or biomedical data",
+    "ROS2/Nav2/SLAM stages skipped when optional profiles are offline",
+    "Evidence loaded from existing artifacts without retraining",
+    "Anomaly path demonstrates safety/HITL gate \u2014 not a real alert system"
+  ],
+  "repo_commit": "0ed9762961b9e717b4a141017f6a8cb92b640410"
+}

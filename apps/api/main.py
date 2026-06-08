@@ -1,4 +1,4 @@
-"""AXON API gateway entrypoint (Phase 7: observability + reliability layer)."""
+"""AXON API gateway entrypoint (Phase 8: integrated mission control layer)."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +10,7 @@ from apps.api.app.routes.agents import router as agents_router
 from apps.api.app.routes.health import router as health_router
 from apps.api.app.routes.learning import router as learning_router
 from apps.api.app.routes.metrics import router as metrics_router
+from apps.api.app.routes.mission import router as mission_router
 from apps.api.app.routes.mlops import router as mlops_router
 from apps.api.app.routes.nav_slam import router as nav_slam_router
 from apps.api.app.routes.rl import router as rl_router
@@ -42,6 +43,7 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(metrics_router)
+app.include_router(mission_router)
 app.include_router(telemetry_router)
 app.include_router(agents_router)
 app.include_router(mlops_router)

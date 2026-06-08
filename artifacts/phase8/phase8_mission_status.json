@@ -1,0 +1,27 @@
+{
+  "run_id": "d468ed56-b387-4fdd-a93d-7d0257e5c3f2",
+  "scenario": "normal_operation",
+  "generated_at": "2026-06-08T04:40:20.792119+00:00",
+  "phase": "phase_8",
+  "seed": 42,
+  "synthetic_data_only": true,
+  "no_medical_claims": true,
+  "system_mode": "scenario_artifact",
+  "components": [
+    "telemetry",
+    "edge_inference",
+    "anomaly_safety",
+    "agents",
+    "safety_hitl",
+    "digital_twin",
+    "observability",
+    "reliability",
+    "evidence_center"
+  ],
+  "limitations": [
+    "Synthetic operational simulation only \u2014 no real hardware or biomedical data",
+    "ROS2/Nav2/SLAM stages skipped when optional profiles are offline",
+    "Evidence loaded from existing artifacts without retraining"
+  ],
+  "repo_commit": "0ed9762961b9e717b4a141017f6a8cb92b640410"
+}

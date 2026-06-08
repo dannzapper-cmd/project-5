@@ -38,7 +38,25 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 7 — Observability + Reliability (lightweight local layer)**
+**Phase 8 — Integrated Mission Control System**
+
+Delivered on branch `feat/phase-8-integrated-mission-control`:
+
+- **Mission API:** `/mission/status`, `/mission/timeline`, `/mission/evidence`,
+  `/mission/scenarios`, `POST /mission/scenarios/run` — unified operational loop view
+  with graceful degradation (HTTP 200, honest `degraded_components`).
+- **Scenario runner:** `scripts/run_phase8_mission_scenario.py` — deterministic seed 42,
+  three scenarios, artifacts under `artifacts/phase8/`.
+- **Evidence Center:** honest index connecting FL, RL, reliability, observability,
+  mission scenarios, twin/agents/safety, and robotics docs.
+- **Dashboard:** Mission Control section (static HTML/JS, 10s polling, API fallback).
+- **Verification:** `scripts/verify_phase8.sh`, `tests/phase8/`, ADR-013.
+
+**Not delivered in Phase 8:** Phase 9 QA hardening, Phase 10 packaging, cloud/Kubernetes,
+mandatory live ROS2/Nav2/SLAM, FL/RL retraining. Synthetic only — no real patient data,
+no medical claims.
+
+### Phase 7 — Observability + Reliability (lightweight local layer)
 
 Delivered on branch `feat/phase-7-observability-reliability`:
 
