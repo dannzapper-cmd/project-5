@@ -1,0 +1,66 @@
+{
+  "run_id": "b890f71b-5b10-404f-8d48-1831ef509ce5",
+  "timestamp": "2026-06-08T03:54:45.597622+00:00",
+  "phase": "phase7",
+  "summary": "pass",
+  "scenarios": [
+    {
+      "scenario": "fl_artifacts_missing",
+      "artifact_present": true,
+      "expected_statuses": [
+        "unavailable",
+        "inactive",
+        "degraded"
+      ],
+      "observed": {
+        "status": "ok",
+        "required": false,
+        "message": "Federated learning artifact present at federated_report.json"
+      }
+    },
+    {
+      "scenario": "rl_artifacts_missing",
+      "artifact_present": true,
+      "expected_statuses": [
+        "unavailable",
+        "inactive",
+        "degraded"
+      ],
+      "observed": {
+        "status": "ok",
+        "required": false,
+        "message": "RL micro-module artifact present at rl_report.json"
+      }
+    },
+    {
+      "scenario": "mlflow_unavailable",
+      "expected_statuses": [
+        "unavailable",
+        "inactive",
+        "degraded"
+      ],
+      "observed": {
+        "status": "inactive",
+        "required": false,
+        "message": "MLflow learning profile not configured (set MLFLOW_HOST to probe)"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "health_live",
+      "passed": true,
+      "detail": "HTTP 200, body status=ok"
+    },
+    {
+      "check": "health_ready",
+      "passed": true,
+      "detail": "HTTP 200, aggregate=ok; schema ok"
+    },
+    {
+      "check": "failure_replay_optional_evidence",
+      "passed": true,
+      "detail": "optional evidence degrades gracefully"
+    }
+  ]
+}

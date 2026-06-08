@@ -205,3 +205,18 @@ button.danger-btn:hover:not(:disabled) { border-color: var(--danger); color: var
 .badge.phase6b { background: rgba(167, 139, 250, 0.18); color: #c4b5fd; }
 .rl-safety { background: rgba(167, 139, 250, 0.10); border-color: rgba(167, 139, 250, 0.35); }
 .rl-subhead { margin: 0.75rem 0 0.4rem; font-size: 0.85rem; color: var(--muted); }
+
+/* Phase 7 Operational Status */
+.badge.phase7 { background: rgba(127, 217, 98, 0.15); color: var(--ok); }
+.ops-disclaimer { color: var(--warn); }
+.ops-subhead { font-size: 0.9rem; margin: 0.75rem 0 0.35rem; color: var(--muted); }
+.ops-table-wrap { overflow-x: auto; margin-bottom: 0.5rem; }
+.ops-status.ok { color: var(--ok); }
+.ops-status.degraded { color: var(--warn); }
+.ops-status.unavailable, .ops-status.inactive { color: var(--muted); }
+.ops-status.error { color: var(--danger); }
+.ops-status.loading { color: var(--muted); font-style: italic; }
+td.ops-status.ok { color: var(--ok); }
+td.ops-status.degraded { color: var(--warn); }
+td.ops-status.error { color: var(--danger); }
+td.ops-status.inactive, td.ops-status.unavailable { color: var(--muted); }

@@ -907,3 +907,101 @@ async function pollRLStatus() {
 
 pollRLStatus();
 setInterval(pollRLStatus, 10000);
+
+// --- Phase 7 Operational / Reliability panel ---
+const CORE_COMPONENTS = new Set([
+  "api",
+  "redis",
+  "mqtt",
+  "telemetry_pipeline",
+  "edge_inference",
+  "digital_twin",
+  "agents_hitl",
+  "dashboard",
+]);
+const OPS_STATUS_CLASS = {
+  ok: "ok",
+  degraded: "degraded",
+  unavailable: "unavailable",
+  inactive: "inactive",
+  error: "error",
+};
+
+function setOpsStatus(elId, status) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const normalized = OPS_STATUS_CLASS[status] ? status : "unavailable";
+  el.textContent = normalized;
+  el.className = "ops-status " + normalized;
+}
+
+function renderOpsRow(name, comp) {
+  const status = comp.status || "unavailable";
+  const req = comp.required ? "yes" : "no (optional)";
+  return `<tr><td>${name}</td><td class="ops-status ${status}">${status}</td><td>${req}</td><td>${comp.message || "—"}</td></tr>`;
+}
+
+async function pollOperationalStatus() {
+  const unreachable = document.getElementById("ops-api-unreachable");
+  const content = document.getElementById("ops-content");
+  try {
+    const [liveRes, readyRes, servicesRes] = await Promise.all([
+      fetch(`${config.apiBase}/health/live`),
+      fetch(`${config.apiBase}/health/ready`),
+      fetch(`${config.apiBase}/status/services`),
+    ]);
+    if (!liveRes.ok || !servicesRes.ok) {
+      throw new Error("API unreachable");
+    }
+    if (unreachable) unreachable.style.display = "none";
+    if (content) content.style.display = "block";
+
+    const live = await liveRes.json();
+    const ready = readyRes.ok ? await readyRes.json() : { status: "unavailable" };
+    const services = await servicesRes.json();
+
+    setOpsStatus("ops-liveness", live.status || "ok");
+    setOpsStatus("ops-readiness", ready.status || "unavailable");
+    setOpsStatus("ops-overall", services.status || "unavailable");
+    document.getElementById("ops-last-check").textContent =
+      services.timestamp || new Date().toISOString();
+
+    const components = services.components || {};
+    const coreBody = document.getElementById("ops-components-core");
+    const optBody = document.getElementById("ops-components-optional");
+    if (!Object.keys(components).length) {
+      const ev = document.getElementById("ops-evidence-summary");
+      if (ev) ev.textContent = "No components reported.";
+    } else {
+      if (coreBody) {
+        coreBody.innerHTML = Object.entries(components)
+          .filter(([name]) => CORE_COMPONENTS.has(name))
+          .map(([name, comp]) => renderOpsRow(name, comp))
+          .join("");
+      }
+      if (optBody) {
+        optBody.innerHTML = Object.entries(components)
+          .filter(([name]) => !CORE_COMPONENTS.has(name))
+          .map(([name, comp]) => renderOpsRow(name, comp))
+          .join("");
+      }
+      const fl = components.fl_module?.status;
+      const rl = components.rl_module?.status;
+      document.getElementById("ops-evidence-summary").textContent =
+        `Evidence: FL=${fl || "—"}, RL=${rl || "—"}, MLOps=${components.mlops_evidence?.status || "—"}`;
+    }
+    document.getElementById("ops-reliability-report").textContent =
+      "Reliability report: artifacts/reliability/phase7a_reliability_report.json (run scripts/reliability/check_phase7_reliability.py)";
+    document.getElementById("ops-observability-report").textContent =
+      "Observability report: artifacts/observability/phase7b_observability_report.json (run scripts/observability/check_phase7_observability.py)";
+  } catch (_) {
+    if (unreachable) unreachable.style.display = "block";
+    if (content) content.style.display = "none";
+    setOpsStatus("ops-overall", "unavailable");
+    setOpsStatus("ops-readiness", "unavailable");
+    setOpsStatus("ops-liveness", "unavailable");
+  }
+}
+
+pollOperationalStatus();
+setInterval(pollOperationalStatus, 15000);
