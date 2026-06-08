@@ -5,7 +5,8 @@
 	test-phase-regression evidence-phase3 mlops-pipeline verify-phase4 compose-learning \
 	compose-ros2 twin-status ros2-logs \
 	compose-nav-slam nav-slam-up nav-slam-down nav-slam-logs nav-slam-ps nav-slam-status \
-	nav-slam-map-demo nav-slam-goal-demo nav-slam-blocked-demo nav-slam-nodes nav-slam-topics
+	nav-slam-map-demo nav-slam-goal-demo nav-slam-blocked-demo nav-slam-nodes nav-slam-topics \
+	learning-install learning-fl-run learning-fl-smoke learning-fl-report fl-status verify-phase6a
 
 SYSTEM_PYTHON ?= python3.12
 VENV ?= .venv
@@ -158,3 +159,25 @@ nav-slam-goal-demo: ## Send a reachable navigation goal (open floor)
 
 nav-slam-blocked-demo: ## Send a goal inside an obstacle (expect blocked state)
 	$(NAVSLAM_EXEC) ros2 service call /axon/nav_slam/send_goal axon_nav_slam_interfaces/srv/SendNavGoal "{x: 4.2, y: 1.3, theta_deg: 0.0, demo: blocked_goal_demo, trace_id: qa-blocked}"'
+
+# --- Phase 6A Federated Learning (on-demand learning profile) ---
+learning-install: ## Install Phase 6A FL deps (Flower + CPU torch + MLflow), isolated from core
+	$(PIP) install torch --index-url https://download.pytorch.org/whl/cpu
+	$(PIP) install -r requirements-learning.txt
+
+learning-fl-run: ## Run the Flower FedAvg federated learning simulation (default 3 clients)
+	$(PYTHON) scripts/run_federated_learning.py --num-clients $${FL_NUM_CLIENTS:-3} --num-rounds $${FL_NUM_ROUNDS:-5} --local-epochs $${FL_LOCAL_EPOCHS:-3} --seed $${FL_SEED:-42}
+
+learning-fl-smoke: ## Run a tiny CI-friendly federated simulation (2 clients, 1 round)
+	$(PYTHON) scripts/run_federated_learning.py --smoke
+
+learning-fl-report: ## Print the latest federated learning report
+	@test -f artifacts/learning/federated/federated_report.json \
+		&& $(PYTHON) -m json.tool artifacts/learning/federated/federated_report.json \
+		|| echo "No report yet. Run 'make learning-fl-run' first."
+
+fl-status: ## Fetch federated learning status from the local API
+	curl -s http://localhost:8000/api/learning/federated/status | python3 -m json.tool
+
+verify-phase6a: ## Run the Phase 6A verification script (lint + FL tests + smoke + compose)
+	bash scripts/verify_phase6a.sh

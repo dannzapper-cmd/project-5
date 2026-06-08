@@ -38,18 +38,22 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 5.5 — Full ROS2 Nav2 + SLAM MiniLab (mandatory advanced)**
+**Phase 6A — Federated Learning Simulation (Flower + FedAvg, synthetic, on-demand)**
 
-Delivered: Phases 1–5 plus the isolated `ros2-nav-slam` profile — headless ROS2
-MiniLab (`axon_nav_slam_minilab` + `axon_nav_slam_interfaces`) with
-`mini_world_node`, `nav_goal_runner`, `slam_status_node`, `axon_nav_slam_bridge`,
-real SLAM Toolbox (online_async) and Nav2 navigation stack on `ros:humble-ros-base`,
-versioned `NavSlam*` schemas, `/api/v1/nav-slam/*` endpoints, `/ws/v1/nav-slam`,
-and a lightweight dashboard MiniLab panel. Full Nav2/SLAM runtime is verified by
-local QA (no Docker/ROS2 in Cursor Web).
+Delivered: Phases 1–5.5 (telemetry, edge AI, agents/HITL, MLOps, digital twin +
+ROS2 core, and the isolated `ros2-nav-slam` Nav2 + SLAM MiniLab), plus Phase 6A —
+a lightweight federated learning simulation. Multiple simulated edge clients
+(3–5) each train a tiny CPU MLP (`AxonFLModelV1`, 850 params) on deterministic
+synthetic non-IID biosignal-like data; a central coordinator aggregates with
+Flower's `FedAvg` (`flwr[simulation]==1.30.0`, stable 1.x). Runs log to a local
+file-based MLflow store, produce `federated_report.json` + convergence artifacts,
+and surface via `/api/learning/federated/*` and a dashboard FL panel. The FL
+experiment is on-demand only (Docker `learning` profile / `fl-runner`); Flower
+and torch are isolated from the core profile.
 
-Not delivered: federated learning, RL (Phase 6), hardware, cloud deployment,
-full 3D physics simulation.
+Not delivered: RL (Phase 6B), Phase 7 observability, hardware, cloud deployment,
+full 3D physics simulation. Synthetic only — no real patient data, no medical
+claims.
 
 ## Forbidden Claims
 

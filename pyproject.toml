@@ -55,6 +55,16 @@ ros2 = []        # Phase 5+: ROS2 bridge dependencies
 learning = [
     "mlflow>=2.13,<3.1",
 ]
+# Phase 6A federated learning (Flower + torch). Isolated to the learning
+# profile; NOT installed by `make install` / core. See requirements-learning.txt
+# (preferred install path, with a CPU-only torch wheel).
+federated = [
+    "flwr[simulation]==1.30.0",
+    "torch>=2.2,<3.0",
+    "mlflow>=2.13,<3.1",
+    "numpy>=1.26.0",
+    "scipy>=1.11",
+]
 observability = []  # Phase 7: opentelemetry SDK/exporters
 
 [project.scripts]

@@ -793,3 +793,65 @@ document
 document
   .getElementById("nav-slam-cmd-reset")
   .addEventListener("click", () => sendNavSlamCommand("reset"));
+
+// --- Phase 6A Federated Learning panel ---
+function fmtNum(v, digits = 4) {
+  return v == null ? "—" : Number(v).toFixed(digits);
+}
+
+function updateFederatedPanel(data) {
+  if (!data) return;
+  document.getElementById("fl-status").textContent = data.status || "idle";
+  document.getElementById("fl-clients").textContent =
+    data.num_clients ? String(data.num_clients) : "—";
+  document.getElementById("fl-rounds").textContent =
+    data.completed_rounds != null ? String(data.completed_rounds) : "—";
+  document.getElementById("fl-accuracy").textContent = fmtNum(data.latest_global_accuracy);
+  document.getElementById("fl-loss").textContent = fmtNum(data.latest_global_loss);
+
+  const summary = data.summary || {};
+  document.getElementById("fl-model").textContent = summary.model_type
+    ? `${summary.model_type} (${summary.model_param_count ?? "?"} params)`
+    : "—";
+  document.getElementById("fl-framework").textContent =
+    summary.framework ? `${summary.framework} · ${summary.strategy || "FedAvg"}` : "—";
+  document.getElementById("fl-mlflow").textContent = data.mlflow_run_id || "—";
+  document.getElementById("fl-report-path").textContent =
+    "Report: " + (data.report_path || data.artifact_dir || "—");
+  document.getElementById("fl-empty").style.display = data.has_run ? "none" : "block";
+
+  const clientsBody = document.getElementById("fl-clients-table");
+  clientsBody.innerHTML = (data.client_summaries || [])
+    .map(
+      (c) =>
+        `<tr><td>${c.client_id}</td><td>${c.signal_type}</td><td>${c.data_size}</td>` +
+        `<td>${fmtNum(c.anomaly_ratio, 2)}</td><td>${fmtNum(c.final_local_loss)}</td></tr>`
+    )
+    .join("");
+
+  const convBody = document.getElementById("fl-convergence-table");
+  convBody.innerHTML = (data.convergence || [])
+    .map(
+      (r) =>
+        `<tr><td>${r.round}</td><td>${fmtNum(r.global_loss)}</td>` +
+        `<td>${fmtNum(r.global_accuracy)}</td></tr>`
+    )
+    .join("");
+
+  if (data.disclaimer) {
+    document.getElementById("fl-disclaimer").textContent = data.disclaimer;
+  }
+}
+
+async function pollFederatedStatus() {
+  try {
+    const res = await fetch(`${config.apiBase}/api/learning/federated/status`);
+    if (!res.ok) return;
+    updateFederatedPanel(await res.json());
+  } catch (_) {
+    /* graceful empty state — panel keeps its disclaimer + idle defaults */
+  }
+}
+
+pollFederatedStatus();
+setInterval(pollFederatedStatus, 10000);

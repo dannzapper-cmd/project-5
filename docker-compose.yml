@@ -49,6 +49,8 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    volumes:
+      - ./artifacts:/app/artifacts:ro
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
@@ -156,11 +158,31 @@ services:
       --host 0.0.0.0
       --port 5000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
       interval: 15s
       timeout: 5s
       retries: 3
     mem_limit: 400m
+
+  # --- Phase 6A federated learning (on-demand, learning profile only) ---
+  # One-shot runner: trains 3-5 simulated edge clients locally and aggregates
+  # with Flower FedAvg, writes evidence artifacts, and logs a local MLflow run.
+  # NOT part of the core profile; never required for the core demo. Heavy deps
+  # (Flower + torch) live only in this image. `restart: "no"` => runs once.
+  fl-runner:
+    profiles: [learning, full]
+    build:
+      context: .
+      dockerfile: services/learning/Dockerfile
+    environment:
+      FL_SEED: ${FL_SEED:-42}
+      FL_NUM_CLIENTS: ${FL_NUM_CLIENTS:-3}
+      FL_NUM_ROUNDS: ${FL_NUM_ROUNDS:-5}
+      FL_LOCAL_EPOCHS: ${FL_LOCAL_EPOCHS:-3}
+      MLFLOW_TRACKING_URI: file:///app/artifacts/mlops/mlruns
+    volumes:
+      - ./artifacts:/app/artifacts
+    restart: "no"
 
   # --- Phase 7+ observability ---
   prometheus:

@@ -1,0 +1,25 @@
+# AXON Phase 6A — Federated Learning dependencies (Docker `learning` profile only).
+#
+# ISOLATION: these are intentionally kept OUT of the core requirements / default
+# install. The core profile (api, redis, mosquitto, dashboard, sensor-generators,
+# edge-inference) does NOT need Flower or torch. Install on demand with:
+#
+#     make learning-install
+#     # or:
+#     pip install -r requirements-learning.txt
+#     pip install torch --index-url https://download.pytorch.org/whl/cpu
+#
+# Flower is pinned to a stable 1.x release (NOT 2.x / experimental APIs). The
+# simulation extra pulls Ray, used by `flwr.simulation.start_simulation`.
+flwr[simulation]==1.30.0
+
+# Tiny CPU MLP (AxonFLModelV1). A CPU-only wheel is strongly recommended:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2,<3.0
+
+# Local-first experiment tracking (file:// store — no server required).
+mlflow>=2.13,<3.1
+
+# Synthetic data generation + distinctness checks.
+numpy>=1.26.0
+scipy>=1.11

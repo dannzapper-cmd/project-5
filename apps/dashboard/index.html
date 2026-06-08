@@ -176,6 +176,61 @@
       <p class="sub" id="mlops-review-id"></p>
     </section>
 
+    <section id="federated-learning-panel">
+      <h2>Federated Learning <span class="badge phase6a">Phase 6A</span></h2>
+      <p class="safety-banner fl-safety" id="fl-disclaimer">
+        Synthetic federated learning simulation. No real patient data. No medical claims.
+      </p>
+      <p class="muted">
+        Simulated edge nodes train a tiny CPU model locally on synthetic
+        biosignal-like data and aggregate with Flower's FedAvg. On-demand only
+        (Docker <code>learning</code> profile); not required for the core demo.
+        Run with <code>make learning-fl-run</code>.
+      </p>
+      <div class="status-grid" id="fl-status-grid">
+        <div class="status-item">Status: <strong id="fl-status">idle</strong></div>
+        <div class="status-item">Edge clients: <strong id="fl-clients">—</strong></div>
+        <div class="status-item">Completed rounds: <strong id="fl-rounds">—</strong></div>
+        <div class="status-item">Global accuracy: <strong id="fl-accuracy">—</strong></div>
+        <div class="status-item">Global loss: <strong id="fl-loss">—</strong></div>
+        <div class="status-item">Model: <strong id="fl-model">—</strong></div>
+        <div class="status-item">Framework: <strong id="fl-framework">—</strong></div>
+        <div class="status-item">MLflow run: <strong id="fl-mlflow">—</strong></div>
+      </div>
+      <p class="sub" id="fl-empty">No federated run yet — run <code>make learning-fl-run</code>.</p>
+      <p class="sub" id="fl-report-path">Report: —</p>
+      <div class="fl-tables">
+        <div class="table-wrap">
+          <h3 class="fl-subhead">Per-client summary</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Edge client</th>
+                <th>Signal type</th>
+                <th>Data size</th>
+                <th>Anomaly ratio</th>
+                <th>Final local loss</th>
+              </tr>
+            </thead>
+            <tbody id="fl-clients-table"></tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <h3 class="fl-subhead">Convergence (per round)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Round</th>
+                <th>Global loss</th>
+                <th>Global accuracy</th>
+              </tr>
+            </thead>
+            <tbody id="fl-convergence-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <section id="digital-twin-panel">
       <h2>Digital Twin — Live State Mirror</h2>
       <p class="muted">Synthetic rehab robot mirror fed by live telemetry, fusion, agents, and safety state.</p>

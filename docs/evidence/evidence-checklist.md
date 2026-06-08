@@ -51,7 +51,23 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 
 ## Phase 6 — Federated Learning + RL
 
-- [ ] Flower convergence chart
+### Phase 6A — Federated Learning (delivered)
+
+- [x] FL deps installed (`make learning-install`)
+- [x] Federated simulation runs (`make learning-fl-run`) — 3–5 synthetic edge clients
+- [x] `federated_report.json` produced with required schema fields
+- [x] Convergence captured (`artifacts/learning/federated/convergence.csv`) — global loss decreases
+- [x] Flower FedAvg used (`framework: flower==1.30.0`, `strategy: FedAvg` in report)
+- [x] MLflow run logged locally (`mlflow_run_id` in report; `mlflow ui` under learning profile)
+- [x] API status before/after run (`make fl-status` / `GET /api/learning/federated/status`)
+- [x] Dashboard Federated Learning panel screenshot (status, clients, rounds, metrics, disclaimer)
+- [x] Phase 6A tests pass (`pytest tests/phase6a/`)
+- [x] `docker compose --profile core config` passes (no Flower/torch in core)
+- [x] `docker compose --profile learning config` passes (`fl-runner` present)
+- [x] No medical claims; synthetic-only disclaimer visible in UI
+
+### Phase 6B — RL (not started)
+
 - [ ] RL reward curve
 
 ## Phase 5 — ROS2 Core
