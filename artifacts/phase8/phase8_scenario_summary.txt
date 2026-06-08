@@ -1,0 +1,29 @@
+Phase 8 Mission Scenario Summary
+Scenario: normal_operation
+Run ID: d468ed56-b387-4fdd-a93d-7d0257e5c3f2
+Generated: 2026-06-08T04:40:20.792119+00:00
+Seed: 42
+
+Components touched:
+  - telemetry
+  - edge_inference
+  - anomaly_safety
+  - agents
+  - safety_hitl
+  - digital_twin
+  - observability
+  - reliability
+  - evidence_center
+
+Artifacts:
+  - artifacts/phase8/phase8_scenario_normal_operation_d468ed56-b387-4fdd-a93d-7d0257e5c3f2.json
+  - artifacts/phase8/phase8_mission_status.json
+  - artifacts/phase8/phase8_mission_timeline.json
+  - artifacts/phase8/phase8_mission_evidence_index.json
+
+Limitations:
+  - Synthetic operational simulation only — no real hardware or biomedical data
+  - ROS2/Nav2/SLAM stages skipped when optional profiles are offline
+  - Evidence loaded from existing artifacts without retraining
+
+Synthetic data only. No medical claims.

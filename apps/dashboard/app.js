@@ -1005,3 +1005,177 @@ async function pollOperationalStatus() {
 
 pollOperationalStatus();
 setInterval(pollOperationalStatus, 15000);
+
+// --- Phase 8 Mission Control panel ---
+const MISSION_STATUS_CLASS = {
+  ok: "ok",
+  offline: "offline",
+  unknown: "unknown",
+  artifact_only: "artifact_only",
+  simulated: "simulated",
+  degraded: "degraded",
+  inactive: "inactive",
+  error: "error",
+  loading: "loading",
+};
+
+const MISSION_COMPONENT_LABELS = {
+  synthetic_telemetry: "Telemetry",
+  edge_inference: "Edge inference",
+  anomaly_safety: "Anomaly / safety",
+  agent_decision: "Agent decision",
+  hitl_safety_gate: "HITL / safety gate",
+  digital_twin: "Digital twin",
+  ros2: "ROS2",
+  nav_slam: "Nav2 / SLAM",
+  fl_evidence: "FL evidence",
+  rl_evidence: "RL evidence",
+  observability: "Observability",
+  reliability: "Reliability",
+  evidence_center: "Evidence Center",
+};
+
+function setMissionStatus(elId, status) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const normalized = MISSION_STATUS_CLASS[status] ? status : "unknown";
+  el.textContent = normalized;
+  el.className = "mission-status " + normalized;
+}
+
+function renderMissionComponentCards(components) {
+  const container = document.getElementById("mission-component-cards");
+  if (!container) return;
+  const entries = Object.entries(components || {});
+  if (!entries.length) {
+    container.innerHTML = '<p class="muted">No component status reported.</p>';
+    return;
+  }
+  container.innerHTML = entries
+    .filter(([key]) => MISSION_COMPONENT_LABELS[key])
+    .map(([key, comp]) => {
+      const label = MISSION_COMPONENT_LABELS[key] || key;
+      const status = comp.status || "unknown";
+      return `<div class="card mission-card"><h3>${label}</h3><div class="metric mission-status ${status}">${status}</div><div class="sub">${comp.message || "—"}</div></div>`;
+    })
+    .join("");
+}
+
+function renderMissionTimeline(events) {
+  const body = document.getElementById("mission-timeline-body");
+  if (!body) return;
+  if (!events || !events.length) {
+    body.innerHTML = '<tr><td colspan="4">No timeline events — run a scenario for artifact-backed timeline.</td></tr>';
+    return;
+  }
+  body.innerHTML = events
+    .slice(0, 20)
+    .map(
+      (ev) =>
+        `<tr><td>${ev.stage}</td><td class="mission-status ${ev.status}">${ev.status}</td><td>${ev.source_component}</td><td>${ev.summary || "—"}</td></tr>`
+    )
+    .join("");
+}
+
+function renderMissionEvidence(items, summary) {
+  const body = document.getElementById("mission-evidence-body");
+  const summaryEl = document.getElementById("mission-evidence-summary");
+  if (summaryEl && summary) {
+    summaryEl.textContent = `Evidence: ${summary.available || 0} available / ${summary.total || 0} indexed (${summary.missing || 0} missing)`;
+  }
+  if (!body) return;
+  const preview = (items || []).slice(0, 12);
+  if (!preview.length) {
+    body.innerHTML = '<tr><td colspan="4">No evidence items indexed.</td></tr>';
+    return;
+  }
+  body.innerHTML = preview
+    .map(
+      (item) =>
+        `<tr><td>${item.category}</td><td>${item.title}</td><td class="mission-status ${item.status}">${item.status}</td><td><code>${item.path}</code></td></tr>`
+    )
+    .join("");
+}
+
+function showMissionFallback(message) {
+  const unreachable = document.getElementById("mission-api-unreachable");
+  const content = document.getElementById("mission-content");
+  if (unreachable) {
+    unreachable.style.display = "block";
+    if (message) unreachable.textContent = message;
+  }
+  if (content) content.style.opacity = "0.65";
+  setMissionStatus("mission-mode", "offline");
+  setMissionStatus("mission-degraded", "unknown");
+}
+
+async function pollMissionControl() {
+  const unreachable = document.getElementById("mission-api-unreachable");
+  const content = document.getElementById("mission-content");
+  try {
+    const [statusRes, timelineRes, evidenceRes] = await Promise.all([
+      fetch(`${config.apiBase}/mission/status`),
+      fetch(`${config.apiBase}/mission/timeline`),
+      fetch(`${config.apiBase}/mission/evidence`),
+    ]);
+    if (!statusRes.ok) throw new Error("Mission API unreachable");
+    if (unreachable) unreachable.style.display = "none";
+    if (content) content.style.opacity = "1";
+
+    const status = await statusRes.json();
+    const timeline = timelineRes.ok ? await timelineRes.json() : { events: [] };
+    const evidence = evidenceRes.ok ? await evidenceRes.json() : { items: [], summary: {} };
+
+    document.getElementById("mission-mode").textContent = status.system_mode || "unknown";
+    document.getElementById("mission-run-id").textContent = status.run_id || status.mission_id || "—";
+    setMissionStatus("mission-degraded", status.degraded ? "degraded" : "ok");
+    document.getElementById("mission-last-update").textContent =
+      status.timestamp || new Date().toISOString();
+
+    renderMissionComponentCards(status.components);
+    renderMissionTimeline(timeline.events);
+    renderMissionEvidence(evidence.items, evidence.summary);
+  } catch (_) {
+    showMissionFallback(
+      "Mission API unavailable — showing fallback state. Start the API or run a Phase 8 scenario script for artifacts."
+    );
+    renderMissionTimeline([]);
+    renderMissionEvidence([], null);
+    const cards = document.getElementById("mission-component-cards");
+    if (cards) cards.innerHTML = '<p class="muted">Component cards unavailable until Mission API responds.</p>';
+  }
+}
+
+async function runMissionScenario(scenario) {
+  const resultEl = document.getElementById("mission-scenario-result");
+  if (resultEl) resultEl.textContent = `Running scenario ${scenario}…`;
+  try {
+    const res = await fetch(`${config.apiBase}/mission/scenarios/run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scenario }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      if (resultEl) resultEl.textContent = `Scenario failed: ${data.detail || res.status}`;
+      return;
+    }
+    if (resultEl) {
+      resultEl.textContent = `Latest scenario: ${data.scenario} (${data.run_id}) — ${data.status}`;
+    }
+    pollMissionControl();
+  } catch (_) {
+    if (resultEl) {
+      resultEl.textContent =
+        "Scenario POST failed — run offline: python scripts/run_phase8_mission_scenario.py --scenario " +
+        scenario;
+    }
+  }
+}
+
+document.querySelectorAll(".mission-scenario-btn").forEach((btn) => {
+  btn.addEventListener("click", () => runMissionScenario(btn.dataset.scenario));
+});
+
+pollMissionControl();
+setInterval(pollMissionControl, 10000);

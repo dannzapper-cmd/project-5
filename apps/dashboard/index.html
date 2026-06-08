@@ -81,6 +81,56 @@
       </div>
     </section>
 
+    <section id="mission-control-panel">
+      <h2>Mission Control <span class="badge phase8">Phase 8</span></h2>
+      <p class="safety-banner mission-disclaimer" id="mission-disclaimer">
+        Integrated mission control cockpit — synthetic operational loop only.
+        Not a medical device. No real patient data. No clinical use.
+      </p>
+      <p class="muted" id="mission-api-unreachable" style="display:none;">
+        Mission API unavailable — showing fallback state. Start the API or run
+        <code>python scripts/run_phase8_mission_scenario.py --scenario normal_operation</code>
+        for artifact-backed evidence.
+      </p>
+      <div id="mission-content">
+        <div class="status-grid mission-summary-grid">
+          <div class="status-item">Mode: <strong id="mission-mode" class="mission-status loading">loading…</strong></div>
+          <div class="status-item">Run ID: <strong id="mission-run-id">—</strong></div>
+          <div class="status-item">Degraded: <strong id="mission-degraded" class="mission-status loading">loading…</strong></div>
+          <div class="status-item">Last update: <strong id="mission-last-update">—</strong></div>
+        </div>
+        <h3 class="mission-subhead">Operational loop</h3>
+        <div class="mission-cards" id="mission-component-cards"></div>
+        <h3 class="mission-subhead">Mission timeline</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Stage</th><th>Status</th><th>Component</th><th>Summary</th></tr>
+            </thead>
+            <tbody id="mission-timeline-body"></tbody>
+          </table>
+        </div>
+        <h3 class="mission-subhead">Evidence Center preview</h3>
+        <p class="sub" id="mission-evidence-summary">Evidence: loading…</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Category</th><th>Title</th><th>Status</th><th>Path</th></tr>
+            </thead>
+            <tbody id="mission-evidence-body"></tbody>
+          </table>
+        </div>
+        <h3 class="mission-subhead">Scenario runner</h3>
+        <p class="muted">Runs offline deterministic scenarios via POST /mission/scenarios/run.</p>
+        <div class="mission-scenario-controls">
+          <button type="button" class="mission-scenario-btn" data-scenario="normal_operation">Normal operation</button>
+          <button type="button" class="mission-scenario-btn" data-scenario="anomaly_safety_intervention">Anomaly / safety</button>
+          <button type="button" class="mission-scenario-btn" data-scenario="learning_evidence_review">Learning evidence</button>
+        </div>
+        <p class="sub" id="mission-scenario-result">Latest scenario: —</p>
+      </div>
+    </section>
+
     <section>
       <div class="decision-panel" id="current-decision">
         <div class="status-grid">

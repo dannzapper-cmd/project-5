@@ -109,11 +109,25 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 - [ ] Mandatory Prometheus/Grafana demo (optional `obs` profile remains)
 - [ ] Memory/CPU profiling report (deferred)
 
-## Phase 8 — Hardware / Cost
+## Phase 8 — Integrated Mission Control
 
-- [ ] Cost/hardware report
+**Status:** Delivered (internal integration — not packaging).
 
-## Phase 9 — Portfolio
+- [x] Mission API endpoints (`/mission/status`, `/timeline`, `/evidence`, `/scenarios`, POST run)
+- [x] Deterministic scenario runner (seed 42, three scenarios)
+- [x] Artifacts under `artifacts/phase8/`
+- [x] Dashboard Mission Control section + API fallback
+- [x] Evidence Center index (FL, RL, reliability, observability, robotics, agents)
+- [x] `scripts/verify_phase8.sh` + `tests/phase8/`
+- [x] ADR-013 + `docs/phase8_mission_control.md`
+- [ ] Live ROS2/Nav2/SLAM runtime validation (optional profile — not required)
+- [ ] Cloud/Kubernetes/VM deployment (deferred)
+
+## Phase 9 — Final QA + Hardening
+
+- [ ] Senior verification and repair pass before packaging
+
+## Phase 10 — Portfolio Packaging (formerly Phase 9)
 
 - [ ] Final demo video
 - [ ] Portfolio case study
