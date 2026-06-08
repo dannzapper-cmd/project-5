@@ -1,0 +1,24 @@
+# HELP axon_api_requests_total Total API HTTP requests observed by Phase 7 middleware.
+# TYPE axon_api_requests_total counter
+axon_api_requests_total 1454
+# HELP axon_api_errors_total Total API HTTP 5xx responses observed by Phase 7 middleware.
+# TYPE axon_api_errors_total counter
+axon_api_errors_total 2
+# HELP axon_service_status Overall service status gauge (0=ok-ish, 1=not ok).
+# TYPE axon_service_status gauge
+axon_service_status 0
+# HELP axon_degraded_components_total Components in degraded/unavailable/error state.
+# TYPE axon_degraded_components_total gauge
+axon_degraded_components_total 0
+# HELP axon_evidence_files_present_total Known evidence files present on disk.
+# TYPE axon_evidence_files_present_total gauge
+axon_evidence_files_present_total 7
+# HELP axon_evidence_files_missing_total Known evidence files missing on disk.
+# TYPE axon_evidence_files_missing_total gauge
+axon_evidence_files_missing_total 0
+# HELP axon_last_telemetry_timestamp Unix epoch of last telemetry event if known.
+# TYPE axon_last_telemetry_timestamp gauge
+axon_last_telemetry_timestamp 0
+# HELP axon_last_model_score_timestamp Last model score timestamp string exported as info.
+# TYPE axon_last_model_score_timestamp gauge
+axon_last_model_score_timestamp 0

@@ -1,0 +1,82 @@
+{
+  "run_id": "3dfdbcef-f514-49c5-8b0b-1dc7f82ae60e",
+  "timestamp": "2026-06-08T03:54:45.680905+00:00",
+  "phase": "phase7",
+  "snapshot": {
+    "status": "ok",
+    "service": "axon-api",
+    "timestamp": "2026-06-08T03:54:45.699941+00:00",
+    "components": {
+      "api": {
+        "status": "ok",
+        "required": true,
+        "message": "API process serving requests"
+      },
+      "dashboard": {
+        "status": "inactive",
+        "required": false,
+        "message": "Dashboard is a separate static server; not probed from API"
+      },
+      "redis": {
+        "status": "ok",
+        "required": true,
+        "message": "TCP reachable at redis:6379"
+      },
+      "mqtt": {
+        "status": "ok",
+        "required": true,
+        "message": "TCP reachable at mosquitto:1883"
+      },
+      "telemetry_pipeline": {
+        "status": "ok",
+        "required": false,
+        "message": "Telemetry pipeline connected (MQTT ingest + Redis streams)"
+      },
+      "edge_inference": {
+        "status": "ok",
+        "required": false,
+        "message": "Edge inference model-score stream connected"
+      },
+      "digital_twin": {
+        "status": "ok",
+        "required": false,
+        "message": "Digital twin broadcast running at 5 Hz"
+      },
+      "agents_hitl": {
+        "status": "ok",
+        "required": false,
+        "message": "Agents/HITL loop available via API (mock or real LLM mode)"
+      },
+      "fl_module": {
+        "status": "ok",
+        "required": false,
+        "message": "Federated learning artifact present at federated_report.json"
+      },
+      "rl_module": {
+        "status": "ok",
+        "required": false,
+        "message": "RL micro-module artifact present at rl_report.json"
+      },
+      "mlflow": {
+        "status": "inactive",
+        "required": false,
+        "message": "MLflow learning profile not configured (set MLFLOW_HOST to probe)"
+      },
+      "mlops_evidence": {
+        "status": "ok",
+        "required": false,
+        "message": "MLOps registry artifact present at model_registry.json"
+      },
+      "ros2": {
+        "status": "inactive",
+        "required": false,
+        "message": "ROS2 profile not active or bridge offline"
+      },
+      "ros2_nav_slam": {
+        "status": "inactive",
+        "required": false,
+        "message": "Nav2/SLAM MiniLab profile not active or bridge offline"
+      }
+    }
+  }
+}

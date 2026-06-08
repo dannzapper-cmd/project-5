@@ -10,7 +10,10 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  # Future Phase 7 targets:
-  # - axon-api (OpenTelemetry metrics exporter)
+  # Future Phase 7 targets (optional — enable when core profile is running):
+  # - job_name: axon-api
+  #   static_configs:
+  #     - targets: ['api:8000']
+  #   metrics_path: /metrics
   # - edge-inference
   # - fusion-service

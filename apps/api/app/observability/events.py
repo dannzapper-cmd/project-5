@@ -1,0 +1,11 @@
+"""Stable Phase 7 operational event names (lowercase, underscore-separated)."""
+
+HEALTH_CHECK_COMPLETED = "health_check_completed"
+READINESS_CHECK_COMPLETED = "readiness_check_completed"
+SERVICE_STATUS_COMPUTED = "service_status_computed"
+DEGRADED_DEPENDENCY_DETECTED = "degraded_dependency_detected"
+EVIDENCE_SNAPSHOT_GENERATED = "evidence_snapshot_generated"
+METRICS_SNAPSHOT_GENERATED = "metrics_snapshot_generated"
+RELIABILITY_CHECK_COMPLETED = "reliability_check_completed"
+OBSERVABILITY_CHECK_COMPLETED = "observability_check_completed"
+DASHBOARD_STATUS_LOADED = "dashboard_status_loaded"

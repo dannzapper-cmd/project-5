@@ -41,8 +41,47 @@
       <p class="event-counter">Model scores received: <strong id="model-score-counter">0</strong></p>
     </section>
 
+    <section id="operational-status-panel">
+      <h2>Operational Status <span class="badge phase7">Phase 7</span></h2>
+      <p class="safety-banner ops-disclaimer" id="ops-disclaimer">
+        AXON SIMULATED SYSTEM — For portfolio and research demonstration only.
+        Not a medical device. No real patient data. No clinical use.
+      </p>
+      <p class="muted" id="ops-api-unreachable" style="display:none;">
+        Operational status unavailable — API not reachable.
+      </p>
+      <div id="ops-content">
+        <div class="status-grid">
+          <div class="status-item">Overall: <strong id="ops-overall" class="ops-status loading">loading…</strong></div>
+          <div class="status-item">Readiness: <strong id="ops-readiness" class="ops-status loading">loading…</strong></div>
+          <div class="status-item">Liveness: <strong id="ops-liveness" class="ops-status loading">loading…</strong></div>
+          <div class="status-item">Last check: <strong id="ops-last-check">—</strong></div>
+        </div>
+        <h3 class="ops-subhead">Core services</h3>
+        <div class="ops-table-wrap">
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Status</th><th>Required</th><th>Message</th></tr>
+            </thead>
+            <tbody id="ops-components-core"></tbody>
+          </table>
+        </div>
+        <h3 class="ops-subhead">Optional modules &amp; evidence</h3>
+        <div class="ops-table-wrap">
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Status</th><th>Required</th><th>Message</th></tr>
+            </thead>
+            <tbody id="ops-components-optional"></tbody>
+          </table>
+        </div>
+        <p class="sub" id="ops-evidence-summary">Evidence availability: loading…</p>
+        <p class="sub" id="ops-reliability-report">Reliability report: —</p>
+        <p class="sub" id="ops-observability-report">Observability report: —</p>
+      </div>
+    </section>
+
     <section>
-      <h2>Current Decision</h2>
       <div class="decision-panel" id="current-decision">
         <div class="status-grid">
           <div>Risk: <strong id="decision-risk">—</strong></div>

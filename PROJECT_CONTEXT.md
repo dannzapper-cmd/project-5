@@ -38,7 +38,27 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 6B — RL Micro-module (Gymnasium + Stable-Baselines3 PPO, synthetic, on-demand)**
+**Phase 7 — Observability + Reliability (lightweight local layer)**
+
+Delivered on branch `feat/phase-7-observability-reliability`:
+
+- **Reliability:** `/health/live`, `/health/ready`, `/status/services` with required vs
+  optional dependency classification, graceful degradation, and TCP/disk checks only
+  (no learning/ROS2 imports in core health code).
+- **Observability:** Prometheus-compatible `/metrics`, structured JSON operational logs,
+  stable event names, and per-request `trace_id` middleware (`run_id` in scripts).
+- **Dashboard:** Operational status panel with simulation disclaimer and API-unreachable
+  fallback (no full dashboard redesign).
+- **Evidence:** `scripts/reliability/check_phase7_reliability.py`,
+  `scripts/observability/check_phase7_observability.py`, and artifacts under
+  `artifacts/reliability/` and `artifacts/observability/`.
+- **Docs:** `docs/phase7_reliability.md`, `docs/phase7_observability.md`.
+
+**Not delivered in Phase 7:** mandatory Prometheus/Grafana, heavy OpenTelemetry,
+packaging, cloud deployment, Kubernetes, Phase 8 hardware path. Synthetic only — no
+real patient data, no medical claims.
+
+### Phase 6B — RL Micro-module (Gymnasium + Stable-Baselines3 PPO, synthetic, on-demand)
 
 Delivered: Phases 1–6A (see below) plus Phase 6B — a lightweight reinforcement
 learning micro-module. A tiny Gymnasium environment (`AxonTriageEnvV1`, 10-dim
@@ -54,8 +74,7 @@ SB3, and torch are isolated from the core profile. The RL policy makes **no
 medical decisions**, controls **no real hardware**, and requires human review for
 high-risk/low-confidence situations.
 
-Phase 6B does NOT implement Phase 7, does NOT modify ROS2/Nav2/SLAM, and does NOT
-change Phase 6A federated learning.
+Phase 6B precedes Phase 7; it does not modify ROS2/Nav2/SLAM or Phase 6A federated learning.
 
 ### Phase 6A — Federated Learning Simulation (Flower + FedAvg, synthetic, on-demand)
 
@@ -70,8 +89,7 @@ and surface via `/api/learning/federated/*` and a dashboard FL panel. The FL
 experiment is on-demand only (Docker `learning` profile / `fl-runner`); Flower
 and torch are isolated from the core profile.
 
-Not delivered: Phase 7 observability, hardware, cloud deployment, full 3D physics
-simulation. Synthetic only — no real patient data, no medical claims.
+Not delivered: Phase 8 hardware/cloud path, full 3D physics simulation. Synthetic only — no real patient data, no medical claims.
 
 ## Forbidden Claims
 
@@ -97,7 +115,7 @@ simulation. Synthetic only — no real patient data, no medical claims.
 | Robotics | ROS2 thin adapter | 5 |
 | Advanced robotics | Nav2 + SLAM MiniLab | 5.5 |
 | Federated / RL | Flower, Gymnasium, SB3 | 6 |
-| Observability | OpenTelemetry, Prometheus, Grafana | 7 |
+| Observability | Structured logs, `/metrics`, health/status (OTEL/Grafana optional) | 7 |
 | Hardware path | ESP32, Pi, Jetson, TinyML (optional) | 8 |
 | Portfolio | Case study, demo video | 9 |
 

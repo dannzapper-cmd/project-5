@@ -272,6 +272,11 @@ Phased delivery for Simulated Rehab Robot Ops. **Phase 0 does not implement runt
 - `obs` profile starts without `full`
 - Runbook for common failure scenarios
 
+**Delivery note (implemented):** Lightweight local reliability/observability layer —
+health/readiness/service status, `/metrics`, structured logs, dashboard operational
+panel, scripts + artifacts. Prometheus/Grafana and heavy OTEL remain optional/future;
+not required for Phase 7 completion.
+
 ---
 
 ## Phase 8: Cloud/VM + Hardware Path

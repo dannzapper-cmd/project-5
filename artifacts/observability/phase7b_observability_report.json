@@ -1,0 +1,26 @@
+{
+  "run_id": "3dfdbcef-f514-49c5-8b0b-1dc7f82ae60e",
+  "timestamp": "2026-06-08T03:54:45.680905+00:00",
+  "phase": "phase7",
+  "api_base": "http://localhost:8000",
+  "offline": false,
+  "summary": "pass",
+  "checks": [
+    {
+      "check": "metrics",
+      "passed": true,
+      "detail": "HTTP 200, content-type=text/plain; version=0.0.4; charset=utf-8"
+    },
+    {
+      "check": "status_services",
+      "passed": true,
+      "detail": "HTTP 200"
+    }
+  ],
+  "artifacts": [
+    "artifacts/observability/phase7b_observability_report.json",
+    "artifacts/observability/metrics_snapshot.txt",
+    "artifacts/observability/logging_sample.jsonl",
+    "artifacts/observability/operational_status_snapshot.json"
+  ]
+}

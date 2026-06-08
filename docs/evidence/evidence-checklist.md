@@ -94,11 +94,20 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 
 - [ ] Nav2 + SLAM MiniLab video or screenshot
 
-## Phase 7 — Observability
+## Phase 7 — Observability + Reliability
 
-- [ ] OpenTelemetry trace evidence
-- [ ] Prometheus/Grafana evidence
-- [ ] Memory/CPU profile
+**Status:** Delivered (lightweight local layer — not full OTEL/Grafana stack).
+
+- [x] `/health/live`, `/health/ready`, `/status/services` endpoints
+- [x] `/metrics` Prometheus-compatible endpoint (no mandatory Prometheus runtime)
+- [x] Structured JSON operational logs + stable event names
+- [x] `trace_id` middleware; `run_id` in evidence scripts
+- [x] Dashboard operational status panel + simulation disclaimer
+- [x] Reliability/observability scripts and Phase 7 artifacts
+- [x] Focused Phase 7 tests + live Redis/MQTT failure validation
+- [ ] Heavy OpenTelemetry trace backend (deferred — lightweight IDs only)
+- [ ] Mandatory Prometheus/Grafana demo (optional `obs` profile remains)
+- [ ] Memory/CPU profiling report (deferred)
 
 ## Phase 8 — Hardware / Cost
 
