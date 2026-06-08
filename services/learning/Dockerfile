@@ -18,7 +18,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # isolated to this image; core images never install them.
 COPY requirements-learning.txt ./requirements-learning.txt
 RUN pip install --upgrade pip && \
-    pip install torch>=2.2,<3.0 --index-url https://download.pytorch.org/whl/cpu && \
+    pip install "torch>=2.2,<3.0" --index-url https://download.pytorch.org/whl/cpu && \
     pip install -r requirements-learning.txt
 
 COPY pyproject.toml README.md ./

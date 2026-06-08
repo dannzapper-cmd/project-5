@@ -166,7 +166,7 @@ learning-install: ## Install Phase 6A FL deps (Flower + CPU torch + MLflow), iso
 	$(PIP) install -r requirements-learning.txt
 
 learning-fl-run: ## Run the Flower FedAvg federated learning simulation (default 3 clients)
-	$(PYTHON) scripts/run_federated_learning.py --num-clients 3 --num-rounds 5 --local-epochs 3 --seed 42
+	$(PYTHON) scripts/run_federated_learning.py --num-clients $${FL_NUM_CLIENTS:-3} --num-rounds $${FL_NUM_ROUNDS:-5} --local-epochs $${FL_LOCAL_EPOCHS:-3} --seed $${FL_SEED:-42}
 
 learning-fl-smoke: ## Run a tiny CI-friendly federated simulation (2 clients, 1 round)
 	$(PYTHON) scripts/run_federated_learning.py --smoke
