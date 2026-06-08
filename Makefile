@@ -6,7 +6,9 @@
 	compose-ros2 twin-status ros2-logs \
 	compose-nav-slam nav-slam-up nav-slam-down nav-slam-logs nav-slam-ps nav-slam-status \
 	nav-slam-map-demo nav-slam-goal-demo nav-slam-blocked-demo nav-slam-nodes nav-slam-topics \
-	learning-install learning-fl-run learning-fl-smoke learning-fl-report fl-status verify-phase6a
+	learning-install learning-fl-run learning-fl-smoke learning-fl-report fl-status verify-phase6a \
+	learning-rl-install learning-rl-run learning-rl-smoke learning-rl-report learning-rl-eval \
+	rl-status verify-phase6b
 
 SYSTEM_PYTHON ?= python3.12
 VENV ?= .venv
@@ -181,3 +183,28 @@ fl-status: ## Fetch federated learning status from the local API
 
 verify-phase6a: ## Run the Phase 6A verification script (lint + FL tests + smoke + compose)
 	bash scripts/verify_phase6a.sh
+
+# --- Phase 6B RL Micro-module (on-demand learning profile) ---
+learning-rl-install: ## Install Phase 6B RL deps (Gymnasium + SB3 + CPU torch + MLflow), isolated from core
+	$(PIP) install torch --index-url https://download.pytorch.org/whl/cpu
+	$(PIP) install -r requirements-rl.txt
+
+learning-rl-run: ## Run the RL micro-module experiment (PPO on AxonTriageEnvV1, default seed 42)
+	$(PYTHON) scripts/run_rl_micro_module.py --seed $${RL_SEED:-42} --total-timesteps $${RL_TOTAL_TIMESTEPS:-15000} --eval-episodes $${RL_EVAL_EPISODES:-100}
+
+learning-rl-smoke: ## Run a tiny CI-friendly RL experiment (500 timesteps, 5 eval episodes)
+	$(PYTHON) scripts/run_rl_micro_module.py --ci --no-mlflow
+
+learning-rl-report: ## Print the latest RL micro-module report
+	@test -f artifacts/learning/rl/rl_report.json \
+		&& $(PYTHON) -m json.tool artifacts/learning/rl/rl_report.json \
+		|| echo "No report yet. Run 'make learning-rl-run' first."
+
+learning-rl-eval: ## Inspect the latest trained policy (state -> action table, manual review)
+	$(PYTHON) scripts/run_rl_micro_module.py --eval --seed $${RL_SEED:-42}
+
+rl-status: ## Fetch RL micro-module status from the local API
+	curl -s http://localhost:8000/api/learning/rl/status | python3 -m json.tool
+
+verify-phase6b: ## Run the Phase 6B verification script (lint + RL tests + smoke + compose + safety + ROS2 freeze)
+	bash scripts/verify_phase6b.sh

@@ -66,9 +66,23 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 - [x] `docker compose --profile learning config` passes (`fl-runner` present)
 - [x] No medical claims; synthetic-only disclaimer visible in UI
 
-### Phase 6B — RL (not started)
+### Phase 6B — RL Micro-module (delivered)
 
-- [ ] RL reward curve
+- [x] RL deps installed (`make learning-rl-install`) — Gymnasium 0.29.1 + SB3 2.3.2
+- [x] `AxonTriageEnvV1` Gymnasium env (10-dim `Box`, `Discrete(6)`); `check_env` passes
+- [x] RL experiment runs (`make learning-rl-run`) — PPO vs random baseline
+- [x] `rl_report.json` produced with required schema fields (`reward_version: REWARD_V1`)
+- [x] Trained policy beats baseline (seed 42: 75.4 vs 0.54; improvement ≈ 138×)
+- [x] Operational safety metrics real (unsafe-action rate ≈ 0.0; HITL rate ≈ 0.32)
+- [x] Reward curve captured (`artifacts/learning/rl/reward_curve.csv`) — rises monotonically
+- [x] MLflow run logged locally (`mlflow_run_id` in report; experiment `axon_rl_micro_module`)
+- [x] Reproducible: same seed → identical metrics; different seed → different metrics
+- [x] API status before/after run (`make rl-status` / `GET /api/learning/rl/status`)
+- [x] Dashboard RL Micro-module panel (status, rewards, rates, reward curve, disclaimer)
+- [x] Phase 6B tests pass (`RL_CI_MODE=true pytest tests/phase6b/`)
+- [x] `docker compose --profile core config` passes (no Gymnasium/SB3/torch in core)
+- [x] `docker compose --profile learning config` passes (`rl-runner` coexists with `fl-runner`)
+- [x] Safety envelope + exact disclaimer visible; no medical claims
 
 ## Phase 5 — ROS2 Core
 

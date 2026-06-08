@@ -184,6 +184,26 @@ services:
       - ./artifacts:/app/artifacts
     restart: "no"
 
+  # --- Phase 6B RL micro-module (on-demand, learning profile only) ---
+  # One-shot runner: trains a tiny PPO policy on the synthetic AxonTriageEnvV1
+  # Gymnasium environment, compares it to a random baseline, writes evidence
+  # artifacts, and logs a local MLflow run. NOT part of the core profile; never
+  # required for the core demo. Heavy deps (Gymnasium + Stable-Baselines3 +
+  # torch) live only in this image. `restart: "no"` => runs once on demand.
+  rl-runner:
+    profiles: [learning, full]
+    build:
+      context: .
+      dockerfile: services/learning/Dockerfile.rl
+    environment:
+      RL_SEED: ${RL_SEED:-42}
+      RL_TOTAL_TIMESTEPS: ${RL_TOTAL_TIMESTEPS:-15000}
+      RL_EVAL_EPISODES: ${RL_EVAL_EPISODES:-100}
+      MLFLOW_TRACKING_URI: file:///app/artifacts/mlops/mlruns
+    volumes:
+      - ./artifacts:/app/artifacts
+    restart: "no"
+
   # --- Phase 7+ observability ---
   prometheus:
     profiles: [obs, full]

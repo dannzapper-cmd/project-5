@@ -231,6 +231,47 @@
       </div>
     </section>
 
+    <section id="rl-micro-module-panel">
+      <h2>RL Micro-module <span class="badge phase6b">Phase 6B</span></h2>
+      <p class="safety-banner rl-safety" id="rl-disclaimer">
+        Synthetic RL operational policy. No real patient data. No medical decisions. Human review required for high-risk actions.
+      </p>
+      <p class="muted">
+        A tiny Gymnasium environment (<code>AxonTriageEnvV1</code>) + PPO policy
+        that optimizes <strong>synthetic operational triage</strong> only — alert
+        prioritization, conservative threshold hints, simulated resource
+        allocation, and human-in-the-loop escalation. On-demand only (Docker
+        <code>learning</code> profile); not required for the core demo. Run with
+        <code>make learning-rl-run</code>.
+      </p>
+      <div class="status-grid" id="rl-status-grid">
+        <div class="status-item">Status: <strong id="rl-status">idle</strong></div>
+        <div class="status-item">Environment: <strong id="rl-env">—</strong></div>
+        <div class="status-item">Algorithm: <strong id="rl-algo">—</strong></div>
+        <div class="status-item">Mean reward: <strong id="rl-mean-reward">—</strong></div>
+        <div class="status-item">Baseline reward: <strong id="rl-baseline">—</strong></div>
+        <div class="status-item">Trained reward: <strong id="rl-trained">—</strong></div>
+        <div class="status-item">Improvement: <strong id="rl-improvement">—</strong></div>
+        <div class="status-item">Unsafe action rate: <strong id="rl-unsafe">—</strong></div>
+        <div class="status-item">HITL suggestion rate: <strong id="rl-hitl">—</strong></div>
+        <div class="status-item">MLflow run: <strong id="rl-mlflow">—</strong></div>
+      </div>
+      <p class="sub" id="rl-empty">No RL run yet — run <code>make learning-rl-run</code>.</p>
+      <p class="sub" id="rl-report-path">Report: —</p>
+      <div class="table-wrap">
+        <h3 class="rl-subhead">Training reward curve (mean episode reward)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Timesteps</th>
+              <th>Mean episode reward</th>
+            </tr>
+          </thead>
+          <tbody id="rl-reward-curve-table"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section id="digital-twin-panel">
       <h2>Digital Twin — Live State Mirror</h2>
       <p class="muted">Synthetic rehab robot mirror fed by live telemetry, fusion, agents, and safety state.</p>

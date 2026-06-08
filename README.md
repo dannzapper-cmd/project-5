@@ -78,23 +78,24 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 6A — Federated Learning Simulation (Flower + FedAvg, synthetic, on-demand)**
+**Phase 6B — RL Micro-module (Gymnasium + Stable-Baselines3 PPO, synthetic, on-demand)**
 
 | Delivered | Not Yet Implemented |
 |-----------|---------------------|
-| Phases 1–5.5: telemetry, edge AI, agents, HITL, MLOps, digital twin, ROS2 core, Nav2 + SLAM MiniLab | RL / Gymnasium / SB3 — Phase 6B |
-| Phase 6A: Flower FedAvg federated simulation (3–5 synthetic edge clients) | Observability (OTel/Prometheus/Grafana) — Phase 7 |
-| `AxonFLModelV1` tiny CPU MLP, deterministic synthetic non-IID data | Hardware integration — Phase 8 |
-| Local MLflow logging, `/api/learning/federated/*`, dashboard FL panel | Gazebo / Isaac / Omniverse / RViz |
-| Isolated `learning` profile (`fl-runner`), deps out of core | Cloud deployment / Kubernetes |
+| Phases 1–5.5: telemetry, edge AI, agents, HITL, MLOps, digital twin, ROS2 core, Nav2 + SLAM MiniLab | Observability (OTel/Prometheus/Grafana) — Phase 7 |
+| Phase 6A: Flower FedAvg federated simulation (3–5 synthetic edge clients) | Hardware integration — Phase 8 |
+| Phase 6B: `AxonTriageEnvV1` Gymnasium env + PPO operational-triage policy | Gazebo / Isaac / Omniverse / RViz |
+| Local MLflow logging, `/api/learning/{federated,rl}/*`, dashboard FL + RL panels | Cloud deployment / Kubernetes |
+| Isolated `learning` profile (`fl-runner`, `rl-runner`), deps out of core | Real clinical/medical decisions — never |
 
-**Next phase:** [Phase 6B — RL](ROADMAP.md) (not started)
+**Next phase:** [Phase 7 — Observability](ROADMAP.md) (not started)
 
 See [docs/evidence/phase-6a-federated-learning.md](docs/evidence/phase-6a-federated-learning.md)
-for the full Phase 6A overview and reproduction steps.
+and [docs/evidence/phase-6b-rl-micro-module.md](docs/evidence/phase-6b-rl-micro-module.md)
+for the full Phase 6A/6B overviews and reproduction steps.
 
-> **Phase 6A is a synthetic federated learning simulation. No real patient data.
-> No medical claims.**
+> **Phase 6A/6B are synthetic learning simulations. No real patient data. No
+> medical decisions. Human review required for high-risk actions.**
 
 ---
 

@@ -91,6 +91,16 @@ artifacts/learning/federated/model_card_axon_fl_v1.md
 artifacts/learning/federated/status.json
 artifacts/learning/federated/runs/
 
+# Phase 6B RL micro-module runtime artifacts (regenerated on demand)
+artifacts/learning/rl/rl_report.json
+artifacts/learning/rl/reward_curve.json
+artifacts/learning/rl/reward_curve.csv
+artifacts/learning/rl/policy_summary.json
+artifacts/learning/rl/safety_envelope.md
+artifacts/learning/rl/status.json
+artifacts/learning/rl/policy_axon_triage_v1.zip
+artifacts/learning/rl/runs/
+
 # IDE
 .idea/
 .vscode/

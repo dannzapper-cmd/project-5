@@ -200,3 +200,8 @@ button.danger-btn:hover:not(:disabled) { border-color: var(--danger); color: var
 .fl-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
 @media (max-width: 860px) { .fl-tables { grid-template-columns: 1fr; } }
 .fl-subhead { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--muted); }
+
+/* Phase 6B RL Micro-module */
+.badge.phase6b { background: rgba(167, 139, 250, 0.18); color: #c4b5fd; }
+.rl-safety { background: rgba(167, 139, 250, 0.10); border-color: rgba(167, 139, 250, 0.35); }
+.rl-subhead { margin: 0.75rem 0 0.4rem; font-size: 0.85rem; color: var(--muted); }
