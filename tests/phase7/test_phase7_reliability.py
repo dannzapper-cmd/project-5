@@ -5,12 +5,11 @@ from __future__ import annotations
 import json
 
 import pytest
-from apps.api.main import app
-from fastapi.testclient import TestClient
-
 from apps.api.app.observability.structured_log import log_event
 from apps.api.app.reliability.dependency_checks import ALLOWED_STATUSES, ComponentCheck
 from apps.api.app.reliability.service_status import compute_components
+from apps.api.main import app
+from fastapi.testclient import TestClient
 
 ALLOWED = {"ok", "degraded", "unavailable", "inactive", "error"}
 

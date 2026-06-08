@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Response
 
+from apps.api.app.core.config import settings
 from apps.api.app.observability import events
 from apps.api.app.observability.structured_log import log_event
-from apps.api.app.core.config import settings
 from apps.api.app.reliability.metrics import render_prometheus_text
 
 router = APIRouter(tags=["observability"])

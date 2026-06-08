@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_observability_script_offline_generates_artifacts(tmp_path, monkeypatch):
-    obs_dir = tmp_path / "artifacts" / "observability"
     monkeypatch.chdir(tmp_path)
     # Run from repo with --offline; artifacts land under cwd if we patch ROOT — run real script
     result = subprocess.run(

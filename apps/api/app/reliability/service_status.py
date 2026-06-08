@@ -10,7 +10,6 @@ from apps.api.app.nav_slam.service import get_service_status as get_nav_slam_sta
 from apps.api.app.observability import events
 from apps.api.app.observability.structured_log import log_event
 from apps.api.app.reliability.dependency_checks import (
-    ALLOWED_STATUSES,
     ComponentCheck,
     artifact_exists,
     check_mlflow,
@@ -144,7 +143,10 @@ def _ros2_nav_slam_status() -> ComponentCheck:
         return ComponentCheck(
             status="ok" if bridge != "degraded" else "degraded",
             required=False,
-            message=f"Nav2/SLAM bridge: {bridge}; nav={nav.get('nav_status')}, slam={nav.get('slam_status')}",
+            message=(
+                f"Nav2/SLAM bridge: {bridge}; "
+                f"nav={nav.get('nav_status')}, slam={nav.get('slam_status')}"
+            ),
         )
     return ComponentCheck(
         status="unavailable",

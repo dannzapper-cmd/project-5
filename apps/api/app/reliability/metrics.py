@@ -64,7 +64,8 @@ def render_prometheus_text() -> str:
     ]
     if telemetry_state.last_model_score_at:
         lines.append(
-            "# HELP axon_last_model_score_timestamp Last model score timestamp string exported as info."
+            "# HELP axon_last_model_score_timestamp "
+            "Last model score timestamp string exported as info."
         )
         lines.append("# TYPE axon_last_model_score_timestamp gauge")
         lines.append("axon_last_model_score_timestamp 0")

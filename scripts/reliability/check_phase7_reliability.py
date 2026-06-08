@@ -88,11 +88,12 @@ def run_checks(api_base: str, offline: bool) -> dict:
         if isinstance(ready, dict):
             ready_errors = validate_status_schema(ready, "ready")
         ready_ok = status in (200, 503) and isinstance(ready, dict) and not ready_errors
+        ready_agg = ready.get("status") if isinstance(ready, dict) else ready
+        ready_detail = "; ".join(ready_errors) if ready_errors else "schema ok"
         record(
             "health_ready",
             ready_ok,
-            f"HTTP {status}, aggregate={ready.get('status') if isinstance(ready, dict) else ready}; "
-            + ("; ".join(ready_errors) if ready_errors else "schema ok"),
+            f"HTTP {status}, aggregate={ready_agg}; {ready_detail}",
         )
 
         status, services, _ = _fetch_json(f"{api_base}/status/services")
@@ -101,11 +102,16 @@ def run_checks(api_base: str, offline: bool) -> dict:
             service_errors = validate_status_schema(services, "services")
             service_snapshot = services
         services_ok = status == 200 and isinstance(services, dict) and not service_errors
+        services_agg = (
+            services.get("status") if isinstance(services, dict) else services
+        )
+        services_detail = (
+            "; ".join(service_errors) if service_errors else "schema ok"
+        )
         record(
             "status_services",
             services_ok,
-            f"HTTP {status}, aggregate={services.get('status') if isinstance(services, dict) else services}; "
-            + ("; ".join(service_errors) if service_errors else "schema ok"),
+            f"HTTP {status}, aggregate={services_agg}; {services_detail}",
         )
 
         try:
@@ -208,7 +214,11 @@ def run_checks(api_base: str, offline: bool) -> dict:
                 else None,
             },
         ],
-        "checks": [c for c in checks if "failure_replay" in c["check"] or c["check"].startswith("health")],
+        "checks": [
+            c
+            for c in checks
+            if "failure_replay" in c["check"] or c["check"].startswith("health")
+        ],
     }
     (RELIABILITY_DIR / "failure_replay_report.json").write_text(
         json.dumps(failure_replay, indent=2) + "\n"
