@@ -1,0 +1,25 @@
+# AXON Phase 6B — RL micro-module dependencies (Docker `learning` profile only).
+#
+# ISOLATION: these are intentionally kept OUT of the core requirements / default
+# install. The core profile (api, redis, mosquitto, dashboard, sensor-generators,
+# edge-inference) does NOT need Gymnasium, Stable-Baselines3, or torch. Install
+# on demand with:
+#
+#     make learning-rl-install
+#     # or:
+#     pip install torch --index-url https://download.pytorch.org/whl/cpu
+#     pip install -r requirements-rl.txt
+#
+# Gymnasium (Farama fork — NOT legacy `gym`) + Stable-Baselines3 PPO. Pinned to a
+# compatible, stable combination (SB3 2.3.2 requires gymnasium>=0.28.1,<0.30).
+gymnasium==0.29.1
+stable-baselines3==2.3.2
+
+# Tiny CPU PPO MlpPolicy. A CPU-only wheel is strongly recommended:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2,<3.0
+
+# Local-first experiment tracking (file:// store — no server required).
+mlflow>=2.13,<3.1
+
+numpy>=1.26.0
