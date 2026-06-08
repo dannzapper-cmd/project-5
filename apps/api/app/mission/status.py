@@ -113,9 +113,11 @@ def build_mission_status(*, force_refresh: bool = False) -> dict[str, Any]:
     decision = get_current_decision()
 
     telemetry_ok = telemetry_state.mqtt_connected and telemetry_state.redis_connected
-    inference_ok = telemetry_state.model_score_stream_connected or telemetry_state.model_scores_received > 0
+    inference_ok = (
+        telemetry_state.model_score_stream_connected
+        or telemetry_state.model_scores_received > 0
+    )
     twin_ok = bool(twin_status.get("running"))
-    agents_ok = decision is not None or bool(safety)
     hitl_pending = decision is not None and decision.get("requires_human_confirmation")
 
     ros2_status = "offline"
@@ -225,10 +227,14 @@ def build_mission_status(*, force_refresh: bool = False) -> dict[str, Any]:
             limitations.append(f"{name} using artifact-only fallback (runtime not verified)")
 
     if not scenario_meta:
-        limitations.append("No Phase 8 scenario has been run yet; timeline uses deterministic fallback")
+        limitations.append(
+            "No Phase 8 scenario has been run yet; timeline uses deterministic fallback"
+        )
 
     if nav_slam.get("bridge_status") in ("offline", "inactive", None):
-        limitations.append("Nav2/SLAM MiniLab not running — status from in-process stub or artifacts")
+        limitations.append(
+            "Nav2/SLAM MiniLab not running — status from in-process stub or artifacts"
+        )
 
     if ros2_status == "offline":
         limitations.append("ROS2 bridge offline — no live robotics runtime required for Phase 8")
@@ -272,7 +278,10 @@ def build_mission_status(*, force_refresh: bool = False) -> dict[str, Any]:
         try:
             cached = json.loads(MISSION_STATUS_ARTIFACT.read_text(encoding="utf-8"))
             if cached.get("run_id"):
-                payload["last_scenario_artifact"] = str(MISSION_STATUS_ARTIFACT.relative_to(MISSION_STATUS_ARTIFACT.parents[2]))
+                artifact_root = MISSION_STATUS_ARTIFACT.parents[2]
+                payload["last_scenario_artifact"] = str(
+                    MISSION_STATUS_ARTIFACT.relative_to(artifact_root)
+                )
         except (OSError, json.JSONDecodeError):
             pass
 

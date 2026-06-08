@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -50,7 +49,10 @@ def _load_artifact_timeline() -> list[dict[str, Any]] | None:
             return None
 
     if PHASE8_DIR.is_dir():
-        candidates = sorted(PHASE8_DIR.glob("phase8_scenario_*.json"), key=lambda p: p.stat().st_mtime)
+        candidates = sorted(
+            PHASE8_DIR.glob("phase8_scenario_*.json"),
+            key=lambda p: p.stat().st_mtime,
+        )
         if candidates:
             try:
                 data = json.loads(candidates[-1].read_text(encoding="utf-8"))
@@ -69,19 +71,54 @@ def _fallback_timeline(status: dict[str, Any]) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
 
     stage_meta = [
-        ("telemetry_received", "Synthetic telemetry", "synthetic_telemetry", "Telemetry ingest path"),
-        ("edge_inference_scored", "Edge inference scored", "edge_inference", "ONNX edge inference"),
-        ("anomaly_status_evaluated", "Anomaly status evaluated", "anomaly_safety", "Safety fusion"),
-        ("agent_decision_generated", "Agent decision generated", "agent_decision", "LangGraph agents"),
-        ("hitl_safety_gate_checked", "HITL safety gate checked", "hitl_safety_gate", "Human-in-the-loop"),
+        (
+            "telemetry_received",
+            "Synthetic telemetry",
+            "synthetic_telemetry",
+            "Telemetry ingest path",
+        ),
+        (
+            "edge_inference_scored",
+            "Edge inference scored",
+            "edge_inference",
+            "ONNX edge inference",
+        ),
+        (
+            "anomaly_status_evaluated",
+            "Anomaly status evaluated",
+            "anomaly_safety",
+            "Safety fusion",
+        ),
+        (
+            "agent_decision_generated",
+            "Agent decision generated",
+            "agent_decision",
+            "LangGraph agents",
+        ),
+        (
+            "hitl_safety_gate_checked",
+            "HITL safety gate checked",
+            "hitl_safety_gate",
+            "Human-in-the-loop",
+        ),
         ("digital_twin_updated", "Digital twin updated", "digital_twin", "Digital twin mirror"),
         ("ros2_status_checked", "ROS2 status checked", "ros2", "ROS2 bridge"),
         ("nav_slam_status_checked", "Nav2/SLAM status checked", "nav_slam", "Nav2 SLAM MiniLab"),
         ("fl_evidence_loaded", "FL evidence loaded", "fl_evidence", "Federated learning"),
         ("rl_evidence_loaded", "RL evidence loaded", "rl_evidence", "RL micro-module"),
-        ("observability_checked", "Observability checked", "observability", "Observability layer"),
+        (
+            "observability_checked",
+            "Observability checked",
+            "observability",
+            "Observability layer",
+        ),
         ("reliability_checked", "Reliability checked", "reliability", "Reliability layer"),
-        ("evidence_artifact_written", "Evidence artifact written", "evidence_center", "Evidence Center"),
+        (
+            "evidence_artifact_written",
+            "Evidence artifact written",
+            "evidence_center",
+            "Evidence Center",
+        ),
     ]
 
     for idx, (stage, title, comp_key, source) in enumerate(stage_meta):
@@ -141,11 +178,18 @@ def build_mission_timeline(*, force_refresh: bool = False) -> dict[str, Any]:
                 )
             )
 
-    events.sort(key=lambda e: TIMELINE_STAGES.index(e["stage"]) if e["stage"] in TIMELINE_STAGES else 999)
+    def _stage_order(event: dict[str, Any]) -> int:
+        stage = event["stage"]
+        return TIMELINE_STAGES.index(stage) if stage in TIMELINE_STAGES else 999
+
+    events.sort(key=_stage_order)
 
     limitations: list[str] = []
     if source == "deterministic_fallback":
-        limitations.append("Timeline generated from live status fallback — run a scenario for artifact-backed timeline")
+        limitations.append(
+            "Timeline generated from live status fallback — "
+            "run a scenario for artifact-backed timeline"
+        )
 
     return {
         "phase": PHASE,

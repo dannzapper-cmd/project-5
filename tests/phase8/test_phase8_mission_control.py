@@ -9,7 +9,6 @@ from pathlib import Path
 import pytest
 from apps.api.app.mission.constants import DEFAULT_SEED, SCENARIO_NAMES, TIMELINE_STAGES
 from apps.api.app.mission.scenarios import run_scenario, validate_artifact_payload
-from apps.api.app.mission.status import build_mission_status
 from apps.api.main import app
 from fastapi.testclient import TestClient
 

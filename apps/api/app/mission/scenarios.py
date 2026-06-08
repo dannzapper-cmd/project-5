@@ -6,11 +6,10 @@ import json
 import random
 import subprocess
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from apps.api.app.mission.constants import DEFAULT_SEED, PHASE, SCENARIO_NAMES, TIMELINE_STAGES
+from apps.api.app.mission.constants import DEFAULT_SEED, PHASE, SCENARIO_NAMES
 from apps.api.app.mission.evidence_index import build_evidence_index
 from apps.api.app.mission.paths import (
     MISSION_EVIDENCE_INDEX_ARTIFACT,
@@ -103,7 +102,13 @@ def _build_scenario_timeline(
         telemetry["imu"] = 0.92
 
     stages: list[tuple[str, str, str, str, str]] = [
-        ("telemetry_received", "Synthetic telemetry received", "MQTT/Redis synthetic ingest", "telemetry", "ok"),
+        (
+            "telemetry_received",
+            "Synthetic telemetry received",
+            "MQTT/Redis synthetic ingest",
+            "telemetry",
+            "ok",
+        ),
         (
             "edge_inference_scored",
             "Edge inference scored synthetic signals",
@@ -195,7 +200,11 @@ def _build_scenario_timeline(
             stage = row[0]
             if stage in ("fl_evidence_loaded", "rl_evidence_loaded"):
                 stages[i] = (stage, row[1], row[2], row[3], "ok")
-            elif stage in ("telemetry_received", "edge_inference_scored", "agent_decision_generated"):
+            elif stage in (
+                "telemetry_received",
+                "edge_inference_scored",
+                "agent_decision_generated",
+            ):
                 stages[i] = (stage, row[1], row[2], row[3], "skipped")
 
     events: list[dict[str, Any]] = []
@@ -253,7 +262,12 @@ def _components_touched(scenario: str) -> list[str]:
         "evidence_center",
     ]
     if scenario == "learning_evidence_review":
-        return ["federated_learning", "reinforcement_learning", "evidence_center", "mission_control"]
+        return [
+            "federated_learning",
+            "reinforcement_learning",
+            "evidence_center",
+            "mission_control",
+        ]
     if scenario == "anomaly_safety_intervention":
         return common + ["safety_hitl"]
     return common
@@ -371,10 +385,13 @@ def run_scenario(scenario: str, *, enrich_from_api: bool = False) -> dict[str, A
         "repo_commit": _git_commit(),
     }
     validate_artifact_payload(evidence_payload, label="evidence index artifact")
-    MISSION_EVIDENCE_INDEX_ARTIFACT.write_text(json.dumps(evidence_payload, indent=2), encoding="utf-8")
+    MISSION_EVIDENCE_INDEX_ARTIFACT.write_text(
+        json.dumps(evidence_payload, indent=2),
+        encoding="utf-8",
+    )
 
     summary_lines = [
-        f"Phase 8 Mission Scenario Summary",
+        "Phase 8 Mission Scenario Summary",
         f"Scenario: {scenario}",
         f"Run ID: {run_id}",
         f"Generated: {generated_at}",
