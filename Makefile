@@ -206,11 +206,14 @@ learning-rl-eval: ## Inspect the latest trained policy (state -> action table, m
 rl-status: ## Fetch RL micro-module status from the local API
 	curl -s http://localhost:8000/api/learning/rl/status | python3 -m json.tool
 
-verify-phase6b: ## Run the Phase 6B verification script (lint + RL tests + smoke + compose + safety + ROS2 freeze)
+	verify-phase6b verify-phase9: ## Run the Phase 6B verification script (lint + RL tests + smoke + compose + safety + ROS2 freeze)
 	bash scripts/verify_phase6b.sh
 
 verify-phase8: ## Run Phase 8 verification (mission control tests + scenario smoke)
 	bash scripts/verify_phase8.sh
+
+verify-phase9: ## Run Phase 9 verification (lightweight claim + evidence checks)
+	bash scripts/verify_phase9.sh
 
 compose-obs: ## Validate Docker Compose obs profile configuration
 	docker compose --profile obs config

@@ -36,9 +36,8 @@ RL_ARTIFACTS = {
 }
 
 MLOPS_ARTIFACTS = {
-    "metrics": ARTIFACTS / "mlops" / "latest_eval" / "metrics.json",
-    "eval_report": ARTIFACTS / "mlops" / "latest_eval" / "eval_report.json",
-    "candidate_manifest": ARTIFACTS / "mlops" / "registry" / "candidate_manifest.json",
+    "latest_eval": ARTIFACTS / "mlops" / "latest_eval.json",
+    "model_registry": ARTIFACTS / "mlops" / "model_registry.json",
 }
 
 MLOPS_DOC_ARTIFACTS = {

@@ -316,6 +316,25 @@ loop visibility, scenario runner, timeline, Evidence Center, and dashboard integ
 
 ---
 
+## Phase 9 — QA, Repair, and Hardening
+
+**Goal:** Senior verification-driven repair before portfolio packaging. No new subsystems.
+
+**Required outputs:**
+- `scripts/verify_phase9.sh` + `scripts/scan_claims.py`
+- Evidence integrity repairs (honest index paths, runtime artifact hygiene)
+- Phase 9 verification and capability truth reports
+
+**Acceptance criteria:**
+- `bash scripts/verify_phase9.sh` passes (Block 1; Block 2 when Docker available)
+- `make lint` and `make test` pass
+- No unqualified fine-tuning or medical-device claims
+- No fake evidence committed
+
+**Next:** Phase 10 — portfolio packaging.
+
+---
+
 ## Phase 8 (legacy note) — Cloud/VM + Hardware Path
 
 *Superseded for portfolio delivery order — hardware/cost report may return in a later
@@ -344,7 +363,7 @@ optional track. Phase 8 as shipped integrates mission control, not cloud packagi
 
 ---
 
-## Phase 9: Portfolio Packaging
+## Phase 10: Portfolio Packaging
 
 **Goal:** Final demo, case study, interview narrative, Evidence Center completion.
 

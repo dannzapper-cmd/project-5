@@ -163,6 +163,19 @@ def test_drift_detector_detects_drift():
     assert result["recommendation"] == "evaluate_candidate_model"
 
 
+def test_drift_recommendation_points_to_retraining_pipeline():
+    """Drift detection recommends candidate evaluation — entry to synthetic retraining loop."""
+    detector = SlidingWindowDriftDetector(window=5, threshold=0.60)
+    for _ in range(5):
+        detector.update(0.30)
+    result = detector.check()
+    assert result["recommendation"] == "evaluate_candidate_model"
+
+    from apps.api.app.mission.paths import GENERATE_CMDS
+
+    assert GENERATE_CMDS["mlops"] == "make mlops-pipeline"
+
+
 def test_drift_detector_nominal():
     detector = SlidingWindowDriftDetector(window=5, threshold=0.60)
     for _ in range(5):
