@@ -65,7 +65,7 @@ flowchart TB
 | Fusion | Multi-sensor state + confidence | 2 |
 | Agent orchestrator | LangGraph stateful workflows | 3 |
 | LangChain layer | Tools, RAG, retrievers | 3 |
-| Learning | MLflow, fine-tuning, Flower, RL | 4, 6 |
+| Learning | MLflow, synthetic retraining / candidate refresh loop, Flower, RL | 4, 6 |
 | Observability | Traces, metrics, dashboards | 7 |
 | ROS2 bridge | Robotics integration | 5, 5.5 |
 | Digital twin | Live visualization | 5 |

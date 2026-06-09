@@ -1,8 +1,15 @@
-"""Phase 8 deterministic mission scenario runner."""
+"""Phase 8 deterministic mission scenario runner.
+
+Determinism note:
+Scenario *content* (synthetic telemetry values, stage ordering, seed=42 labels) is
+deterministic. ``run_id``, ``event_id``, and ``generated_at`` are runtime metadata
+by design — they use uuid4 and datetime.now and are not byte-reproducible across runs.
+"""
 
 from __future__ import annotations
 
 import json
+import logging
 import random
 import subprocess
 from datetime import UTC, datetime, timedelta
@@ -19,6 +26,8 @@ from apps.api.app.mission.paths import (
     SCENARIO_SUMMARY_ARTIFACT,
 )
 from apps.api.app.mission.status import build_mission_status
+
+logger = logging.getLogger(__name__)
 
 REQUIRED_ARTIFACT_FIELDS = (
     "synthetic_data_only",
@@ -339,92 +348,105 @@ def run_scenario(scenario: str, *, enrich_from_api: bool = False) -> dict[str, A
 
     validate_artifact_payload(scenario_payload, label="scenario artifact")
 
-    PHASE8_DIR.mkdir(parents=True, exist_ok=True)
+    persisted = True
+    persistence_note: str | None = None
+    artifact_paths: dict[str, str] = {}
 
-    scenario_path = PHASE8_DIR / f"phase8_scenario_{scenario}_{run_id}.json"
-    scenario_path.write_text(json.dumps(scenario_payload, indent=2), encoding="utf-8")
+    try:
+        PHASE8_DIR.mkdir(parents=True, exist_ok=True)
 
-    status_payload = {
-        "run_id": run_id,
-        "scenario": scenario,
-        "generated_at": generated_at,
-        "phase": PHASE,
-        "seed": DEFAULT_SEED,
-        "synthetic_data_only": True,
-        "no_medical_claims": True,
-        "system_mode": "scenario_artifact",
-        "components": components,
-        "limitations": limitations,
-        "repo_commit": _git_commit(),
-    }
-    validate_artifact_payload(status_payload, label="mission status artifact")
-    MISSION_STATUS_ARTIFACT.write_text(json.dumps(status_payload, indent=2), encoding="utf-8")
+        scenario_path = PHASE8_DIR / f"phase8_scenario_{scenario}_{run_id}.json"
+        scenario_path.write_text(json.dumps(scenario_payload, indent=2), encoding="utf-8")
+        artifact_paths["scenario"] = str(scenario_path)
 
-    timeline_payload = {
-        "run_id": run_id,
-        "scenario": scenario,
-        "generated_at": generated_at,
-        "phase": PHASE,
-        "seed": DEFAULT_SEED,
-        "synthetic_data_only": True,
-        "no_medical_claims": True,
-        "events": timeline,
-        "limitations": limitations,
-        "repo_commit": _git_commit(),
-    }
-    validate_artifact_payload(timeline_payload, label="timeline artifact")
-    MISSION_TIMELINE_ARTIFACT.write_text(json.dumps(timeline_payload, indent=2), encoding="utf-8")
+        status_payload = {
+            "run_id": run_id,
+            "scenario": scenario,
+            "generated_at": generated_at,
+            "phase": PHASE,
+            "seed": DEFAULT_SEED,
+            "synthetic_data_only": True,
+            "no_medical_claims": True,
+            "system_mode": "scenario_artifact",
+            "components": components,
+            "limitations": limitations,
+            "repo_commit": _git_commit(),
+        }
+        validate_artifact_payload(status_payload, label="mission status artifact")
+        MISSION_STATUS_ARTIFACT.write_text(json.dumps(status_payload, indent=2), encoding="utf-8")
+        artifact_paths["mission_status"] = str(MISSION_STATUS_ARTIFACT)
 
-    evidence_payload = {
-        **evidence,
-        "run_id": run_id,
-        "scenario": scenario,
-        "generated_at": generated_at,
-        "seed": DEFAULT_SEED,
-        "limitations": limitations,
-        "repo_commit": _git_commit(),
-    }
-    validate_artifact_payload(evidence_payload, label="evidence index artifact")
-    MISSION_EVIDENCE_INDEX_ARTIFACT.write_text(
-        json.dumps(evidence_payload, indent=2),
-        encoding="utf-8",
-    )
+        timeline_payload = {
+            "run_id": run_id,
+            "scenario": scenario,
+            "generated_at": generated_at,
+            "phase": PHASE,
+            "seed": DEFAULT_SEED,
+            "synthetic_data_only": True,
+            "no_medical_claims": True,
+            "events": timeline,
+            "limitations": limitations,
+            "repo_commit": _git_commit(),
+        }
+        validate_artifact_payload(timeline_payload, label="timeline artifact")
+        MISSION_TIMELINE_ARTIFACT.write_text(
+            json.dumps(timeline_payload, indent=2),
+            encoding="utf-8",
+        )
+        artifact_paths["mission_timeline"] = str(MISSION_TIMELINE_ARTIFACT)
 
-    summary_lines = [
-        "Phase 8 Mission Scenario Summary",
-        f"Scenario: {scenario}",
-        f"Run ID: {run_id}",
-        f"Generated: {generated_at}",
-        f"Seed: {DEFAULT_SEED}",
-        "",
-        "Components touched:",
-        *[f"  - {c}" for c in components],
-        "",
-        "Artifacts:",
-        f"  - {scenario_path.relative_to(PHASE8_DIR.parents[1])}",
-        f"  - {MISSION_STATUS_ARTIFACT.relative_to(PHASE8_DIR.parents[1])}",
-        f"  - {MISSION_TIMELINE_ARTIFACT.relative_to(PHASE8_DIR.parents[1])}",
-        f"  - {MISSION_EVIDENCE_INDEX_ARTIFACT.relative_to(PHASE8_DIR.parents[1])}",
-        "",
-        "Limitations:",
-        *[f"  - {lim}" for lim in limitations],
-        "",
-        "Synthetic data only. No medical claims.",
-    ]
-    SCENARIO_SUMMARY_ARTIFACT.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+        evidence_payload = {
+            **evidence,
+            "run_id": run_id,
+            "scenario": scenario,
+            "generated_at": generated_at,
+            "seed": DEFAULT_SEED,
+            "limitations": limitations,
+            "repo_commit": _git_commit(),
+        }
+        validate_artifact_payload(evidence_payload, label="evidence index artifact")
+        MISSION_EVIDENCE_INDEX_ARTIFACT.write_text(
+            json.dumps(evidence_payload, indent=2),
+            encoding="utf-8",
+        )
+        artifact_paths["mission_evidence_index"] = str(MISSION_EVIDENCE_INDEX_ARTIFACT)
+
+        summary_lines = [
+            "Phase 8 Mission Scenario Summary",
+            f"Scenario: {scenario}",
+            f"Run ID: {run_id}",
+            f"Generated: {generated_at}",
+            f"Seed: {DEFAULT_SEED}",
+            "",
+            "Components touched:",
+            *[f"  - {c}" for c in components],
+            "",
+            "Artifacts:",
+            f"  - {scenario_path.relative_to(PHASE8_DIR.parents[1])}",
+            f"  - {MISSION_STATUS_ARTIFACT.relative_to(PHASE8_DIR.parents[1])}",
+            f"  - {MISSION_TIMELINE_ARTIFACT.relative_to(PHASE8_DIR.parents[1])}",
+            f"  - {MISSION_EVIDENCE_INDEX_ARTIFACT.relative_to(PHASE8_DIR.parents[1])}",
+            "",
+            "Limitations:",
+            *[f"  - {lim}" for lim in limitations],
+            "",
+            "Synthetic data only. No medical claims.",
+        ]
+        SCENARIO_SUMMARY_ARTIFACT.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+        artifact_paths["scenario_summary"] = str(SCENARIO_SUMMARY_ARTIFACT)
+    except (OSError, PermissionError) as exc:
+        persisted = False
+        persistence_note = "artifact path read-only in this profile"
+        logger.warning("Scenario artifact write failed (%s): %s", persistence_note, exc)
 
     return {
         "run_id": run_id,
         "scenario": scenario,
         "status": "completed",
         "timeline": timeline,
-        "artifact_paths": {
-            "scenario": str(scenario_path),
-            "mission_status": str(MISSION_STATUS_ARTIFACT),
-            "mission_timeline": str(MISSION_TIMELINE_ARTIFACT),
-            "mission_evidence_index": str(MISSION_EVIDENCE_INDEX_ARTIFACT),
-            "scenario_summary": str(SCENARIO_SUMMARY_ARTIFACT),
-        },
+        "artifact_paths": artifact_paths,
+        "persisted": persisted,
+        "persistence_note": persistence_note,
         "limitations": limitations,
         "synthetic_data_only": True,
         "no_medical_claims": True,

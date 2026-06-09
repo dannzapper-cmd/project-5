@@ -129,7 +129,7 @@ Not delivered: Phase 8 hardware/cloud path, full 3D physics simulation. Syntheti
 | Inference | ONNX Runtime | 2 |
 | Fusion | Custom fusion service | 2 |
 | Agents | LangGraph + LangChain | 3 |
-| MLOps | MLflow, fine-tuning, continual learning | 4 |
+| MLOps | MLflow, synthetic retraining / candidate refresh loop | 4 |
 | Robotics | ROS2 thin adapter | 5 |
 | Advanced robotics | Nav2 + SLAM MiniLab | 5.5 |
 | Federated / RL | Flower, Gymnasium, SB3 | 6 |

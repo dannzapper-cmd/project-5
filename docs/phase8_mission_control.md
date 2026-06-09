@@ -51,13 +51,26 @@ flowchart LR
 |--------|------|---------|----------|
 | GET | `/mission/status` | Unified system snapshot | HTTP 200, `degraded: true` |
 | GET | `/mission/timeline` | Ordered loop events | Deterministic fallback timeline |
-| GET | `/mission/evidence` | Evidence Center index | Missing items marked `missing` |
+| GET | `/mission/evidence` | Evidence Center index | Committed docs `missing`; generated artifacts `not_generated` |
 | GET | `/mission/scenarios` | Scenario catalog | Static definitions |
 | POST | `/mission/scenarios/run` | Run scenario | 400 for unknown scenario name |
 
 All responses include `synthetic_data_only: true` and `no_medical_claims: true`.
 
 Status cache TTL: `STATUS_TTL_S = 300`. Evidence index TTL: `EVIDENCE_TTL_S = 300`.
+
+## Scenario determinism
+
+Scenario *content* (synthetic telemetry values, stage ordering, `seed=42` labels) is
+deterministic. `run_id`, `event_id`, and `generated_at` are runtime metadata by design —
+they use `uuid4` and `datetime.now` and are not byte-reproducible across runs.
+
+Runtime mission artifacts (`phase8_mission_*.json`, `phase8_scenario_summary.txt`) are
+generated locally and are not committed. See `docs/evidence/phase8_snapshot_note.md`.
+
+`POST /mission/scenarios/run` returns `persisted: false` with a `persistence_note` when
+the artifact path is read-only (e.g. Docker `core` profile `:ro` mount) instead of
+silently claiming persistence succeeded.
 
 ## Scenario runner usage
 

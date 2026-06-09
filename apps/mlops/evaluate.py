@@ -1,4 +1,11 @@
-"""Offline evaluation: Phase 2 v1 vs candidate v2."""
+"""Offline evaluation: Phase 2 v1 vs candidate v2.
+
+Methodology (synthetic retraining / candidate refresh loop):
+- v1 is a legacy 2-class heuristic baseline evaluated on its native feature space.
+- v2 is a retrained candidate (StandardScaler + LogisticRegression) on engineered features.
+- The accuracy delta is an artifact of evaluation asymmetry, not a controlled model
+  quality improvement. This is not fine-tuning of a pretrained neural network.
+"""
 
 from __future__ import annotations
 
@@ -38,6 +45,13 @@ from edge_inference.preprocess import preprocess_sensor_event
 
 V1_EMG_MAP = {"normal": "normal", "elevated_activity": "anomaly"}
 V1_IMU_MAP = {"stable_motion": "normal", "movement_spike": "spike"}
+
+COMPARISON_NOTE = (
+    "v1 is a legacy 2-class heuristic baseline evaluated on its native feature space. "
+    "v2 is a retrained candidate on engineered features. "
+    "The accuracy delta is an artifact of the evaluation asymmetry and does not represent "
+    "a controlled model quality improvement."
+)
 
 
 def _parse_onnx_class_output(outputs: list, output_names: list[str], n_classes: int) -> int:
@@ -200,7 +214,6 @@ def run_evaluation_pipeline(
     label_set = EMG_LABELS if signal_type == "emg" else IMU_LABELS
 
     _, X_test, _, y_test, _, raw_test = _split_test(features, labels, raw, seed)
-    _, _, _, y_train_raw, _, _ = _split_test(features, labels, raw, seed)
 
     candidate_path = str(MODELS_DIR / f"{signal_type}_v2_candidate.onnx")
     train_and_export_candidate(
@@ -226,6 +239,11 @@ def run_evaluation_pipeline(
         "seed": seed,
         "synthetic_only": True,
         "safety_notes": SAFETY_NOTES,
+        "methodology": (
+            "Synthetic retraining / candidate refresh loop for small classical models. "
+            "Not neural fine-tuning."
+        ),
+        "comparison_note": COMPARISON_NOTE,
         "signal_type": signal_type,
         "v1": v1,
         "v2_candidate": v2,
@@ -248,6 +266,11 @@ def run_evaluation_pipeline(
         f"- Signal: {signal_type}",
         f"- Dataset: {dataset['dataset_id']}",
         f"- Recommendation: {report['improvement']['recommendation']}",
+        "",
+        "## Methodology",
+        report["methodology"],
+        "",
+        report["comparison_note"],
         "",
         "## v1 vs v2",
         "| Metric | v1 | v2_candidate |",

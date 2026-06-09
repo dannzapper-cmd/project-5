@@ -14,7 +14,7 @@ A reproducible intelligent systems project that will:
 - Run **edge-like inference** with ONNX Runtime
 - **Fuse sensors** into operational state with confidence scoring
 - **Coordinate agents** via LangGraph with LangChain tools/RAG
-- Support **learning loops** (MLflow, fine-tuning, continual learning, Flower, RL)
+- Support **learning loops** (MLflow, synthetic retraining / candidate refresh loop, Flower, RL)
 - **Visualize operations** through a live dashboard and digital twin
 - Collect **evidence** for every major capability
 
@@ -78,24 +78,23 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 6B — RL Micro-module (Gymnasium + Stable-Baselines3 PPO, synthetic, on-demand)**
+**Phase 9 — QA, Repair, and Hardening (in progress on `feat/phase-9-pass1-credibility-hardening`)**
 
-| Delivered | Not Yet Implemented |
-|-----------|---------------------|
-| Phases 1–5.5: telemetry, edge AI, agents, HITL, MLOps, digital twin, ROS2 core, Nav2 + SLAM MiniLab | Observability (OTel/Prometheus/Grafana) — Phase 7 |
-| Phase 6A: Flower FedAvg federated simulation (3–5 synthetic edge clients) | Hardware integration — Phase 8 |
-| Phase 6B: `AxonTriageEnvV1` Gymnasium env + PPO operational-triage policy | Gazebo / Isaac / Omniverse / RViz |
-| Local MLflow logging, `/api/learning/{federated,rl}/*`, dashboard FL + RL panels | Cloud deployment / Kubernetes |
-| Isolated `learning` profile (`fl-runner`, `rl-runner`), deps out of core | Real clinical/medical decisions — never |
+| Completed (merged) | Current work (Phase 9) | Not yet |
+|--------------------|------------------------|---------|
+| Phases 1–8: telemetry, edge AI, agents, HITL, MLOps synthetic retraining loop, digital twin, ROS2, Nav2 + SLAM MiniLab, FL/RL, observability/reliability, integrated mission control | Credibility repairs, evidence integrity, reproducibility, phase/version alignment, lightweight CI expansion | Phase 10 packaging, demo video, portfolio release |
 
-**Next phase:** [Phase 7 — Observability](ROADMAP.md) (not started)
+**Phase 8 (merged):** Mission API (`/mission/*`), deterministic scenario runner (seed 42),
+Evidence Center index, dashboard Mission Control section. See
+[docs/phase8_mission_control.md](docs/phase8_mission_control.md).
 
-See [docs/evidence/phase-6a-federated-learning.md](docs/evidence/phase-6a-federated-learning.md)
-and [docs/evidence/phase-6b-rl-micro-module.md](docs/evidence/phase-6b-rl-micro-module.md)
-for the full Phase 6A/6B overviews and reproduction steps.
+**Phase 4 MLOps note:** AXON includes a synthetic retraining / candidate refresh loop for
+small classical models. It is not fine-tuning of a pretrained neural network.
 
-> **Phase 6A/6B are synthetic learning simulations. No real patient data. No
-> medical decisions. Human review required for high-risk actions.**
+**Next after Phase 9:** [Phase 10 — Portfolio Packaging](ROADMAP.md) (not started).
+
+> **Synthetic data only. No real patient data. No medical claims. Human review required
+> for high-risk actions.**
 
 ---
 
@@ -271,7 +270,7 @@ Dashboard: http://localhost:3000 — live telemetry + model score panels.
 - ONNX Runtime edge inference
 - Sensor fusion
 - Deep learning with small models
-- Fine-tuning
+- Synthetic retraining / candidate refresh loop (classical models — not neural fine-tuning)
 - TinyML / tiny deep learning path
 - MLflow for MLOps
 - Continual learning
@@ -345,7 +344,7 @@ Policies: [docs/safety/](docs/safety/)
 | Safety boundaries | Biomedical policy + HITL policy |
 | Human-in-the-loop | `requires_human_confirmation` in decision events |
 | Evidence Center | Phase-gated checklist with reproducible proof |
-| MLOps and learning loops | MLflow, fine-tuning, Flower, RL (future phases) |
+| MLOps and learning loops | MLflow, synthetic retraining / candidate refresh loop, Flower, RL |
 | Observability | OpenTelemetry, Prometheus, Grafana (Phase 7) |
 | Robotics integration | ROS2 thin adapter + mandatory Nav2 MiniLab |
 | Replay and failure injection | MQTT replay publish + Redis buffer (Phase 1) |

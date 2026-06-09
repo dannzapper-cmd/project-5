@@ -46,8 +46,8 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 ## Phase 4 — MLOps
 
 - [ ] MLflow run screenshot
-- [ ] Fine-tuning before/after report
-- [ ] Continual learning drift trigger evidence
+- [ ] Synthetic retraining / candidate refresh before/after report
+- [ ] Drift-triggered retraining recommendation evidence
 
 ## Phase 6 — Federated Learning + RL
 
@@ -115,7 +115,7 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 
 - [x] Mission API endpoints (`/mission/status`, `/timeline`, `/evidence`, `/scenarios`, POST run)
 - [x] Deterministic scenario runner (seed 42, three scenarios)
-- [x] Artifacts under `artifacts/phase8/`
+- [x] Runtime artifacts under `artifacts/phase8/` (generated locally — not committed; see `docs/evidence/phase8_snapshot_note.md`)
 - [x] Dashboard Mission Control section + API fallback
 - [x] Evidence Center index (FL, RL, reliability, observability, robotics, agents)
 - [x] `scripts/verify_phase8.sh` + `tests/phase8/`

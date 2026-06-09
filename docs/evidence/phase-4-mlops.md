@@ -1,6 +1,8 @@
-# Phase 4 — MLOps + Continual Learning
+# Phase 4 — MLOps + Synthetic Retraining
 
 ## Overview
+
+AXON includes a synthetic retraining / candidate refresh loop for small classical models. It is not fine-tuning of a pretrained neural network.
 
 Phase 4 adds a lightweight, local-first MLOps loop:
 

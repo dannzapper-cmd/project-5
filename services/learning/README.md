@@ -2,11 +2,11 @@
 
 ## Purpose
 
-MLOps, fine-tuning, continual learning, federated learning (Flower), and RL micro-module training loops.
+MLOps, synthetic retraining / candidate refresh loop, federated learning (Flower), and RL micro-module training loops.
 
 ## Phase
 
-- Phase 4 — MLOps + Fine-tuning + Continual Learning (delivered; see `apps/mlops/`)
+- Phase 4 — MLOps + Synthetic Retraining (delivered; see `apps/mlops/`)
 - Phase 6A — Federated Learning (Flower + FedAvg) — **delivered**
 - Phase 6B — RL — future
 
@@ -35,7 +35,7 @@ Synthetic federated learning simulation. No real patient data. No medical claims
 ## Expected Outputs
 
 - MLflow runs and model artifacts
-- Fine-tuning before/after reports
+- Synthetic retraining / candidate refresh before/after reports
 - Flower convergence metrics
 - RL reward curves
 

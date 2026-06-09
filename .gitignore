@@ -91,6 +91,12 @@ artifacts/learning/federated/model_card_axon_fl_v1.md
 artifacts/learning/federated/status.json
 artifacts/learning/federated/runs/
 
+# Phase 8 runtime mission artifacts (generated locally — not committed)
+artifacts/phase8/phase8_mission_evidence_index.json
+artifacts/phase8/phase8_mission_status.json
+artifacts/phase8/phase8_mission_timeline.json
+artifacts/phase8/phase8_scenario_summary.txt
+
 # Phase 6B RL micro-module runtime artifacts (regenerated on demand)
 artifacts/learning/rl/rl_report.json
 artifacts/learning/rl/reward_curve.json

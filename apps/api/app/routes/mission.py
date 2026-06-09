@@ -75,17 +75,21 @@ def mission_evidence() -> dict[str, Any]:
     try:
         index = build_evidence_index(force_refresh=True)
         missing = [i["id"] for i in index["items"] if i["status"] == "missing"]
+        not_generated = [i["id"] for i in index["items"] if i["status"] == "not_generated"]
         degraded = bool(missing)
+        limitations: list[str] = ["Evidence index regenerated from disk"]
+        if missing:
+            limitations = [f"{len(missing)} committed evidence items missing on disk"]
+        elif not_generated:
+            limitations = [
+                f"{len(not_generated)} optional/generated artifacts not yet produced locally"
+            ]
         return _wrap(
             {
                 **index,
                 "degraded": degraded,
                 "degraded_components": ["evidence_missing"] if missing else [],
-                "limitations": (
-                    [f"{len(missing)} evidence items missing on disk"]
-                    if missing
-                    else ["Evidence index regenerated from disk"]
-                ),
+                "limitations": limitations,
             }
         )
     except Exception as exc:  # noqa: BLE001
