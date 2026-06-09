@@ -132,6 +132,8 @@ docker compose --profile core down
 
 Full runbook: [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/phase10/demo/runbook-phase10a.md)
 
+For clean-machine reproduction from a fresh clone, see the [Fresh Clone Demo Checklist](docs/evidence/phase10/demo/fresh-clone-demo-checklist.md).
+
 ---
 
 ## Evidence
@@ -141,6 +143,7 @@ Full runbook: [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/pha
 | Screenshot index | [docs/evidence/phase10/demo/screenshot-index.md](docs/evidence/phase10/demo/screenshot-index.md) |
 | Demo verification report | [docs/evidence/phase10/demo/demo-verification-report.md](docs/evidence/phase10/demo/demo-verification-report.md) |
 | Demo runbook | [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/phase10/demo/runbook-phase10a.md) |
+| Fresh clone checklist | [docs/evidence/phase10/demo/fresh-clone-demo-checklist.md](docs/evidence/phase10/demo/fresh-clone-demo-checklist.md) |
 | Latest screenshots | [docs/evidence/phase10/demo/screenshots/latest/](docs/evidence/phase10/demo/screenshots/latest/) |
 | Evidence Center index | [docs/evidence/README.md](docs/evidence/README.md) |
 | Phase 9 final seal | [docs/evidence/phase9_final_seal_report.md](docs/evidence/phase9_final_seal_report.md) |
