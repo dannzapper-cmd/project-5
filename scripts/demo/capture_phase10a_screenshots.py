@@ -8,14 +8,14 @@ import os
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "http://localhost:3000")
 API_BASE = os.environ.get("API_BASE", "http://localhost:8000")
 WARMUP_MS = int(os.environ.get("SCREENSHOT_WARMUP_MS", "30000"))
-TIMESTAMP = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+TIMESTAMP = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
 OUT_DIR = ROOT / "docs/evidence/phase10/demo/screenshots" / TIMESTAMP
 LATEST_DIR = ROOT / "docs/evidence/phase10/demo/screenshots/latest"
 
@@ -25,9 +25,21 @@ SHOTS = [
     ("02_edge_inference_and_fusion.png", "edge-inference", "Edge inference / model scores"),
     ("03_agent_traces_and_hitl.png", "agent-traces", "Agent traces and HITL context"),
     ("04_digital_twin_state_mirror.png", "digital-twin", "Digital twin state mirror"),
-    ("05_evidence_center_or_observability.png", "operational-status", "Operational status / evidence"),
-    ("06_failure_or_degraded_mode_if_available.png", "failure-injection", "Failure injection panel"),
-    ("07_ros2_nav_slam_compose_status_if_available.png", "nav-slam", "Nav2/SLAM MiniLab offline panel"),
+    (
+        "05_evidence_center_or_observability.png",
+        "operational-status",
+        "Operational status / evidence",
+    ),
+    (
+        "06_failure_or_degraded_mode_if_available.png",
+        "failure-injection",
+        "Failure injection panel",
+    ),
+    (
+        "07_ros2_nav_slam_compose_status_if_available.png",
+        "nav-slam",
+        "Nav2/SLAM MiniLab offline panel",
+    ),
 ]
 
 

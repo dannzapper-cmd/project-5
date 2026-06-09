@@ -84,6 +84,12 @@ Output:
 - `docs/evidence/phase10/demo/screenshots/<timestamp>/`
 - `docs/evidence/phase10/demo/screenshots/latest/` (copies of latest run)
 
+Validate PNG evidence (stdlib, no Pillow required):
+
+```bash
+.venv/bin/python scripts/demo/validate_phase10a_screenshots.py
+```
+
 ## Stop / cleanup
 
 ```bash

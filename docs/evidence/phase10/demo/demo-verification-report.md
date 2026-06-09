@@ -10,7 +10,9 @@ Phase 10A local demo automation, health verification, and real screenshot captur
 
 | Field | Value |
 |-------|-------|
+| PR | [#18](https://github.com/dannzapper-cmd/project-5/pull/18) |
 | Branch | `feat/phase-10a-demo-automation` |
+| Phase 10A commit | `f582f70` (initial); closeout audit may add follow-up commit |
 | Base commit (PR #17) | `f8d5e1b643a122bf6197ecef9f3818f2933df841` |
 | Capture timestamp (UTC) | 2026-06-09T05:47:40 |
 | Machine | macOS darwin 25.5.0, Docker Compose local, arm64 |
@@ -92,6 +94,15 @@ Sample telemetry at capture: `received_events` ≈ 195+, `model_scores_received`
 1. Dashboard `status/services` reports dashboard as `inactive` (expected — static file server not probed by API).
 2. Mission scenario runner not executed during capture (live telemetry sufficient).
 3. ROS2/Nav2/SLAM live screenshots require `ros2-nav-slam` profile — documented as offline/compose-validated only.
+4. IMU model score card may show `—` in section crop if no IMU score at capture instant (EMG scores present).
+
+## Closeout audit (final)
+
+- PNG validation: 8/8 PASS via `scripts/demo/validate_phase10a_screenshots.py` (section crops; not full-page).
+- Visual review: performed on committed screenshots — loaded UI, live counters, synthetic disclaimers visible; screenshot 07 shows **MiniLab — offline** honestly.
+- `latest/` byte-identical to `20260609-054740/`.
+- CI smoke initially failed on ruff lint in `capture_phase10a_screenshots.py` — fixed in closeout commit.
+- Full test suite: **not run**. Ran `make lint`, `verify_phase9.sh`, `tests/phase9/test_scan_claims.py` only.
 
 ## Claim scan result
 

@@ -26,3 +26,8 @@ Full machine-readable provenance: [screenshots/20260609-054740/capture-metadata.
 - Screenshots reflect **core profile only** — ROS2/Nav2/SLAM intentionally offline.
 - No stock or AI-generated imagery; all captures from local Chromium headless against live dashboard.
 - Thumbnails above use relative paths to `screenshots/latest/`.
+- Captures are **section crops** (`data-testid` element screenshots), not full-page. Typical width ~1068px; height varies by panel. Validate with:
+
+```bash
+.venv/bin/python scripts/demo/validate_phase10a_screenshots.py
+```
