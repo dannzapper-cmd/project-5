@@ -5,8 +5,9 @@ Phase 10 splits into sub-deliverables:
 | Sub-phase | Scope | Status |
 |-----------|-------|--------|
 | **10A** | Demo automation, health verification, real screenshots | Merged (PR #18) — PASS WITH DOCUMENTED RISKS |
-| **10B** | Final README, case study, portfolio copy, evidence index | In progress |
-| **10C** | External manual screen recording (video) | Not started |
+| **10B** | Final README, case study, portfolio copy, evidence index | Merged (PR #19) — PASS WITH DOCUMENTED RISKS |
+| **10C-1** | Final release readiness audit | This branch — PASS WITH DOCUMENTED RISKS |
+| **10C-2** | External manual screen recording (video) | Pending — after 10C-1 merge |
 
 ---
 
@@ -26,7 +27,7 @@ All demo evidence lives under [demo/](demo/):
 
 - [packaging-report.md](packaging-report.md) — closeout record for written packaging PR
 - [business-case-audit-report.md](business-case-audit-report.md) — Phase 10B mini audit + business case follow-up
-- Root [README.md](../../README.md) — portfolio-facing entry point
+- Root [README.md](../../../README.md) — portfolio-facing entry point
 - [docs/portfolio/](../../portfolio/) — case study, copy, Q&A, claims guide
 - [docs/business/AXON_BUSINESS_CASE.md](../../business/AXON_BUSINESS_CASE.md) — product/business case (non-clinical)
 - Updated [docs/evidence/README.md](../README.md) — Evidence Center index
@@ -35,6 +36,10 @@ All demo evidence lives under [demo/](demo/):
 
 ---
 
+## Phase 10C-1 artifact
+
+- [final-release-readiness-audit.md](final-release-readiness-audit.md) — post-10B merge readiness gate (no video, no release)
+
 ## Phase 10C boundary
 
-The project is ready for external manual screen recording after Phase 10B/10C review. No video documentation is committed in Phase 10B by design.
+The project is ready for external manual screen recording after Phase 10C-1 merge. No video documentation is committed in Phase 10B/10C-1 by design.
