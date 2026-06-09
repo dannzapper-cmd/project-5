@@ -25,8 +25,10 @@ All demo evidence lives under [demo/](demo/):
 ## Phase 10B artifacts
 
 - [packaging-report.md](packaging-report.md) — closeout record for written packaging PR
+- [business-case-audit-report.md](business-case-audit-report.md) — Phase 10B mini audit + business case follow-up
 - Root [README.md](../../README.md) — portfolio-facing entry point
 - [docs/portfolio/](../../portfolio/) — case study, copy, Q&A, claims guide
+- [docs/business/AXON_BUSINESS_CASE.md](../../business/AXON_BUSINESS_CASE.md) — product/business case (non-clinical)
 - Updated [docs/evidence/README.md](../README.md) — Evidence Center index
 
 **Explicitly not in 10B:** video scripts, release tags, cloud deployment, new runtime features.

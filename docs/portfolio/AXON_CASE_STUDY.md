@@ -135,7 +135,7 @@ Capture run: `20260609-054740` UTC · 8/8 PNGs in `screenshots/latest/`.
 
 ### Synthetic retraining / candidate refresh
 
-Phase 4 MLOps implements a **classical** train/eval/promote loop for small candidate models. Wording is intentional: this is **not** fine-tuning of a pretrained neural network. Drift detection can recommend retrain; artifacts appear on demand.
+Phase 4 MLOps implements a **classical** train/eval/promote loop for small candidate models. Wording is intentional: this is not fine-tuning of a pretrained neural network. Drift detection can recommend retrain; artifacts appear on demand.
 
 ### FL / RL on-demand
 
@@ -168,7 +168,7 @@ When discussing AXON, I lead with **scope and evidence**:
 - I separated **compose-validated robotics** from **live-gated core demo** so Nav2 honesty is visible in screenshots.
 - The LLM is a **copilot inside a safety envelope**, not the system brain for irreversible actions.
 
-Trade-offs I can defend: static dashboard vs SPA build pipeline (faster reproducibility); classical MLOps vs large-model fine-tuning (appropriate for synthetic portfolio scope); headless Nav2 lab vs Gazebo (CI-friendly, no hardware fiction).
+Trade-offs worth noting: static dashboard vs SPA build pipeline (faster reproducibility); classical MLOps vs large pretrained-model adaptation (appropriate for synthetic portfolio scope); headless Nav2 lab vs Gazebo (CI-friendly, no hardware fiction).
 
 ---
 

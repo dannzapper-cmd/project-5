@@ -38,7 +38,7 @@ Do **not** say or imply:
 - Hospital / clinic deployment
 - Autonomous clinical decision-maker
 - Real patient monitoring or real patient data
-- Fine-tuning of a pretrained neural network (use synthetic retraining / candidate refresh)
+- Pretrained neural network weight adaptation (use synthetic retraining / candidate refresh)
 - ROS2/Nav2/SLAM always live when only core profile runs
 - FL/RL/MLOps always running in core demo
 - Enterprise healthcare compliance (FDA, HIPAA) unless explicitly negated as out of scope

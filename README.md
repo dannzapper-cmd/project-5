@@ -50,7 +50,7 @@ AXON is a **portfolio technical demonstration** of how intelligent systems can *
 | Digital twin | Live SVG state mirror with safe command API |
 | Observability | Lightweight metrics, structured logs, health/live/ready endpoints |
 | Evidence governance | Phase-gated checklists, verification scripts, claim scanner |
-| Learning loops | Synthetic retraining / candidate refresh (classical models — **not** neural fine-tuning of a pretrained model) |
+| Learning loops | Synthetic retraining / candidate refresh (classical models; not neural fine-tuning of a pretrained model) |
 | FL / RL | Flower FedAvg and Gymnasium PPO micro-modules — **on-demand** (`learning` profile) |
 | Robotics boundary | ROS2 thin adapter + Nav2/SLAM MiniLab — **compose-validated**; live runtime requires explicit profiles |
 
@@ -197,7 +197,7 @@ Policies: [docs/safety/](docs/safety/) · Positioning guide: [docs/portfolio/CLA
 - Robotics software integration boundaries (thin ROS2 adapter, isolated Nav2 lab)
 - Trade-off awareness under local compute and modular profile constraints
 
-Interview prep: [docs/portfolio/TECHNICAL_QA.md](docs/portfolio/TECHNICAL_QA.md)
+Technical Q&A: [docs/portfolio/TECHNICAL_QA.md](docs/portfolio/TECHNICAL_QA.md) · Business case: [docs/business/AXON_BUSINESS_CASE.md](docs/business/AXON_BUSINESS_CASE.md)
 
 ---
 
