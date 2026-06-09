@@ -1,0 +1,13 @@
+{
+  "name": "@axon/demo-automation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phase 10A local demo verification and screenshot capture",
+  "scripts": {
+    "capture": "node capture-phase10a-screenshots.mjs",
+    "install-browsers": "npx playwright install chromium"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}

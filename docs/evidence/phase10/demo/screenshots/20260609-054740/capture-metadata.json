@@ -1,0 +1,57 @@
+{
+  "timestamp": "20260609-054740",
+  "git_sha": "f8d5e1b643a122bf6197ecef9f3818f2933df841",
+  "branch": "feat/phase-10a-demo-automation",
+  "command": ".venv/bin/python scripts/demo/capture_phase10a_screenshots.py",
+  "dashboard_url": "http://localhost:3000",
+  "api_base": "http://localhost:8000",
+  "docker_profiles": "core (api, dashboard, edge-inference, mosquitto, redis, sensor-generators)",
+  "warmup_ms": 30000,
+  "screenshots": [
+    {
+      "file": "00_dashboard_overview.png",
+      "status": "ok",
+      "label": "Dashboard overview / connection status"
+    },
+    {
+      "file": "01_live_telemetry_streams.png",
+      "status": "ok",
+      "label": "Live telemetry streams"
+    },
+    {
+      "file": "02_edge_inference_and_fusion.png",
+      "status": "ok",
+      "label": "Edge inference / model scores"
+    },
+    {
+      "file": "03_agent_traces_and_hitl.png",
+      "status": "ok",
+      "label": "Agent traces and HITL context"
+    },
+    {
+      "file": "04_digital_twin_state_mirror.png",
+      "status": "ok",
+      "label": "Digital twin state mirror"
+    },
+    {
+      "file": "05_evidence_center_or_observability.png",
+      "status": "ok",
+      "label": "Operational status / evidence"
+    },
+    {
+      "file": "06_failure_or_degraded_mode_if_available.png",
+      "status": "ok",
+      "label": "Failure injection panel"
+    },
+    {
+      "file": "07_ros2_nav_slam_compose_status_if_available.png",
+      "status": "ok",
+      "label": "Nav2/SLAM MiniLab offline panel"
+    }
+  ],
+  "pass": true,
+  "notes": [
+    "ROS2/Nav2/SLAM panel shows offline state under core-only profile \u2014 compose-validated.",
+    "Screenshots from real local execution; no stock or generated imagery."
+  ]
+}
