@@ -1,0 +1,57 @@
+{
+  "timestamp": "20260609-193234",
+  "git_sha": "d9b92b2f0e3484e343d054a1f544cf9e73a99c73",
+  "branch": "feat/phase-10c2a-interactive-dashboard-proof",
+  "command": ".venv/bin/python scripts/demo/capture_phase10c2a_dashboard_ux.py",
+  "dashboard_url": "http://localhost:3000",
+  "api_base": "http://localhost:8000",
+  "warmup_ms": 30000,
+  "screenshots": [
+    {
+      "file": "00_demo_cockpit_top.png",
+      "status": "ok",
+      "label": "Live Demo Cockpit guide"
+    },
+    {
+      "file": "01_backend_proof_action_log.png",
+      "status": "ok",
+      "label": "Backend proof panel"
+    },
+    {
+      "file": "02_failure_injection_visible_effect.png",
+      "status": "ok",
+      "label": "Failure injection effect on safety"
+    },
+    {
+      "file": "03_hitl_decision_flow.png",
+      "status": "ok",
+      "label": "HITL / safety gate"
+    },
+    {
+      "file": "04_digital_twin_command_feedback.png",
+      "status": "ok",
+      "label": "Digital twin command feedback"
+    },
+    {
+      "file": "05_learning_evidence_panels.png",
+      "status": "ok",
+      "label": "Learning evidence panels"
+    },
+    {
+      "file": "06_robotics_lab_profile_boundary.png",
+      "status": "ok",
+      "label": "Robotics Lab profile boundary"
+    },
+    {
+      "file": "07_guided_demo_mode.png",
+      "status": "ok",
+      "label": "Guided demo overlay"
+    }
+  ],
+  "pass": true,
+  "notes": [
+    "Phase 10C-2A interactive dashboard UX captures (separate from Phase 10A).",
+    "ROS2/Nav2/SLAM shown offline under core profile; live buttons disabled by design.",
+    "Real local execution; no stock or generated imagery."
+  ]
+}

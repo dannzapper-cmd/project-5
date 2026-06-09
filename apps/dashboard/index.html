@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AXON Dashboard — Phase 5 Digital Twin</title>
+  <title>AXON — Live Operations Cockpit</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,11 +12,14 @@
       <p class="tagline">Perceive. Decide. Learn. Operate.</p>
       <h1>AXON — Bio-Robotics Edge Command System</h1>
       <div class="badges">
-        <span class="badge">Phase 5 — Digital Twin</span>
-        <span class="badge">ROS2 Core</span>
-        <span class="badge phase55">Phase 5.5 — Nav2 + SLAM MiniLab</span>
+        <span class="badge cap-badge">Live Operations Cockpit</span>
+        <span class="badge cap-badge">Digital Twin</span>
+        <span class="badge cap-badge">Edge AI</span>
+        <span class="badge cap-badge">Robotics Lab</span>
+        <span class="badge cap-badge">Mission Control</span>
         <span class="badge mode" id="mode-label">Mode: awaiting</span>
         <span class="badge scenario" id="scenario-label">Scenario: —</span>
+        <span class="badge" id="header-live-badge" title="Backend connectivity">Backend: checking…</span>
       </div>
       <p class="safety-banner">
         ⚠ Synthetic biomedical-inspired signals only.
@@ -24,6 +27,130 @@
         Operator recommendations require human confirmation when flagged.
       </p>
     </header>
+
+    <section id="demo-cockpit" class="cockpit-panel" data-testid="demo-cockpit">
+      <div class="cockpit-head">
+        <h2>Live Demo Cockpit</h2>
+        <div class="cockpit-head-actions">
+          <button type="button" id="guided-demo-start" class="primary-btn">▶ Start Guided Demo</button>
+        </div>
+      </div>
+      <p class="muted">
+        This is a live, locally-running operations cockpit — not static HTML. The
+        list below explains what to watch; every button logs an action and shows a
+        visible result. Optional modules state their activation command instead of
+        failing silently.
+      </p>
+      <ul class="cockpit-watchlist">
+        <li>Live backend / API / WebSocket connectivity (Backend Proof panel + status dots).</li>
+        <li>Synthetic telemetry streams (EMG, ECG-like, IMU, SpO2-proxy) updating in real time.</li>
+        <li>Edge inference / model score updates with per-event latency.</li>
+        <li>Safety + Human-in-the-Loop decisions you can confirm or reject.</li>
+        <li>Digital twin state changes after operator commands.</li>
+        <li>Evidence-backed optional modules (FL / RL / MLOps) and clear profile boundaries.</li>
+      </ul>
+      <div class="cockpit-flow">
+        <h3 class="cockpit-subhead">Recommended demo flow</h3>
+        <div class="flow-steps" id="demo-flow-steps">
+          <button type="button" class="flow-step" data-target="backend-proof-panel">1 · Backend Proof</button>
+          <button type="button" class="flow-step" data-target="mission-control-panel">2 · Mission Control</button>
+          <button type="button" class="flow-step" data-target="hitl-panel">3 · HITL / Safety</button>
+          <button type="button" class="flow-step" data-target="failure-injection-panel">4 · Failure Injection</button>
+          <button type="button" class="flow-step" data-target="digital-twin-panel">5 · Digital Twin</button>
+          <button type="button" class="flow-step" data-target="learning-evidence-panel">6 · Learning Evidence</button>
+          <button type="button" class="flow-step" data-target="nav-slam-panel">7 · Robotics Lab</button>
+          <button type="button" class="flow-step" data-target="evidence-center-panel">8 · Evidence Center</button>
+        </div>
+      </div>
+      <div class="cockpit-prove">
+        <h3 class="cockpit-subhead">How to prove this is not static HTML</h3>
+        <p class="muted">
+          Open any endpoint below in a new tab, or run the verification script — the
+          counters, timestamps, and trace IDs on this page come from those same
+          responses.
+        </p>
+        <p class="verify-cmd">
+          <code id="verify-cmd-text">ASSUME_UP=true bash scripts/demo/phase10a_verify_demo.sh</code>
+          <button type="button" class="copy-btn" data-copy-target="verify-cmd-text">Copy</button>
+        </p>
+      </div>
+    </section>
+
+    <section id="backend-proof-panel" class="proof-panel" data-testid="backend-proof">
+      <h2>Backend Proof / Live System Proof</h2>
+      <p class="muted">
+        Real values fetched from the running API and WebSocket streams. If these
+        change while you watch, the dashboard is connected to a live backend.
+      </p>
+      <div class="proof-grid">
+        <div class="proof-item">API health: <strong id="proof-api-health" class="ops-status loading">checking…</strong></div>
+        <div class="proof-item">Liveness: <strong id="proof-liveness" class="ops-status loading">—</strong></div>
+        <div class="proof-item">Readiness: <strong id="proof-readiness" class="ops-status loading">—</strong></div>
+        <div class="proof-item">Service: <strong id="proof-service">—</strong></div>
+        <div class="proof-item">Version: <strong id="proof-version">—</strong></div>
+        <div class="proof-item">Active scenario: <strong id="proof-scenario">—</strong></div>
+        <div class="proof-item">Active mode: <strong id="proof-mode">—</strong></div>
+        <div class="proof-item">WS connected: <strong id="proof-ws-connected">0 / 8</strong></div>
+      </div>
+      <h3 class="cockpit-subhead">WebSocket event counters (this session)</h3>
+      <div class="proof-grid">
+        <div class="proof-item">Sensor events: <strong id="proof-cnt-sensors">0</strong></div>
+        <div class="proof-item">Model scores: <strong id="proof-cnt-scores">0</strong></div>
+        <div class="proof-item">Agent traces: <strong id="proof-cnt-agents">0</strong></div>
+        <div class="proof-item">Decisions: <strong id="proof-cnt-decisions">0</strong></div>
+        <div class="proof-item">Safety updates: <strong id="proof-cnt-safety">0</strong></div>
+        <div class="proof-item">Twin updates: <strong id="proof-cnt-twin">0</strong></div>
+      </div>
+      <h3 class="cockpit-subhead">Latest backend signals</h3>
+      <div class="proof-grid">
+        <div class="proof-item">Last telemetry: <strong id="proof-last-telemetry">—</strong></div>
+        <div class="proof-item">Last model score: <strong id="proof-last-score">—</strong></div>
+        <div class="proof-item">Last mission update: <strong id="proof-last-mission">—</strong></div>
+        <div class="proof-item">Latest trace ID: <strong id="proof-trace-id">—</strong></div>
+        <div class="proof-item">Latest command ID: <strong id="proof-command-id">—</strong></div>
+        <div class="proof-item">Latest decision ID: <strong id="proof-decision-id">—</strong></div>
+      </div>
+      <h3 class="cockpit-subhead">Verify endpoints directly (open in a new tab)</h3>
+      <div class="endpoint-links" id="endpoint-links"></div>
+    </section>
+
+    <section id="capabilities-panel" class="cap-panel" data-testid="capabilities">
+      <h2>Capabilities &amp; Profiles</h2>
+      <p class="muted">
+        What is live in the core demo, what is artifact-backed, and what requires an
+        optional Docker profile. Statuses update from live backend signals where available.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Capability</th><th>Status</th><th>In core demo</th><th>How to activate</th></tr>
+          </thead>
+          <tbody id="capabilities-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="action-log-panel" class="action-log-panel" data-testid="action-log">
+      <div class="cockpit-head">
+        <h2>System Event Timeline</h2>
+        <div class="cockpit-head-actions">
+          <span class="muted" id="action-log-count">0 events</span>
+          <button type="button" id="action-log-clear">Clear</button>
+        </div>
+      </div>
+      <p class="muted">
+        Every button click and important backend response is appended here with a
+        timestamp, result, and a jump link to the affected panel.
+      </p>
+      <div class="action-log-wrap">
+        <table>
+          <thead>
+            <tr><th>Time</th><th>Action</th><th>Module</th><th>Result</th><th>Detail</th><th></th></tr>
+          </thead>
+          <tbody id="action-log-body"></tbody>
+        </table>
+      </div>
+    </section>
 
     <section class="status-panel" data-testid="connection-status">
       <h2>Connection Status</h2>
@@ -42,7 +169,7 @@
     </section>
 
     <section id="operational-status-panel" data-testid="operational-status">
-      <h2>Operational Status <span class="badge phase7">Phase 7</span></h2>
+      <h2>Observability &amp; Reliability <span class="badge cap-badge">Operational Status</span></h2>
       <p class="safety-banner ops-disclaimer" id="ops-disclaimer">
         AXON SIMULATED SYSTEM — For portfolio and research demonstration only.
         Not a medical device. No real patient data. No clinical use.
@@ -82,7 +209,7 @@
     </section>
 
     <section id="mission-control-panel" data-testid="mission-control">
-      <h2>Mission Control <span class="badge phase8">Phase 8</span></h2>
+      <h2>Mission Control <span class="badge cap-badge">Operational Loop</span></h2>
       <p class="safety-banner mission-disclaimer" id="mission-disclaimer">
         Integrated mission control cockpit — synthetic operational loop only.
         Not a medical device. No real patient data. No clinical use.
@@ -110,7 +237,7 @@
             <tbody id="mission-timeline-body"></tbody>
           </table>
         </div>
-        <h3 class="mission-subhead">Evidence Center preview</h3>
+        <h3 class="mission-subhead" id="evidence-center-panel">Evidence Center preview</h3>
         <p class="sub" id="mission-evidence-summary">Evidence: loading…</p>
         <div class="table-wrap">
           <table>
@@ -147,8 +274,9 @@
       </div>
     </section>
 
-    <section>
+    <section id="safety-panel">
       <h2>Safety Panel</h2>
+      <p class="muted">Reflects the live safety verdict from the agent loop and any active failure injection.</p>
       <div class="status-grid">
         <div>Mode: <strong id="safety-mode">deterministic</strong></div>
         <div>Stale telemetry: <strong id="safety-stale">—</strong></div>
@@ -156,30 +284,73 @@
         <div>Low confidence: <strong id="safety-low-conf">—</strong></div>
         <div>High risk: <strong id="safety-high-risk">—</strong></div>
         <div>LLM authority: <strong id="safety-llm">advisory only</strong></div>
+        <div>Active failure mode: <strong id="safety-active-failure" class="failure-mode-badge none">none</strong></div>
       </div>
     </section>
 
-    <section>
-      <h2>Human-in-the-Loop</h2>
-      <p class="muted">Requires operator confirmation for high simulated risk or low confidence.</p>
+    <section id="hitl-panel" data-testid="hitl">
+      <h2>Human-in-the-Loop / Safety Gate</h2>
+      <p class="muted">
+        AXON requires operator confirmation when simulated risk is high or
+        confidence is low. Confirm/Reject are enabled only when a gate is pending.
+      </p>
+      <div class="hitl-status" id="hitl-status">
+        <p class="sub" id="hitl-state-text">No pending HITL gate. Trigger one with the
+          <em>Low Confidence</em> failure injection below, then confirm or reject here.</p>
+        <div class="status-grid">
+          <div>Pending decision ID: <strong id="hitl-decision-id">none</strong></div>
+          <div>Reason: <strong id="hitl-reason">—</strong></div>
+          <div>Risk / confidence: <strong id="hitl-risk-conf">—</strong></div>
+          <div>Last receipt: <strong id="hitl-receipt">—</strong></div>
+        </div>
+      </div>
       <div class="hitl-controls">
-        <input type="text" id="hitl-note" placeholder="Operator note (optional)" />
+        <label class="field-label" for="hitl-note">Operator note (optional)</label>
+        <input type="text" id="hitl-note" placeholder="e.g. confirmed after reviewing safety panel" />
         <button id="hitl-confirm" disabled>Confirm Decision</button>
         <button id="hitl-reject" class="danger-btn" disabled>Reject Decision</button>
       </div>
-      <p class="sub">Pending decision ID: <span id="hitl-decision-id">none</span></p>
     </section>
 
-    <section data-testid="failure-injection">
+    <section id="copilot-panel" data-testid="copilot">
+      <h2>Operator Copilot (LLM)</h2>
+      <p class="muted">
+        Advisory-only operator copilot. The default core demo uses a deterministic
+        offline mock — no API key required and no clinical inference. A real LLM is
+        optional and never authorizes actions.
+      </p>
+      <div class="status-grid">
+        <div>Mode: <strong id="copilot-mode">—</strong></div>
+        <div>Provider: <strong id="copilot-provider">—</strong></div>
+        <div>Model: <strong id="copilot-model">—</strong></div>
+        <div>Authority: <strong id="copilot-authority">advisory_only</strong></div>
+        <div>Real LLM configured: <strong id="copilot-real">—</strong></div>
+      </div>
+      <div class="copilot-controls">
+        <button type="button" id="copilot-generate">Generate explanation</button>
+        <span class="muted" id="copilot-activation">Real LLM is optional — see Capabilities &amp; Profiles.</span>
+      </div>
+      <p class="sub">Latest explanation:</p>
+      <p class="copilot-output" id="copilot-output">—</p>
+      <p class="sub">Trace: <span id="copilot-trace">—</span></p>
+    </section>
+
+    <section id="failure-injection-panel" data-testid="failure-injection">
       <h2>Failure Injection (Simulated)</h2>
+      <p class="muted">
+        Inject a controlled fault into the synthetic pipeline. Each injection
+        visibly changes the active failure mode, the Safety Panel, and (for low
+        confidence) can open a HITL gate. Auto-resets after a short window.
+      </p>
       <div class="injection-controls">
-        <button data-scenario="sensor_dropout">Sensor Dropout</button>
-        <button data-scenario="corrupt_event">Corrupt Event</button>
-        <button data-scenario="model_low_confidence">Low Confidence</button>
-        <button data-scenario="stale_telemetry">Stale Telemetry</button>
+        <button data-scenario="sensor_dropout" title="Drop two sensor streams">Sensor Dropout</button>
+        <button data-scenario="corrupt_event" title="Mark inputs as corrupt">Corrupt Event</button>
+        <button data-scenario="model_low_confidence" title="Force low model confidence → may open HITL gate">Low Confidence</button>
+        <button data-scenario="stale_telemetry" title="Backdate telemetry timestamps">Stale Telemetry</button>
         <button id="injection-reset">Reset</button>
       </div>
       <p class="sub">Active: <span id="active-injections">none</span></p>
+      <p class="sub muted">Tip: after injecting, watch the Safety Panel and System Event Timeline update.</p>
     </section>
 
     <section>
@@ -242,8 +413,8 @@
       </div>
     </section>
 
-    <section>
-      <h2>MLOps — Synthetic Retraining</h2>
+    <section id="mlops-panel">
+      <h2>MLOps Evidence — Synthetic Retraining <span class="badge cap-badge">On-demand</span></h2>
       <p class="safety-banner mlops-safety" id="mlops-safety-notice">
         Synthetic simulation only. Not a medical device. No medical diagnosis. No treatment advice. No clinical claims.
       </p>
@@ -262,14 +433,32 @@
       </div>
       <p class="sub" id="mlops-artifacts">Artifacts: —</p>
       <p class="sub" id="mlops-empty">No evaluation run yet</p>
+      <div class="learning-actions">
+        <button type="button" class="copy-btn" data-copy-text="make mlops-pipeline">Copy run command</button>
+        <button type="button" class="copy-btn" data-copy-target="mlops-artifacts">Copy artifact path</button>
+      </div>
       <button type="button" id="mlops-promote-btn" class="mlops-btn">
         Manual Review Only — Simulated (dry-run)
       </button>
       <p class="sub" id="mlops-review-id"></p>
     </section>
 
+    <section id="learning-evidence-panel" class="learning-anchor">
+      <h2>Learning Evidence — Federated Learning, RL &amp; MLOps <span class="badge cap-badge">On-demand evidence</span></h2>
+      <p class="muted">
+        These modules are <strong>documented evidence mode</strong>: they run on
+        demand via the Docker <code>learning</code> profile / Make targets and are
+        not always-on in the core demo. Use the buttons in each panel to view a
+        report, copy the exact run command, or show the artifact path.
+      </p>
+      <div class="learning-actions">
+        <button type="button" class="copy-btn" data-copy-text="docker compose --profile learning up --build">Copy: start learning profile</button>
+        <a class="endpoint-link" href="http://localhost:8000/status/services" target="_blank" rel="noopener">Open /status/services</a>
+      </div>
+    </section>
+
     <section id="federated-learning-panel">
-      <h2>Federated Learning <span class="badge phase6a">Phase 6A</span></h2>
+      <h2>Federated Learning Evidence <span class="badge cap-badge">On-demand</span></h2>
       <p class="safety-banner fl-safety" id="fl-disclaimer">
         Synthetic federated learning simulation. No real patient data. No medical claims.
       </p>
@@ -291,6 +480,11 @@
       </div>
       <p class="sub" id="fl-empty">No federated run yet — run <code>make learning-fl-run</code>.</p>
       <p class="sub" id="fl-report-path">Report: —</p>
+      <div class="learning-actions">
+        <button type="button" class="copy-btn" data-copy-text="make learning-fl-run">Copy run command</button>
+        <button type="button" class="copy-btn" data-copy-target="fl-report-path">Copy report path</button>
+        <a class="endpoint-link" href="http://localhost:8000/api/learning/federated/status" target="_blank" rel="noopener">View FL status JSON</a>
+      </div>
       <div class="fl-tables">
         <div class="table-wrap">
           <h3 class="fl-subhead">Per-client summary</h3>
@@ -324,7 +518,7 @@
     </section>
 
     <section id="rl-micro-module-panel">
-      <h2>RL Micro-module <span class="badge phase6b">Phase 6B</span></h2>
+      <h2>RL Evidence — Triage Micro-module <span class="badge cap-badge">On-demand</span></h2>
       <p class="safety-banner rl-safety" id="rl-disclaimer">
         Synthetic RL operational policy. No real patient data. No medical decisions. Human review required for high-risk actions.
       </p>
@@ -350,6 +544,11 @@
       </div>
       <p class="sub" id="rl-empty">No RL run yet — run <code>make learning-rl-run</code>.</p>
       <p class="sub" id="rl-report-path">Report: —</p>
+      <div class="learning-actions">
+        <button type="button" class="copy-btn" data-copy-text="make learning-rl-run">Copy run command</button>
+        <button type="button" class="copy-btn" data-copy-target="rl-report-path">Copy report path</button>
+        <a class="endpoint-link" href="http://localhost:8000/api/learning/rl/status" target="_blank" rel="noopener">View RL status JSON</a>
+      </div>
       <div class="table-wrap">
         <h3 class="rl-subhead">Training reward curve (mean episode reward)</h3>
         <table>
@@ -430,7 +629,7 @@
     </section>
 
     <section id="nav-slam-panel" data-testid="nav-slam">
-      <h2>ROS2 Nav2 + SLAM MiniLab <span class="badge phase55">Phase 5.5</span></h2>
+      <h2>Robotics Lab — Nav2 + SLAM MiniLab <span class="badge cap-badge">Optional profile</span></h2>
       <p class="muted">
         Simulated robotics navigation/mapping lab (isolated <code>ros2-nav-slam</code> profile).
         No physical robot. No clinical autonomy. No medical claims. Degrades to
@@ -468,13 +667,30 @@
             <div>Last update: <strong id="nav-slam-updated">—</strong></div>
           </div>
           <div class="nav-slam-commands">
-            <h3>MiniLab Commands</h3>
+            <div class="nav-slam-offline-cta" id="nav-slam-offline-cta">
+              <p class="sub"><strong>Offline in core demo.</strong> This module requires the
+                <code>ros2-nav-slam</code> profile. The core demo keeps it offline for
+                reproducibility and resource control. Live buttons below are disabled until
+                the MiniLab bridge is detected online.</p>
+              <p class="verify-cmd">
+                <code id="nav-slam-activate-cmd">docker compose --profile ros2-nav-slam up -d --build</code>
+                <button type="button" class="copy-btn" data-copy-target="nav-slam-activate-cmd">Copy</button>
+              </p>
+            </div>
+            <h3>Live MiniLab Commands</h3>
             <button id="nav-slam-cmd-mapping">Start Mapping</button>
             <button id="nav-slam-cmd-goal">Send Nav Goal</button>
             <button id="nav-slam-cmd-blocked" class="danger-btn">Blocked Goal Demo</button>
             <button id="nav-slam-cmd-reset">Reset</button>
+            <h3 class="nav-slam-preview-head">Local Preview (UI only — not live ROS2)</h3>
+            <div class="nav-slam-preview-controls">
+              <button type="button" id="nav-slam-preview-mapping">Preview Mapping Flow</button>
+              <button type="button" id="nav-slam-preview-goal">Preview Nav Goal</button>
+              <button type="button" id="nav-slam-preview-blocked" class="danger-btn">Preview Blocked Goal</button>
+              <button type="button" id="nav-slam-preview-reset">Reset Preview</button>
+            </div>
             <p class="sub" id="nav-slam-cmd-result">—</p>
-            <p class="sub muted">Commands queue for the ROS2 bridge to forward to the MiniLab.</p>
+            <p class="sub muted">Live commands queue for the ROS2 bridge to forward to the MiniLab. Previews animate locally only.</p>
           </div>
         </div>
       </div>
@@ -525,6 +741,21 @@
       Operational simulation scores — not for diagnosis or treatment.
       LLM copilot is advisory only and cannot authorize critical actions.
     </footer>
+  </div>
+
+  <div id="toast-container" aria-live="polite"></div>
+
+  <div id="guided-demo-overlay" class="guided-demo-overlay" hidden>
+    <div class="guided-demo-card" role="dialog" aria-modal="true" aria-labelledby="guided-demo-title">
+      <div class="guided-demo-progress" id="guided-demo-progress"></div>
+      <h3 id="guided-demo-title">Guided demo</h3>
+      <p id="guided-demo-text" class="guided-demo-text">—</p>
+      <div class="guided-demo-actions">
+        <button type="button" id="guided-demo-prev">Previous</button>
+        <button type="button" id="guided-demo-next" class="primary-btn">Next</button>
+        <button type="button" id="guided-demo-end">End demo</button>
+      </div>
+    </div>
   </div>
 
   <script src="config.js"></script>

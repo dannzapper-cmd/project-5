@@ -28,6 +28,7 @@ AXON's proof-of-capability archive. Every major technology produces visible, rep
 | 9 | QA, integrity seal | [phase9_final_seal_report.md](phase9_final_seal_report.md), [phase9_verification_report.md](phase9_verification_report.md), [phase9_capability_truth_matrix.md](phase9_capability_truth_matrix.md) |
 | 10A | Demo automation + screenshots | [phase10/demo/](phase10/demo/) — **PASS WITH DOCUMENTED RISKS** |
 | 10B | Portfolio packaging | [phase10/packaging-report.md](phase10/packaging-report.md) |
+| 10C-2A | Interactive dashboard UX + backend proof | [phase10/dashboard-ux-hardening-report.md](phase10/dashboard-ux-hardening-report.md), [dashboard demo guide](../dashboard/DEMO_GUIDE.md) |
 
 ---
 
