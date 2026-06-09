@@ -78,11 +78,11 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 9 — QA, Repair, and Hardening (Pass 2 on `feat/phase-9-pass2-final-qa-hardening`)**
+**Phase 9 — QA, Repair, and Hardening (Final Seal on `feat/phase-9-final-integrity-seal`)**
 
-| Completed (merged) | Current work (Phase 9 Pass 2) | Not yet |
-|--------------------|-------------------------------|---------|
-| Phases 1–8 + Pass 1 credibility fixes (PR #15) | Senior verification, `verify_phase9.sh`, claim scanning, evidence path repair, lightweight CI | Phase 10 packaging, demo video, portfolio release |
+| Completed (merged) | Current work (Phase 9 Final Seal) | Not yet |
+|--------------------|-----------------------------------|---------|
+| Phases 1–8 + Phase 9 Pass 1/2 credibility fixes (PR #15, PR #16) | Evidence-integrity closure, runtime artifact hygiene, final QA report | Phase 10 packaging, demo video, portfolio release |
 
 **Phase 8 (merged):** Mission API (`/mission/*`), deterministic scenario runner (seed 42),
 Evidence Center index, dashboard Mission Control section. See
@@ -445,7 +445,7 @@ See [docs/evidence/evidence-checklist.md](docs/evidence/evidence-checklist.md).
 ### Future Phases
 
 ```bash
-# Full portfolio demo (Phase 9 — not yet implemented)
+# Full portfolio demo (Phase 10 — not yet implemented)
 # docker compose --profile full up
 ```
 

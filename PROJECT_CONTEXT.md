@@ -38,23 +38,21 @@ Simulated rehabilitation robot, exoskeleton, or robotic arm operations with synt
 
 ## Current Phase
 
-**Phase 8 — Integrated Mission Control System**
+**Phase 9 — QA, Repair, and Hardening (Final Seal)**
 
-Delivered on branch `feat/phase-8-integrated-mission-control`:
+Phase 8 and Phase 9 Pass 1/2 are merged. The active work is the final evidence-integrity
+seal before Phase 10 packaging:
 
-- **Mission API:** `/mission/status`, `/mission/timeline`, `/mission/evidence`,
-  `/mission/scenarios`, `POST /mission/scenarios/run` — unified operational loop view
-  with graceful degradation (HTTP 200, honest `degraded_components`).
-- **Scenario runner:** `scripts/run_phase8_mission_scenario.py` — deterministic seed 42,
-  three scenarios, artifacts under `artifacts/phase8/`.
-- **Evidence Center:** honest index connecting FL, RL, reliability, observability,
-  mission scenarios, twin/agents/safety, and robotics docs.
-- **Dashboard:** Mission Control section (static HTML/JS, 10s polling, API fallback).
-- **Verification:** `scripts/verify_phase8.sh`, `tests/phase8/`, ADR-013.
+- Runtime Phase 8 scenario JSON files are generated locally and ignored, not committed
+  as source truth.
+- `scripts/verify_phase9.sh` is the lightweight Phase 9 gate for claim, evidence, and
+  compose-config checks.
+- Tests and verification must not rewrite committed evidence snapshots.
+- Phase 10 packaging, final screenshots, demo video, release tags, cloud/VM/Kubernetes,
+  and live ROS2/Nav2 runtime gates are still not part of Phase 9.
 
-**Not delivered in Phase 8:** Phase 9 QA hardening, Phase 10 packaging, cloud/Kubernetes,
-mandatory live ROS2/Nav2/SLAM, FL/RL retraining. Synthetic only — no real patient data,
-no medical claims.
+Synthetic only — no real patient data, no medical claims, and no unqualified
+fine-tuning claims.
 
 ### Phase 7 — Observability + Reliability (lightweight local layer)
 
