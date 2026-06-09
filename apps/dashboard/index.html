@@ -25,7 +25,7 @@
       </p>
     </header>
 
-    <section class="status-panel">
+    <section class="status-panel" data-testid="connection-status">
       <h2>Connection Status</h2>
       <div class="status-grid">
         <div class="status-item"><span id="api-status" class="dot offline"></span> API</div>
@@ -41,7 +41,7 @@
       <p class="event-counter">Model scores received: <strong id="model-score-counter">0</strong></p>
     </section>
 
-    <section id="operational-status-panel">
+    <section id="operational-status-panel" data-testid="operational-status">
       <h2>Operational Status <span class="badge phase7">Phase 7</span></h2>
       <p class="safety-banner ops-disclaimer" id="ops-disclaimer">
         AXON SIMULATED SYSTEM — For portfolio and research demonstration only.
@@ -81,7 +81,7 @@
       </div>
     </section>
 
-    <section id="mission-control-panel">
+    <section id="mission-control-panel" data-testid="mission-control">
       <h2>Mission Control <span class="badge phase8">Phase 8</span></h2>
       <p class="safety-banner mission-disclaimer" id="mission-disclaimer">
         Integrated mission control cockpit — synthetic operational loop only.
@@ -170,7 +170,7 @@
       <p class="sub">Pending decision ID: <span id="hitl-decision-id">none</span></p>
     </section>
 
-    <section>
+    <section data-testid="failure-injection">
       <h2>Failure Injection (Simulated)</h2>
       <div class="injection-controls">
         <button data-scenario="sensor_dropout">Sensor Dropout</button>
@@ -192,17 +192,17 @@
       </div>
     </section>
 
-    <section>
+    <section data-testid="live-telemetry">
       <h2>Live Telemetry</h2>
       <div class="cards" id="signal-cards"></div>
     </section>
 
-    <section>
+    <section data-testid="edge-inference">
       <h2>Live Model Scores</h2>
       <div class="cards" id="model-score-cards"></div>
     </section>
 
-    <section>
+    <section data-testid="agent-traces">
       <h2>Agent Traces</h2>
       <div class="table-wrap">
         <table>
@@ -364,7 +364,7 @@
       </div>
     </section>
 
-    <section id="digital-twin-panel">
+    <section id="digital-twin-panel" data-testid="digital-twin">
       <h2>Digital Twin — Live State Mirror</h2>
       <p class="muted">Synthetic rehab robot mirror fed by live telemetry, fusion, agents, and safety state.</p>
       <div class="twin-layout">
@@ -429,7 +429,7 @@
       </div>
     </section>
 
-    <section id="nav-slam-panel">
+    <section id="nav-slam-panel" data-testid="nav-slam">
       <h2>ROS2 Nav2 + SLAM MiniLab <span class="badge phase55">Phase 5.5</span></h2>
       <p class="muted">
         Simulated robotics navigation/mapping lab (isolated <code>ros2-nav-slam</code> profile).
