@@ -58,10 +58,11 @@ def validate_status_schema(data: dict, label: str) -> list[str]:
     return errors
 
 
-def run_checks(api_base: str, offline: bool) -> dict:
+def run_checks(api_base: str, offline: bool, output_dir: Path | None = None) -> dict:
     run_id = str(uuid4())
     timestamp = datetime.now(UTC).isoformat()
     checks: list[dict] = []
+    reliability_dir = output_dir or RELIABILITY_DIR
 
     def record(name: str, passed: bool, detail: str) -> None:
         checks.append({"check": name, "passed": passed, "detail": detail})
@@ -158,7 +159,7 @@ def run_checks(api_base: str, offline: bool) -> dict:
     passed = all(c["passed"] for c in checks)
     summary = "pass" if passed else ("partial" if any(c["passed"] for c in checks) else "fail")
 
-    RELIABILITY_DIR.mkdir(parents=True, exist_ok=True)
+    reliability_dir.mkdir(parents=True, exist_ok=True)
     report = {
         "run_id": run_id,
         "timestamp": timestamp,
@@ -168,11 +169,11 @@ def run_checks(api_base: str, offline: bool) -> dict:
         "summary": summary,
         "checks": checks,
     }
-    (RELIABILITY_DIR / "phase7a_reliability_report.json").write_text(
+    (reliability_dir / "phase7a_reliability_report.json").write_text(
         json.dumps(report, indent=2) + "\n"
     )
     if service_snapshot:
-        (RELIABILITY_DIR / "service_status_snapshot.json").write_text(
+        (reliability_dir / "service_status_snapshot.json").write_text(
             json.dumps(
                 {
                     "run_id": run_id,
@@ -220,7 +221,7 @@ def run_checks(api_base: str, offline: bool) -> dict:
             if "failure_replay" in c["check"] or c["check"].startswith("health")
         ],
     }
-    (RELIABILITY_DIR / "failure_replay_report.json").write_text(
+    (reliability_dir / "failure_replay_report.json").write_text(
         json.dumps(failure_replay, indent=2) + "\n"
     )
 
@@ -236,8 +237,14 @@ def main() -> int:
         action="store_true",
         help="Skip live API checks; still write artifact scaffolding",
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Directory for generated reports (defaults to committed evidence path)",
+    )
     args = parser.parse_args()
-    report = run_checks(args.api_base, args.offline)
+    report = run_checks(args.api_base, args.offline, args.output_dir)
     return 0 if report["summary"] == "pass" else 1
 
 

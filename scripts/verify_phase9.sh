@@ -18,10 +18,27 @@ VERIFY_DIR="/tmp/phase9_verify_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$VERIFY_DIR"
 export AXON_PHASE9_VERIFY_DIR="$VERIFY_DIR"
 
-echo "=== Phase 9 Verification (Pass 2) ==="
+echo "=== Phase 9 Verification (Final Seal) ==="
 echo "Temp outputs: $VERIFY_DIR"
 
 BLOCK1_OK=1
+
+echo "--- Block 1: Tracked runtime artifact hygiene ---"
+if tracked_phase8="$(git ls-files 'artifacts/phase8/phase8_scenario_*.json')" && [ -n "$tracked_phase8" ]; then
+  echo "FAIL: Phase 8 runtime scenario JSON files are tracked:"
+  echo "$tracked_phase8" | sed 's/^/  /'
+  BLOCK1_OK=0
+else
+  echo "PASS: no tracked Phase 8 runtime scenario JSON files"
+fi
+
+if dirty_snapshots="$(git diff --name-only -- artifacts/observability artifacts/reliability)" && [ -n "$dirty_snapshots" ]; then
+  echo "FAIL: committed observability/reliability snapshots are dirty:"
+  echo "$dirty_snapshots" | sed 's/^/  /'
+  BLOCK1_OK=0
+else
+  echo "PASS: committed observability/reliability snapshots are clean"
+fi
 
 echo "--- Block 1: Python syntax (apps/) ---"
 if "$PYTHON" - <<'PY'

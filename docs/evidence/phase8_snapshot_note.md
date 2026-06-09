@@ -1,1 +1,1 @@
-Runtime mission artifacts are generated locally — not committed. Run `bash scripts/verify_phase8.sh` to generate.
+Runtime mission artifacts, including `artifacts/phase8/phase8_scenario_*.json`, are generated locally and ignored by git. They are not committed as source-of-truth evidence. Run `bash scripts/verify_phase8.sh` to regenerate local copies.

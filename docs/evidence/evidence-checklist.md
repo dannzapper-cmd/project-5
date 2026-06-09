@@ -126,8 +126,9 @@ Track demonstrable proof across AXON phases. Check items only when reproducible 
 ## Phase 9 — Final QA + Hardening
 
 - [x] Pass 1 credibility repairs (PR #15)
-- [ ] Pass 2 senior verification (`scripts/verify_phase9.sh`, claim scan, evidence path repair)
-- [ ] Phase 9 verification report + capability truth matrix
+- [x] Pass 2 senior verification (`scripts/verify_phase9.sh`, claim scan, evidence path repair; PR #16)
+- [ ] Final Seal evidence-integrity closure (`feat/phase-9-final-integrity-seal`)
+- [x] Phase 9 verification report + capability truth matrix
 
 ## Phase 10 — Portfolio Packaging (formerly Phase 9)
 

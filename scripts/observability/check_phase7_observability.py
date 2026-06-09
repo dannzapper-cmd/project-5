@@ -31,10 +31,11 @@ def _fetch(url: str, timeout: float = 5.0) -> tuple[int | None, str, str | None]
         return None, str(exc), None
 
 
-def run_checks(api_base: str, offline: bool) -> dict:
+def run_checks(api_base: str, offline: bool, output_dir: Path | None = None) -> dict:
     run_id = str(uuid4())
     timestamp = datetime.now(UTC).isoformat()
     checks: list[dict] = []
+    obs_dir = output_dir or OBS_DIR
 
     def record(name: str, passed: bool, detail: str) -> None:
         checks.append({"check": name, "passed": passed, "detail": detail})
@@ -70,11 +71,11 @@ def run_checks(api_base: str, offline: bool) -> dict:
             services_ok = False
         record("status_services", services_ok, f"HTTP {status}")
 
-    OBS_DIR.mkdir(parents=True, exist_ok=True)
-    (OBS_DIR / "metrics_snapshot.txt").write_text(metrics_body if metrics_body else "# empty\n")
+    obs_dir.mkdir(parents=True, exist_ok=True)
+    (obs_dir / "metrics_snapshot.txt").write_text(metrics_body if metrics_body else "# empty\n")
 
     if services_body:
-        (OBS_DIR / "operational_status_snapshot.json").write_text(
+        (obs_dir / "operational_status_snapshot.json").write_text(
             json.dumps(
                 {
                     "run_id": run_id,
@@ -87,7 +88,7 @@ def run_checks(api_base: str, offline: bool) -> dict:
             + "\n"
         )
     else:
-        (OBS_DIR / "operational_status_snapshot.json").write_text(
+        (obs_dir / "operational_status_snapshot.json").write_text(
             json.dumps(
                 {
                     "run_id": run_id,
@@ -127,7 +128,7 @@ def run_checks(api_base: str, offline: bool) -> dict:
             run_id=run_id,
         ),
     ]
-    with (OBS_DIR / "logging_sample.jsonl").open("w") as fh:
+    with (obs_dir / "logging_sample.jsonl").open("w") as fh:
         for event in sample_events:
             fh.write(json.dumps(event, separators=(",", ":")) + "\n")
 
@@ -157,7 +158,7 @@ def run_checks(api_base: str, offline: bool) -> dict:
             "artifacts/observability/operational_status_snapshot.json",
         ],
     }
-    (OBS_DIR / "phase7b_observability_report.json").write_text(json.dumps(report, indent=2) + "\n")
+    (obs_dir / "phase7b_observability_report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
     return report
 
@@ -166,8 +167,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Phase 7B AXON observability checks")
     parser.add_argument("--api-base", default="http://localhost:8000")
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Directory for generated reports (defaults to committed evidence path)",
+    )
     args = parser.parse_args()
-    report = run_checks(args.api_base, args.offline)
+    report = run_checks(args.api_base, args.offline, args.output_dir)
     return 0 if report["summary"] in ("pass", "partial") else 1
 
 

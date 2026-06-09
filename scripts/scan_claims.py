@@ -27,24 +27,80 @@ SCAN_SUFFIXES = {".py", ".md", ".html", ".js", ".sh", ".yml", ".yaml", ".toml", 
 
 # Positive unsafe claims — fail when matched without a qualifier on the same line.
 UNSAFE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("medical_diagnosis", re.compile(r"AXON provides medical diagnosis", re.I)),
-    ("medical_grade_monitoring", re.compile(r"medical-grade monitoring", re.I)),
-    ("diagnoses_arrhythmia", re.compile(r"diagnoses arrhythmia", re.I)),
-    ("clinical_decision_maker", re.compile(r"clinical decision-maker", re.I)),
-    ("hospital_deployment", re.compile(r"hospital deployment", re.I)),
+    (
+        "medical_diagnosis",
+        re.compile(
+            r"\bAXON\s+(?:provides\s+)?(?:medical\s+)?diagnos(?:es|is)\b"
+            r"|\bdiagnos(?:e|es|is|tic)\b(?=.*\b(?:arrhythmia|clinical|medical|patient|disease|condition)\b)",
+            re.I,
+        ),
+    ),
+    ("medical_grade", re.compile(r"\bmedical[- ]grade\b", re.I)),
+    (
+        "clinical_decision_maker",
+        re.compile(r"\b(?:autonomous\s+)?clinical decision[- ]maker\b", re.I),
+    ),
+    (
+        "patient_data",
+        re.compile(
+            r"\b(?:uses|ingests|stores|processes|trains on|trained on|includes)\s+"
+            r"(?:real\s+)?patient data\b|\breal patient data\b",
+            re.I,
+        ),
+    ),
+    (
+        "regulatory_claim",
+        re.compile(r"\b(?:FDA[- ]approved|HIPAA[- ]compliant|HIPAA compliance)\b", re.I),
+    ),
+    (
+        "treatment_claim",
+        re.compile(
+            r"\btreats?\b(?=.*\b(?:arrhythmia|clinical|medical|patient|disease|condition)\b)"
+            r"|\btreatment\b(?=.*\b(?:clinical|medical|patient|disease|condition)\b)",
+            re.I,
+        ),
+    ),
+    ("hospital_deployment", re.compile(r"\bhospital deployment\b", re.I)),
 ]
 
 QUALIFIER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"not a medical device", re.I),
+    re.compile(r"not a diagnostic system", re.I),
     re.compile(r"not for clinical use", re.I),
+    re.compile(r"not based on real patient data", re.I),
+    re.compile(r"not medical diagnosis", re.I),
+    re.compile(r"not trained on real patients?", re.I),
     re.compile(r"no medical claims", re.I),
+    re.compile(r"does not diagnose", re.I),
+    re.compile(r"does not .*diagnose", re.I),
+    re.compile(r"does\s+\W*not\W+.*diagnose", re.I),
+    re.compile(r"does not diagnose or treat", re.I),
+    re.compile(r"\bNOT diagnose\b", re.I),
+    re.compile(r"does not treat", re.I),
+    re.compile(r"not diagnosis", re.I),
     re.compile(r"claims we avoid", re.I),
+    re.compile(r"claim scanner", re.I),
+    re.compile(r"claim scan", re.I),
+    re.compile(r"scan_claims\.py", re.I),
     re.compile(r"not fine-tuning", re.I),
     re.compile(r"no medical diagnosis", re.I),
+    re.compile(r"no .*diagnos", re.I),
+    re.compile(r"no diagnosis or treatment", re.I),
+    re.compile(r"no treatment advice", re.I),
     re.compile(r"no clinical claims", re.I),
     re.compile(r"no clinical inference", re.I),
     re.compile(r"not for diagnosis", re.I),
+    re.compile(r"not for treatment", re.I),
     re.compile(r"synthetic simulation only", re.I),
+    re.compile(r"synthetic only", re.I),
+    re.compile(r"no real patient data", re.I),
+    re.compile(r"without real patient data", re.I),
+    re.compile(r"what .* does not do", re.I),
+    re.compile(r"out of scope", re.I),
+    re.compile(r"not in scope", re.I),
+    re.compile(r"must never do", re.I),
+    re.compile(r"do not use", re.I),
+    re.compile(r"medical claim was added", re.I),
     re.compile(r"prohibited claims", re.I),
     re.compile(r"no claims of", re.I),
     re.compile(r"forbidden claims", re.I),
@@ -54,10 +110,16 @@ QUALIFIER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"diagnosis of arrhythmia", re.I),
     re.compile(r"re\.compile\(", re.I),
     re.compile(r'banned term|BANNED_TERMS|"hospital deployment"', re.I),
+    re.compile(
+        r'^\s*["\'](?:medical[- ]grade|clinical decision|patient outcome|'
+        r'treatment recommendation|hospital deployment)["\'],?\s*$',
+        re.I,
+    ),
 ]
 
 FORBIDDEN_SECTION_MARKERS = re.compile(
-    r"Forbidden Claims|Claims We Avoid|Prohibited Language|What AXON Does NOT",
+    r"Forbidden Claims|Claims We Avoid|Prohibited Language|What AXON Does NOT|"
+    r"Out of Scope|Intentionally Not in Scope|must never do|No medical claims",
     re.I,
 )
 SECTION_BREAK = re.compile(r"^#{1,3}\s+", re.M)

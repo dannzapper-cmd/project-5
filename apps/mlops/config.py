@@ -13,7 +13,6 @@ MODELS_DIR = MLOPS_ARTIFACTS / "models"
 PROMOTION_REVIEWS_DIR = MLOPS_ARTIFACTS / "promotion_reviews"
 REGISTRY_PATH = MLOPS_ARTIFACTS / "model_registry.json"
 LATEST_EVAL_PATH = MLOPS_ARTIFACTS / "latest_eval.json"
-CANDIDATE_MANIFEST_PATH = MLOPS_ARTIFACTS / "candidate_manifest.json"
 
 PHASE2_ONNX_DIR = ROOT / "models" / "onnx"
 PHASE2_METADATA_DIR = ROOT / "models" / "metadata"

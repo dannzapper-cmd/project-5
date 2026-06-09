@@ -1,6 +1,6 @@
 # Phase 9 Capability Truth Matrix
 
-Generated: 2026-06-08 | Branch: `feat/phase-9-pass2-final-qa-hardening`
+Generated: 2026-06-08 | Branch: `feat/phase-9-final-integrity-seal`
 
 Columns: **Claimed** (docs/README), **Impl** (code exists), **Wired** (compose/API/dashboard), **Tested** (automated tests), **Evidenced** (artifacts/docs), **Verified P9** (checked this pass), **Status** (honest summary).
 
@@ -21,10 +21,10 @@ Columns: **Claimed** (docs/README), **Impl** (code exists), **Wired** (compose/A
 | RL micro-module (PPO) | Yes | `apps/learning/rl/`, `scripts/run_rl_micro_module.py` | Yes | Yes (learning profile) | Yes | On-demand JSON | Yes | **Working (on-demand)** |
 | Observability (lightweight) | Yes | `apps/api/app/observability/`, `scripts/observability/` | Yes | Yes (obs profile) | Yes | Committed snapshots | Yes | **Working** |
 | Reliability (health/ready) | Yes | `apps/api/app/reliability/` | Yes | Yes | Yes | Committed snapshots | Yes | **Working** |
-| Mission control API | Yes | `apps/api/app/mission/`, `apps/api/app/routes/mission.py` | Yes | Yes | Yes | Runtime gitignored | Yes | **Working** — honest degradation |
+| Mission control API | Yes | `apps/api/app/mission/`, `apps/api/app/routes/mission.py` | Yes | Yes | Yes | Runtime-generated locally, ignored | Yes | **Working** — honest degradation; scenario JSONs are not committed source truth |
 | Evidence Center index | Yes | `apps/api/app/mission/evidence_index.py` | Yes | Yes | Yes | API + docs | Yes | **Working** — existence checks truthful after path fix |
 | Dashboard mission panel | Yes | `apps/dashboard/` | Yes | Yes | Partial | Manual | Yes | **Working** — static HTML/JS polling |
-| Phase 9 verification gate | Yes | `scripts/verify_phase9.sh`, `scripts/scan_claims.py` | Yes | Yes (Makefile/CI) | Yes | This report | Yes | **Working** — lightweight default |
+| Phase 9 verification gate | Yes | `scripts/verify_phase9.sh`, `scripts/scan_claims.py` | Yes | Yes (Makefile/CI) | Yes | This report + Final Seal report | Yes | **Working** — lightweight default with runtime artifact hygiene checks |
 | Cloud/Kubernetes deploy | No (deferred) | — | No | No | No | No | Yes | **Not implemented** — Phase 10+ optional |
 | Portfolio packaging / video | No | — | No | No | No | No | Yes | **Not started** — Phase 10 |
 
@@ -40,8 +40,8 @@ Columns: **Claimed** (docs/README), **Impl** (code exists), **Wired** (compose/A
 
 ## P9 verification methods used
 
-- `make lint`, `make test` (231 tests)
-- `bash scripts/verify_phase9.sh` (+ optional `AXON_PHASE9_FULL_VERIFY=1`)
-- `bash scripts/verify_phase4.sh` through `verify_phase8.sh`
+- documented install path: `201 passed, 4 skipped`
+- full local extras venv: `make test` (`235 passed`)
+- `bash scripts/verify_phase9.sh`
 - Static review of fusion, MLOps paths, evidence index, dashboard labels
 - Docker Compose config for all listed profiles
