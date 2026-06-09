@@ -11,7 +11,7 @@ Phase 10B delivers written portfolio packaging for AXON using **real Phase 10A e
 | Branch | `feat/phase-10b-portfolio-packaging` |
 | Base commit (main after PR #18) | `18db5ad` — feat: add Phase 10A demo automation and screenshot evidence (#18) |
 | Phase 9 reference base | `f8d5e1b643a122bf6197ecef9f3818f2933df841` |
-| Commit | *(recorded at push — see `git log -1` on branch)* |
+| Commit | `cda5d2e` — docs: add phase 10b portfolio packaging |
 | Date | 2026-06-09 |
 
 ## Docs created
