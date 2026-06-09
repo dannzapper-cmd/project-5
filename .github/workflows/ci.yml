@@ -40,6 +40,9 @@ jobs:
       - name: Phase 8 verification
         run: bash scripts/verify_phase8.sh
 
+      - name: Phase 9 verification
+        run: bash scripts/verify_phase9.sh
+
       - name: Validate Docker Compose config
         run: |
           docker compose --profile core config
