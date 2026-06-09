@@ -39,6 +39,7 @@ AXON's proof-of-capability archive. Every major technology produces visible, rep
 | Screenshot index | [phase10/demo/screenshot-index.md](phase10/demo/screenshot-index.md) |
 | Demo verification report | [phase10/demo/demo-verification-report.md](phase10/demo/demo-verification-report.md) |
 | Runbook | [phase10/demo/runbook-phase10a.md](phase10/demo/runbook-phase10a.md) |
+| Fresh clone checklist | [phase10/demo/fresh-clone-demo-checklist.md](phase10/demo/fresh-clone-demo-checklist.md) |
 | Commands summary | [phase10/demo/commands-summary.md](phase10/demo/commands-summary.md) |
 | Latest screenshots | [phase10/demo/screenshots/latest/](phase10/demo/screenshots/latest/) |
 | Capture metadata | [phase10/demo/screenshots/20260609-054740/capture-metadata.json](phase10/demo/screenshots/20260609-054740/capture-metadata.json) |

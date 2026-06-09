@@ -8,7 +8,8 @@ Phase 10 splits into sub-deliverables:
 | **10B** | Final README, case study, portfolio copy, evidence index | Merged (PR #19) — PASS WITH DOCUMENTED RISKS |
 | **10C-1** | Final release readiness audit | Merged (#20) — PASS WITH DOCUMENTED RISKS |
 | **10C-2** | External manual screen recording (video) | Pending — after 10C-1 merge |
-| **Production path** | Enterprise hardening roadmap (docs only) | This branch |
+| **Production path** | Enterprise hardening roadmap (docs only) | Merged (#21) |
+| **Fresh clone checklist** | Reviewer demo reproduction from clean machine | This branch |
 
 ---
 
@@ -17,6 +18,7 @@ Phase 10 splits into sub-deliverables:
 All demo evidence lives under [demo/](demo/):
 
 - [README.md](demo/README.md) — quick start
+- [fresh-clone-demo-checklist.md](demo/fresh-clone-demo-checklist.md) — clean-machine core demo path
 - [runbook-phase10a.md](demo/runbook-phase10a.md)
 - [screenshot-index.md](demo/screenshot-index.md)
 - [demo-verification-report.md](demo/demo-verification-report.md)
