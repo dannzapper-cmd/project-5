@@ -39,7 +39,7 @@ This phase performed **final readiness audit only**. Explicitly excluded:
 | Base main commit (after PR #19) | `d665763` — `docs: add Phase 10B portfolio packaging (#19)` |
 | PR #19 merged | **Yes** — confirmed in `git log --oneline` on `origin/main` |
 | Prior phase merges verified | PR #14–#18 present in history |
-| Audit commit | `TBD` — see merge commit on `chore/phase-10c1-release-readiness-audit` |
+| Audit commit | `28fe2c9` — `chore: add phase 10c1 final release readiness audit` |
 
 ---
 
