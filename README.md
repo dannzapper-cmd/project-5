@@ -1,474 +1,253 @@
-# AXON - Bio-Robotics Edge Command System
+# AXON — Bio-Robotics Edge Command System
 
-**Perceive. Decide. Learn. Operate.**
+**Synthetic, local-first command system for simulated rehab robot operations.**
 
-AXON is a modular Edge AI, IoT, robotics software, and biomedical-inspired synthetic monitoring system for simulated rehabilitation robot operations.
-
----
-
-## What AXON Is
-
-A reproducible intelligent systems project that will:
-
-- Ingest **synthetic telemetry** (EMG, ECG-like, IMU, SpO2-proxy, robot state, environment)
-- Run **edge-like inference** with ONNX Runtime
-- **Fuse sensors** into operational state with confidence scoring
-- **Coordinate agents** via LangGraph with LangChain tools/RAG
-- Support **learning loops** (MLflow, synthetic retraining / candidate refresh loop, Flower, RL)
-- **Visualize operations** through a live dashboard and digital twin
-- Collect **evidence** for every major capability
-
-**Expanded name:** Autonomous eXecution and Operations Network  
-**Fixed scenario:** Simulated Rehab Robot Ops
-
-## What AXON Is Not
-
-- Not a chatbot
-- Not a static dashboard
-- Not a medical device
-- Not a diagnostic system
-- Not based on real patient data
-- Not dependent on expensive always-on infrastructure
-- Not a robotics hardware project blocked by physical devices
+*Perceive. Decide. Learn. Operate.*
 
 ---
 
-## Future High-Level Architecture
+## What is AXON?
 
+AXON (Autonomous eXecution and Operations Network) is a **simulated-only, synthetic-only, local-first** intelligent systems project for **Simulated Rehab Robot Ops**. It is a full-stack command and evidence system — not a chatbot, not a static dashboard, and not a medical device.
+
+The stack ingests synthetic biomedical-inspired telemetry (EMG, ECG-like, IMU, SpO2-proxy, robot state), runs **edge-like local inference** with ONNX Runtime, fuses operational state with confidence scoring, coordinates **safety-aware agents** with human-in-the-loop (HITL) gates, mirrors state in a **digital twin**, and collects **evidence** for observability, reliability, mission control, and learning loops (synthetic retraining / candidate refresh, federated learning, RL — on-demand where applicable).
+
+> **Synthetic data only. No real patient data. No medical claims. Human review required for high-risk actions.**
+
+---
+
+## Demo snapshot
+
+Evidence-backed screenshots from Phase 10A ([full index](docs/evidence/phase10/demo/screenshot-index.md)):
+
+| Panel | Capture |
+|-------|---------|
+| Dashboard connectivity | ![AXON dashboard overview](docs/evidence/phase10/demo/screenshots/latest/00_dashboard_overview.png) |
+| Live synthetic telemetry | ![Live telemetry streams](docs/evidence/phase10/demo/screenshots/latest/01_live_telemetry_streams.png) |
+| Agent traces and HITL | ![Agent traces and HITL](docs/evidence/phase10/demo/screenshots/latest/03_agent_traces_and_hitl.png) |
+| Digital twin mirror | ![Digital twin state mirror](docs/evidence/phase10/demo/screenshots/latest/04_digital_twin_state_mirror.png) |
+| Evidence / observability | ![Evidence Center and observability](docs/evidence/phase10/demo/screenshots/latest/05_evidence_center_or_observability.png) |
+
+**Honest notes:** captures use the **`core` profile only**. ROS2/Nav2/SLAM appears as **offline / compose-validated** in screenshot 07 unless `ros2-nav-slam` is explicitly started. FL/RL/MLOps panels may be artifact-only unless on-demand scripts are run. Section crops (~1068px wide), not full-page — see [demo verification report](docs/evidence/phase10/demo/demo-verification-report.md).
+
+---
+
+## Why this project exists
+
+AXON is a **portfolio technical demonstration** of how intelligent systems can **perceive, decide, learn, and operate** under real engineering constraints: local compute, modular activation, safety envelopes, and evidence governance. It shows applied AI systems engineering — event-driven architecture, edge inference, agent orchestration, observability, and honest scope boundaries — without pretending to be a regulated medical product or cloud-native enterprise deployment.
+
+---
+
+## System capabilities
+
+| Area | What AXON demonstrates |
+|------|------------------------|
+| Telemetry | Real-time synthetic MQTT → API → Redis Streams → WebSocket → dashboard |
+| Edge inference | ONNX Runtime scores on local streams (EMG anomaly, IMU movement, etc.) |
+| Sensor fusion | Operational confidence aggregation (twin-side; standalone fusion service is a documented placeholder) |
+| Mission control | Deterministic scenario runner, mission API, Evidence Center index |
+| Agents & safety | LangGraph orchestration, LangChain tools/RAG layer, safety envelope, HITL |
+| Digital twin | Live SVG state mirror with safe command API |
+| Observability | Lightweight metrics, structured logs, health/live/ready endpoints |
+| Evidence governance | Phase-gated checklists, verification scripts, claim scanner |
+| Learning loops | Synthetic retraining / candidate refresh (classical models; not neural fine-tuning of a pretrained model) |
+| FL / RL | Flower FedAvg and Gymnasium PPO micro-modules — **on-demand** (`learning` profile) |
+| Robotics boundary | ROS2 thin adapter + Nav2/SLAM MiniLab — **compose-validated**; live runtime requires explicit profiles |
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+  SG[Synthetic sensors] --> MQTT[MQTT / Mosquitto]
+  MQTT --> API[FastAPI gateway]
+  API --> RS[Redis Streams]
+  RS --> ONNX[ONNX edge inference]
+  RS --> FUSE[Sensor fusion / twin]
+  ONNX --> AG[LangGraph agents]
+  FUSE --> AG
+  AG --> HITL[HITL safety envelope]
+  HITL --> WS[WebSocket broadcast]
+  WS --> DASH[Dashboard + digital twin]
+  DASH --> EV[Evidence / observability]
+  AG --> LEARN[Learning loops on-demand]
 ```
-Synthetic Sensors / IoT Nodes
-        │
-        ▼
-   MQTT / Mosquitto
-        │
-        ▼
-FastAPI async gateway + Pydantic event schemas
-        │
-        ▼
-Redis Streams buffer + replay mode
-        │
-        ├──────────────────┐
-        ▼                  ▼
-ONNX Runtime          Sensor Fusion
- edge inference            │
-        │                  │
-        └────────┬─────────┘
-                 ▼
-        LangGraph Agent Layer
-                 │
-                 ▼
-   LangChain tools / RAG / retrievers
-                 │
-                 ▼
-        WebSocket broadcast
-                 │
-        ┌────────┴────────┐
-        ▼                 ▼
-  Dashboard +      Evidence Center
-  Digital Twin
-        │
-        ├─ MLflow / Observability / Learning Loops
-        ├─ ROS2 thin adapter
-        └─ Advanced ROS2 Nav2 + SLAM MiniLab profile
-```
 
-See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile details.
+**Safety note:** the optional LLM copilot is **advisory** — it does not govern clinical actions or irreversible hardware commands. High-risk and low-confidence paths require human confirmation.
+
+Deeper diagrams: [docs/architecture/](docs/architecture/) · Portfolio case study: [docs/portfolio/AXON_CASE_STUDY.md](docs/portfolio/AXON_CASE_STUDY.md)
 
 ---
 
-## Current Phase
+## Local quickstart
 
-**Phase 9 — QA, Repair, and Hardening (Final Seal on `feat/phase-9-final-integrity-seal`)**
+### Prerequisites
 
-| Completed (merged) | Current work (Phase 9 Final Seal) | Not yet |
-|--------------------|-----------------------------------|---------|
-| Phases 1–8 + Phase 9 Pass 1/2 credibility fixes (PR #15, PR #16) | Evidence-integrity closure, runtime artifact hygiene, final QA report | Phase 10 packaging, demo video, portfolio release |
+- Docker Desktop or Docker Engine
+- Python 3.12
+- Git
 
-**Phase 8 (merged):** Mission API (`/mission/*`), deterministic scenario runner (seed 42),
-Evidence Center index, dashboard Mission Control section. See
-[docs/phase8_mission_control.md](docs/phase8_mission_control.md).
-
-**Phase 4 MLOps note:** AXON includes a synthetic retraining / candidate refresh loop for
-small classical models. It is not fine-tuning of a pretrained neural network.
-
-**Next after Phase 9:** [Phase 10 — Portfolio Packaging](ROADMAP.md) (not started).
-
-> **Synthetic data only. No real patient data. No medical claims. Human review required
-> for high-risk actions.**
-
----
-
-## Phase 5.5 — Nav2 + SLAM MiniLab Quickstart
-
-Headless, isolated, reproducible. **No physical robot. No medical claims.**
-`core` is unaffected and does not depend on this profile.
+### Setup and run (core profile)
 
 ```bash
-make install && make test && make lint
-make compose-config        # core profile valid
-make compose-nav-slam      # ros2-nav-slam profile valid
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,edge-ai,agents,mlops]"
 
-# Core stays independent
-docker compose --profile core up --build -d
-
-# Start the MiniLab (heavy image: Nav2 + SLAM Toolbox on ros:humble-ros-base)
-docker compose --profile ros2-nav-slam up --build -d
-make nav-slam-ps
-make nav-slam-nodes
-make nav-slam-topics
-
-# Synthetic data rates (B3): defaults target /scan 12 Hz, /odom 25 Hz
-# Hard gates remain /scan >= 10 Hz, /odom >= 20 Hz.
-docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 topic hz /scan
-docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 topic hz /odom
-docker compose --profile ros2-nav-slam exec ros2_nav_slam ros2 run tf2_tools view_frames  # map->odom->base_link
-
-# Demos
-make nav-slam-map-demo      # SLAM mapping from synthetic scan/odom/TF
-make nav-slam-goal-demo     # reachable goal -> planning -> navigating -> reached
-make nav-slam-blocked-demo  # goal inside obstacle -> blocked (honest)
-make nav-slam-status        # AXON-side status; dashboard panel http://localhost:3000
-make nav-slam-down
-```
-
-**What Phase 5.5 does not do:** medical diagnosis, real patient data, hardware,
-cloud deployment, Gazebo/RViz, federated learning, RL, Kubernetes.
-
-Evidence checklist: [docs/evidence/phase-5-5-nav2-slam-minilab.md](docs/evidence/phase-5-5-nav2-slam-minilab.md)
-· ADRs: [ADR-009](docs/adr/ADR-009-nav2-slam-minilab-scope.md), [ADR-010](docs/adr/ADR-010-headless-minisim-no-gazebo-rviz.md)
-
----
-
-## Phase 5 — Digital Twin + ROS2 Quickstart
-
-```bash
-make install
-make test
-make models-generate
-docker compose --profile core up --build -d
-
-# Dashboard digital twin: http://localhost:3000
-curl -s http://localhost:8000/api/v1/twin/state | python3 -m json.tool
-curl -s http://localhost:8000/health | python3 -m json.tool
-
-# Live generators (QA-LIVE-1)
-# Twin updates via /ws/v1/twin within ~200ms at 5 Hz
-
-# Replay scenarios (QA-LIVE-3)
-make replay-normal
-make replay-fatigue
-make replay-dropout
-
-# Staleness demo (QA-LIVE-2): stop sensor-generators, wait for stale/dropout TTLs
-docker compose --profile core stop sensor-generators
-
-# Safe commands
-curl -X POST http://localhost:8000/api/v1/twin/command \
-  -H 'Content-Type: application/json' \
-  -d '{"schema_version":"v1","command":"pause","requested_by":"qa"}'
-
-# ROS2 profile (requires core API running)
-docker compose --profile core --profile ros2 up --build -d
-docker compose --profile ros2 exec ros2_bridge ros2 topic echo /axon/twin/state
-```
-
-**What Phase 5 does not do:** medical diagnosis, real patient data, Nav2, SLAM, navigation stack, heavy simulation.
-
-Evidence checklist: [docs/evidence/phase-5-digital-twin-ros2.md](docs/evidence/phase-5-digital-twin-ros2.md)
-
----
-
-## Phase 4 — MLOps Quickstart
-
-```bash
-make install
-make models-generate
-make mlops-pipeline      # smoke dataset + train/eval
-make verify-phase4       # full Phase 4 verification
-
-# Optional MLflow UI (learning profile)
-docker compose --profile learning up -d mlflow
-# http://localhost:5001
-AXON_MLOPS_BACKEND=mlflow make mlops-pipeline
-```
-
-API: `GET /api/v1/mlops/status` · Dashboard MLOps panel polls every 10s.
-
----
-
-## Phase 3 — Agents + Safety Quickstart
-
-```bash
-make install
-make models-generate
-docker compose --profile core up --build
-
-# Verify agents
-curl http://localhost:8000/api/v1/agents/traces
-curl http://localhost:8000/api/v1/decisions/current
-curl http://localhost:8000/api/v1/safety/status
-redis-cli XLEN axon:v1:stream:agent_traces
-
-# Failure injection demo
-curl -X POST http://localhost:8000/api/v1/failure-injection/model_low_confidence
-curl -X POST http://localhost:8000/api/v1/failure-injection/reset
-
-# Evidence + regression
-make evidence-phase3
-make test-phase-regression
-```
-
-Dashboard: http://localhost:3000 — telemetry, model scores, agent traces, HITL, MLOps.
-
-### Core Mode (default — no API keys)
-
-Mock LLM is default. Core profile runs without `OPENAI_API_KEY` or provider packages.
-
-### Real LLM Mode (optional portfolio demo)
-
-```bash
-export AXON_LLM_MODE=real
-export AXON_LLM_PROVIDER=openai
-export AXON_LLM_MODEL=gpt-4o-mini
-export OPENAI_API_KEY=your-key-here
-docker compose --profile core --profile llm up --build
-```
-
----
-
-## Phase 2 — Edge AI Core Quickstart
-
-```bash
-# Step 1: Generate ONNX models (required before Docker build)
+# Required before Docker build — ONNX models are gitignored
 make models-generate
 
-# Step 2: Start Phase 2 core stack
-docker compose --profile core up --build
-# or: make edge-ai-up
-
-# Verify
-curl http://localhost:8000/telemetry/status
-curl http://localhost:8000/model-scores/status
-redis-cli XLEN axon:v1:stream:model_scores
-
-# Benchmark (local, no Docker)
-make benchmark-inference
+docker compose --profile core up -d --build
 ```
 
-Dashboard: http://localhost:3000 — live telemetry + model score panels.
+Wait 30–60 seconds for MQTT, Redis, API health, and live telemetry.
 
----
-
-## Mandatory Roadmap Technologies
-
-- Edge AI
-- IoT and real-time telemetry
-- MQTT / Eclipse Mosquitto
-- Redis Streams
-- FastAPI + WebSockets
-- Pydantic event schemas
-- ONNX Runtime edge inference
-- Sensor fusion
-- Deep learning with small models
-- Synthetic retraining / candidate refresh loop (classical models — not neural fine-tuning)
-- TinyML / tiny deep learning path
-- MLflow for MLOps
-- Continual learning
-- Federated learning with Flower
-- RL micro-module with Gymnasium / Stable-Baselines3
-- LangGraph (main agent orchestration runtime)
-- LangChain (tools, RAG, retrievers, research/model-call layer)
-- Human-in-the-loop safety
-- Safety boundaries
-- Failure injection
-- Replay mode
-- OpenTelemetry / metrics / logs
-- Docker Compose profiles
-- Evidence Center
-- Digital twin
-- ROS2 thin adapter
-- Full ROS2 Nav2 + SLAM MiniLab (mandatory advanced phase)
-- Cost and hardware report
-- Optional hardware: ESP32, Raspberry Pi, Jetson Nano, Edge Impulse / TFLite Micro
-
----
-
-## Docker Compose Profiles
-
-Profiles prevent all systems from running at once and enable staged development.
-
-| Profile | Purpose |
-|---------|---------|
-| `core` | API, dashboard, Redis, Mosquitto, sensor-generators, edge-inference |
-| `obs` | Prometheus, Grafana (Phase 7+) |
-| `learning` | MLflow (Phase 4+) |
-| `ros2` | ROS2 thin adapter (Phase 5+) |
-| `ros2-nav-slam` | Nav2 + SLAM MiniLab (Phase 5.5, mandatory) |
-| `sim` | Sensor simulation orchestrator (Phase 1+) |
-| `llm` | Optional LLM copilot (Phase 3+, not always-on) |
-| `full` | Union of all profiles for late integration demos |
+### Verify
 
 ```bash
-# Validate core profile
-make compose-config
+ASSUME_UP=true bash scripts/demo/phase10a_verify_demo.sh
+```
 
-# Start Phase 2 edge AI stack
-make models-generate
-make edge-ai-up
-# or: make compose-core
+| Service | URL |
+|---------|-----|
+| Dashboard | http://localhost:3000 |
+| API health | http://localhost:8000/health |
+| Telemetry status | http://localhost:8000/telemetry/status |
+
+### Stop
+
+```bash
+docker compose --profile core down
+```
+
+### Re-capture screenshots (optional)
+
+```bash
+.venv/bin/pip install playwright
+.venv/bin/playwright install chromium
+.venv/bin/python scripts/demo/capture_phase10a_screenshots.py
+.venv/bin/python scripts/demo/validate_phase10a_screenshots.py
+```
+
+Full runbook: [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/phase10/demo/runbook-phase10a.md)
+
+---
+
+## Evidence
+
+| Artifact | Link |
+|----------|------|
+| Screenshot index | [docs/evidence/phase10/demo/screenshot-index.md](docs/evidence/phase10/demo/screenshot-index.md) |
+| Demo verification report | [docs/evidence/phase10/demo/demo-verification-report.md](docs/evidence/phase10/demo/demo-verification-report.md) |
+| Demo runbook | [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/phase10/demo/runbook-phase10a.md) |
+| Latest screenshots | [docs/evidence/phase10/demo/screenshots/latest/](docs/evidence/phase10/demo/screenshots/latest/) |
+| Evidence Center index | [docs/evidence/README.md](docs/evidence/README.md) |
+| Phase 9 final seal | [docs/evidence/phase9_final_seal_report.md](docs/evidence/phase9_final_seal_report.md) |
+| Capability truth matrix | [docs/evidence/phase9_capability_truth_matrix.md](docs/evidence/phase9_capability_truth_matrix.md) |
+
+**Phase 10A status:** **PASS WITH DOCUMENTED RISKS** — core demo automation, health checks, and 8/8 real screenshots verified. Risks include ROS2/Nav2 offline in core-only captures, on-demand FL/RL/MLOps artifacts, and `make models-generate` required on fresh clones.
+
+---
+
+## Execution profiles
+
+Profiles prevent all subsystems from running at once. **Do not assume everything is live in `core`.**
+
+| Profile | Purpose | Stability |
+|---------|---------|-----------|
+| `core` | API, dashboard, Redis, Mosquitto, sensor-generators, edge-inference | **Default demo path** |
+| `obs` | Prometheus, Grafana (Phase 7) | On-demand |
+| `learning` | MLflow, FL runner, RL runner | On-demand / artifact-only in core UI |
+| `ros2` | ROS2 thin adapter | Compose-validated; requires explicit start |
+| `ros2-nav-slam` | Nav2 + SLAM MiniLab (headless) | Compose-validated; heavy image |
+| `sim` | Sensor simulation orchestrator | Optional |
+| `llm` | Optional real LLM copilot | Not required; mock LLM is default |
+| `full` | Union of profiles for late integration | Not the default demo |
+
+```bash
+make compose-config          # validate core
+docker compose --profile core config
 ```
 
 Details: [docs/architecture/profiles.md](docs/architecture/profiles.md)
 
 ---
 
-## Safety and Biomedical Boundary
+## Safety and scope boundaries
 
-AXON uses **synthetic biomedical-inspired signals only**.
+- **Synthetic-only** biomedical-inspired signals — no real patient data
+- **Simulated** rehab robot operations — operational anomaly detection only
+- **Not** a medical device, diagnostic system, or treatment advisor
+- **Not** for care-environment rollout, clinical decision-making, or regulatory product claims
+- **Human-in-the-loop** for high-risk and low-confidence agent actions
+- **MLOps wording:** synthetic retraining / candidate refresh loop for small classical models — not fine-tuning of a pretrained neural network
 
-- No real patient data
-- No diagnosis or treatment advice
-- No clinical or medical-device claims
-- Software engineering simulation for portfolio demonstration
-
-Policies: [docs/safety/](docs/safety/)
-
----
-
-## Why This Is Senior-Leaning
-
-| Practice | AXON Implementation |
-|----------|---------------------|
-| Event-driven architecture | MQTT → API → Redis → services → WebSocket |
-| Data contracts | Pydantic v2 schemas + topic taxonomy |
-| Safety boundaries | Biomedical policy + HITL policy |
-| Human-in-the-loop | `requires_human_confirmation` in decision events |
-| Evidence Center | Phase-gated checklist with reproducible proof |
-| MLOps and learning loops | MLflow, synthetic retraining / candidate refresh loop, Flower, RL |
-| Observability | OpenTelemetry, Prometheus, Grafana (Phase 7) |
-| Robotics integration | ROS2 thin adapter + mandatory Nav2 MiniLab |
-| Replay and failure injection | MQTT replay publish + Redis buffer (Phase 1) |
-| Modular profiles | Documented trade-offs in ADRs and cost docs |
+Policies: [docs/safety/](docs/safety/) · Positioning guide: [docs/portfolio/CLAIMS_AND_POSITIONING.md](docs/portfolio/CLAIMS_AND_POSITIONING.md)
 
 ---
 
-## Claims We Avoid
+## What this demonstrates technically
 
-- Medical-grade monitoring
-- Diagnosis of arrhythmia, fatigue, oxygen problems, or clinical conditions
-- Production-ready medical device
-- Real hospital/clinic deployment
-- Autonomous clinical decision-maker
-- Enterprise healthcare compliance claims
+- Applied AI systems engineering across telemetry, inference, agents, and UI
+- Edge/IoT event-driven architecture (MQTT, Redis Streams, WebSockets)
+- Full-stack real-time dashboard with honest degradation modes
+- Reliability and evidence governance (health gates, claim scanner, verification scripts)
+- MLOps and learning-loop evidence without overstating always-on training
+- Robotics software integration boundaries (thin ROS2 adapter, isolated Nav2 lab)
+- Trade-off awareness under local compute and modular profile constraints
 
----
-
-## Repository Structure
-
-```
-apps/api/                      FastAPI gateway + MQTT ingest + WebSockets
-apps/dashboard/                Live Phase 2 dashboard (telemetry + model scores)
-services/edge-inference/       ONNX Runtime edge inference service
-models/                        ONNX artifacts + metadata (generated)
-services/sensor-generators/    Synthetic MQTT publishers
-replay/                        JSONL scenarios + replay_publish.py
-docs/                          Architecture, ADRs, safety, evidence, schemas
-infra/                         Mosquitto, Prometheus, Grafana configs
-tests/                         Schema, generator, routing, replay tests
-scripts/                       Dev validation scripts
-```
+Technical Q&A: [docs/portfolio/TECHNICAL_QA.md](docs/portfolio/TECHNICAL_QA.md) · Business case: [docs/business/AXON_BUSINESS_CASE.md](docs/business/AXON_BUSINESS_CASE.md)
 
 ---
 
-## Python Packaging
+## Current status
 
-Dependencies are managed in **`pyproject.toml`** (not `requirements.txt`).
-
-`pyproject.toml` provides a modern single place for project metadata, dependencies, optional dependency groups, test configuration, and lint configuration — keeping Phase 0 installs lightweight while allowing phase-specific extras later.
+| Milestone | Status |
+|-----------|--------|
+| Phases 1–8 | Merged (PR #14) |
+| Phase 9 QA / hardening | Merged (PR #15–#17) |
+| Phase 10A demo evidence | Merged (PR #18) — **PASS WITH DOCUMENTED RISKS** |
+| Phase 10B portfolio packaging | In progress — written packaging, no new runtime features |
+| Phase 10C video | Not started — project ready for external manual screen recording after 10B/10C review |
+| Release / tags / cloud | Not started — intentionally deferred |
 
 ---
 
-## Commands
+## Repository map
 
-### Setup
-
-```bash
-git pull
-python -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev,edge-ai]"
-make test
-make dev-check
 ```
-
-### Phase 1 — Telemetry Spine
-
-```bash
-# Validate Compose config
-docker compose --profile core config
-# or: make compose-config
-
-# Start full spine (Mosquitto, Redis, API, generators, dashboard)
-docker compose --profile core up --build
-# or: make telemetry-up
-
-# URLs (browser on host machine)
-# Dashboard:  http://localhost:3000
-# API health: http://localhost:8000/health
-# Telemetry:  http://localhost:8000/telemetry/status
-
-make api-status   # pretty-print telemetry status JSON
-make telemetry-logs
-make telemetry-down
-```
-
-### Replay
-
-```bash
-make replay-generate    # regenerate JSONL scenario files
-make replay-normal      # publish normal_session to MQTT
-make replay-dropout     # publish sensor_dropout scenario
-```
-
-### Phase 1 Evidence (collect after demo)
-
-| Artifact | How to capture |
-|----------|----------------|
-| Dashboard live telemetry | Screenshot at http://localhost:3000 |
-| Generator logs | `docker compose logs sensor-generators` |
-| Telemetry status | `curl http://localhost:8000/telemetry/status` |
-| Redis stream proof | `redis-cli XLEN axon:v1:stream:sensors:emg` |
-| MQTT proof | `mosquitto_sub -t 'axon/v1/sensors/#' -v` |
-
-See [docs/evidence/evidence-checklist.md](docs/evidence/evidence-checklist.md).
-
-### Future Phases
-
-```bash
-# Full portfolio demo (Phase 10 — not yet implemented)
-# docker compose --profile full up
+apps/api/                 FastAPI gateway, MQTT ingest, agents, twin, mission, health
+apps/dashboard/           Live HTML/JS dashboard (telemetry, agents, twin, evidence)
+services/                 edge-inference, sensor-generators, ROS2 bridge, Nav2 MiniLab
+models/                   ONNX artifacts (generated locally — gitignored)
+scripts/                  Verification, demo capture, MLOps/FL/RL runners
+docs/evidence/            Evidence Center — checklists, phase reports, screenshots
+docs/portfolio/           Case study, reusable copy, technical Q&A
+docs/architecture/        Diagrams, event flow, profile strategy
+docs/adr/                 Architecture decision records
+tests/                    Schema, regression, claim-scan, phase gates
 ```
 
 ---
 
-## Documentation Index
+## Documentation index
 
 | Document | Description |
 |----------|-------------|
 | [ROADMAP.md](ROADMAP.md) | Phased delivery plan |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | AI agent and contributor context |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution rules |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Contributor and agent context |
+| [docs/portfolio/AXON_CASE_STUDY.md](docs/portfolio/AXON_CASE_STUDY.md) | Technical portfolio case study |
+| [docs/portfolio/PORTFOLIO_COPY.md](docs/portfolio/PORTFOLIO_COPY.md) | Reusable portfolio copy |
 | [docs/architecture/](docs/architecture/) | System diagrams |
 | [docs/adr/](docs/adr/) | Architecture decision records |
-| [docs/evidence/](docs/evidence/) | Evidence Center |
 | [docs/safety/](docs/safety/) | Safety policies |
-| [docs/schemas/](docs/schemas/) | Event contracts and topic taxonomy |
 
 ---
 
 ## License
 
-MIT (see project metadata in `pyproject.toml`).
+MIT (see `pyproject.toml`).
 
 ---
 
