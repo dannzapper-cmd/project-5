@@ -208,8 +208,8 @@ Technical Q&A: [docs/portfolio/TECHNICAL_QA.md](docs/portfolio/TECHNICAL_QA.md) 
 | Phases 1–8 | Merged (PR #14) |
 | Phase 9 QA / hardening | Merged (PR #15–#17) |
 | Phase 10A demo evidence | Merged (PR #18) — **PASS WITH DOCUMENTED RISKS** |
-| Phase 10B portfolio packaging | In progress — written packaging, no new runtime features |
-| Phase 10C video | Not started — project ready for external manual screen recording after 10B/10C review |
+| Phase 10B portfolio packaging | Merged (PR #19) — **PASS WITH DOCUMENTED RISKS** |
+| Phase 10C video / release prep | Pending — manual screen recording and release prep after 10C-1 audit |
 | Release / tags / cloud | Not started — intentionally deferred |
 
 ---
