@@ -211,6 +211,7 @@ Technical Q&A: [docs/portfolio/TECHNICAL_QA.md](docs/portfolio/TECHNICAL_QA.md) 
 | Phase 10B portfolio packaging | Merged (PR #19) — **PASS WITH DOCUMENTED RISKS** |
 | Phase 10C video / release prep | Pending — manual screen recording and release prep after 10C-1 audit |
 | Release / tags / cloud | Not started — intentionally deferred |
+| Enterprise production path | Documented roadmap only — AXON is **not** enterprise-production-ready today |
 
 ---
 
@@ -223,6 +224,7 @@ services/                 edge-inference, sensor-generators, ROS2 bridge, Nav2 M
 models/                   ONNX artifacts (generated locally — gitignored)
 scripts/                  Verification, demo capture, MLOps/FL/RL runners
 docs/evidence/            Evidence Center — checklists, phase reports, screenshots
+docs/production/          Enterprise production path (planning only — not shipped)
 docs/portfolio/           Case study, reusable copy, technical Q&A
 docs/architecture/        Diagrams, event flow, profile strategy
 docs/adr/                 Architecture decision records
@@ -242,6 +244,8 @@ tests/                    Schema, regression, claim-scan, phase gates
 | [docs/architecture/](docs/architecture/) | System diagrams |
 | [docs/adr/](docs/adr/) | Architecture decision records |
 | [docs/safety/](docs/safety/) | Safety policies |
+| [docs/production/ENTERPRISE_PRODUCTION_PATH.md](docs/production/ENTERPRISE_PRODUCTION_PATH.md) | Enterprise hardening roadmap (not production-ready today) |
+| [docs/business/AXON_BUSINESS_CASE.md](docs/business/AXON_BUSINESS_CASE.md) | Business case and staged transition context |
 
 ---
 

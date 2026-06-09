@@ -6,8 +6,9 @@ Phase 10 splits into sub-deliverables:
 |-----------|-------|--------|
 | **10A** | Demo automation, health verification, real screenshots | Merged (PR #18) — PASS WITH DOCUMENTED RISKS |
 | **10B** | Final README, case study, portfolio copy, evidence index | Merged (PR #19) — PASS WITH DOCUMENTED RISKS |
-| **10C-1** | Final release readiness audit | This branch — PASS WITH DOCUMENTED RISKS |
+| **10C-1** | Final release readiness audit | Merged (#20) — PASS WITH DOCUMENTED RISKS |
 | **10C-2** | External manual screen recording (video) | Pending — after 10C-1 merge |
+| **Production path** | Enterprise hardening roadmap (docs only) | This branch |
 
 ---
 
@@ -39,6 +40,13 @@ All demo evidence lives under [demo/](demo/):
 ## Phase 10C-1 artifact
 
 - [final-release-readiness-audit.md](final-release-readiness-audit.md) — post-10B merge readiness gate (no video, no release)
+
+## Enterprise production path (documentation)
+
+- [../../production/ENTERPRISE_PRODUCTION_PATH.md](../../production/ENTERPRISE_PRODUCTION_PATH.md) — eight workstreams, Stage 0–5, readiness matrix
+- [production-path-report.md](production-path-report.md) — closeout record for production path PR
+
+**Boundary:** planning documentation only. No runtime, release, cloud, or dashboard changes. AXON is not enterprise-production-ready today.
 
 ## Phase 10C boundary
 

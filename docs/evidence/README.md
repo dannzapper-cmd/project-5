@@ -122,3 +122,11 @@ Product and business analysis (non-clinical, non-hiring):
 
 - [../business/AXON_BUSINESS_CASE.md](../business/AXON_BUSINESS_CASE.md)
 - [phase10/business-case-audit-report.md](phase10/business-case-audit-report.md)
+
+## Production documentation (planning only)
+
+Enterprise architecture and production-readiness roadmap. AXON is **not** enterprise-production-ready today.
+
+- [../production/README.md](../production/README.md)
+- [../production/ENTERPRISE_PRODUCTION_PATH.md](../production/ENTERPRISE_PRODUCTION_PATH.md)
+- [phase10/production-path-report.md](phase10/production-path-report.md)
