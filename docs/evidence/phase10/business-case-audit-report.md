@@ -12,7 +12,7 @@ Lightweight audit of Phase 10B / PR #19 documentation, plus addition of a profes
 | Branch | `feat/phase-10b-portfolio-packaging` |
 | Base commit (main after PR #18) | `18db5ad` |
 | Phase 10B commits | `cda5d2e`, `abe325d` |
-| Follow-up commit | *(this commit — business case + audit fixes)* |
+| Follow-up commit | `b907cba` — docs: add AXON business case and phase 10b audit |
 
 ## Part 1 — Mini audit findings
 
