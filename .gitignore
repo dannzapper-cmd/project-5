@@ -96,6 +96,7 @@ artifacts/phase8/phase8_mission_evidence_index.json
 artifacts/phase8/phase8_mission_status.json
 artifacts/phase8/phase8_mission_timeline.json
 artifacts/phase8/phase8_scenario_summary.txt
+artifacts/phase8/phase8_scenario_*.json
 
 # Phase 6B RL micro-module runtime artifacts (regenerated on demand)
 artifacts/learning/rl/rl_report.json

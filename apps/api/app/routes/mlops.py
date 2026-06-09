@@ -66,7 +66,7 @@ def mlops_status() -> dict:
     cand_imu = registry.get("candidate_models", {}).get("imu", {})
 
     return {
-        "phase": "Phase 4 - MLOps + Continual Learning",
+        "phase": "Phase 4 - MLOps + Synthetic Retraining",
         "active_model_version": {
             "emg": active_emg.get("model_version", "v1"),
             "imu": active_imu.get("model_version", "v1"),

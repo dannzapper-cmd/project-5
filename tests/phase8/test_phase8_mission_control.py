@@ -151,6 +151,14 @@ def test_evidence_index_includes_mlops_category():
             assert item["generate_cmd"] == "make mlops-pipeline"
 
 
+def test_evidence_mlops_paths_match_pipeline_outputs():
+    from apps.api.app.mission.paths import MLOPS_ARTIFACTS
+    from apps.mlops.config import LATEST_EVAL_PATH, REGISTRY_PATH
+
+    assert MLOPS_ARTIFACTS["latest_eval"] == LATEST_EVAL_PATH
+    assert MLOPS_ARTIFACTS["model_registry"] == REGISTRY_PATH
+
+
 def test_evidence_fl_rl_not_generated_when_absent(monkeypatch, tmp_path):
     from apps.api.app.mission import evidence_index as ei
 

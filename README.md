@@ -78,11 +78,11 @@ See [docs/architecture/](docs/architecture/) for Mermaid diagrams and profile de
 
 ## Current Phase
 
-**Phase 9 — QA, Repair, and Hardening (in progress on `feat/phase-9-pass1-credibility-hardening`)**
+**Phase 9 — QA, Repair, and Hardening (Pass 2 on `feat/phase-9-pass2-final-qa-hardening`)**
 
-| Completed (merged) | Current work (Phase 9) | Not yet |
-|--------------------|------------------------|---------|
-| Phases 1–8: telemetry, edge AI, agents, HITL, MLOps synthetic retraining loop, digital twin, ROS2, Nav2 + SLAM MiniLab, FL/RL, observability/reliability, integrated mission control | Credibility repairs, evidence integrity, reproducibility, phase/version alignment, lightweight CI expansion | Phase 10 packaging, demo video, portfolio release |
+| Completed (merged) | Current work (Phase 9 Pass 2) | Not yet |
+|--------------------|-------------------------------|---------|
+| Phases 1–8 + Pass 1 credibility fixes (PR #15) | Senior verification, `verify_phase9.sh`, claim scanning, evidence path repair, lightweight CI | Phase 10 packaging, demo video, portfolio release |
 
 **Phase 8 (merged):** Mission API (`/mission/*`), deterministic scenario runner (seed 42),
 Evidence Center index, dashboard Mission Control section. See
