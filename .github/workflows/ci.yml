@@ -37,7 +37,14 @@ jobs:
       - name: Test
         run: make test
 
+      - name: Phase 8 verification
+        run: bash scripts/verify_phase8.sh
+
       - name: Validate Docker Compose config
         run: |
           docker compose --profile core config
           docker compose --profile core config --services
+          docker compose --profile learning config
+          docker compose --profile obs config
+          docker compose --profile ros2 config
+          docker compose --profile ros2-nav-slam config

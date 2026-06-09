@@ -8,7 +8,7 @@
 	nav-slam-map-demo nav-slam-goal-demo nav-slam-blocked-demo nav-slam-nodes nav-slam-topics \
 	learning-install learning-fl-run learning-fl-smoke learning-fl-report fl-status verify-phase6a \
 	learning-rl-install learning-rl-run learning-rl-smoke learning-rl-report learning-rl-eval \
-	rl-status verify-phase6b
+	rl-status verify-phase6b verify-phase8 compose-obs
 
 SYSTEM_PYTHON ?= python3.12
 VENV ?= .venv
@@ -208,3 +208,9 @@ rl-status: ## Fetch RL micro-module status from the local API
 
 verify-phase6b: ## Run the Phase 6B verification script (lint + RL tests + smoke + compose + safety + ROS2 freeze)
 	bash scripts/verify_phase6b.sh
+
+verify-phase8: ## Run Phase 8 verification (mission control tests + scenario smoke)
+	bash scripts/verify_phase8.sh
+
+compose-obs: ## Validate Docker Compose obs profile configuration
+	docker compose --profile obs config
