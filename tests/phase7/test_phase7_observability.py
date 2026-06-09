@@ -12,12 +12,14 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def test_observability_script_offline_generates_artifacts(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    # Run from repo with --offline; artifacts land under cwd if we patch ROOT — run real script
+    output_dir = tmp_path / "observability"
     result = subprocess.run(
         [
             sys.executable,
             str(ROOT / "scripts" / "observability" / "check_phase7_observability.py"),
             "--offline",
+            "--output-dir",
+            str(output_dir),
         ],
         cwd=ROOT,
         capture_output=True,
@@ -25,17 +27,17 @@ def test_observability_script_offline_generates_artifacts(tmp_path, monkeypatch)
         check=False,
     )
     assert result.returncode in (0, 1)
-    report = ROOT / "artifacts" / "observability" / "phase7b_observability_report.json"
+    report = output_dir / "phase7b_observability_report.json"
     assert report.is_file()
     data = json.loads(report.read_text())
     assert data["phase"] == "phase7"
     assert "run_id" in data
     assert len(data.get("checks", [])) >= 1
 
-    metrics = ROOT / "artifacts" / "observability" / "metrics_snapshot.txt"
+    metrics = output_dir / "metrics_snapshot.txt"
     assert metrics.is_file() and metrics.read_text().strip()
 
-    sample = ROOT / "artifacts" / "observability" / "logging_sample.jsonl"
+    sample = output_dir / "logging_sample.jsonl"
     assert sample.is_file()
     for line in sample.read_text().splitlines():
         obj = json.loads(line)
@@ -43,12 +45,15 @@ def test_observability_script_offline_generates_artifacts(tmp_path, monkeypatch)
         assert obj.get("message")
 
 
-def test_reliability_script_offline_generates_artifacts():
+def test_reliability_script_offline_generates_artifacts(tmp_path):
+    output_dir = tmp_path / "reliability"
     result = subprocess.run(
         [
             sys.executable,
             str(ROOT / "scripts" / "reliability" / "check_phase7_reliability.py"),
             "--offline",
+            "--output-dir",
+            str(output_dir),
         ],
         cwd=ROOT,
         capture_output=True,
@@ -60,6 +65,6 @@ def test_reliability_script_offline_generates_artifacts():
         "phase7a_reliability_report.json",
         "failure_replay_report.json",
     ):
-        path = ROOT / "artifacts" / "reliability" / name
+        path = output_dir / name
         assert path.is_file(), name
         json.loads(path.read_text())
