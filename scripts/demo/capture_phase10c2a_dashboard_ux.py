@@ -27,12 +27,37 @@ LATEST_DIR = ROOT / "docs/evidence/phase10/dashboard-ux/screenshots/latest"
 # (filename, css_selector, label, pre_action)
 SHOTS = [
     ("00_demo_cockpit_top.png", '[data-testid="demo-cockpit"]', "Live Demo Cockpit guide", None),
-    ("01_backend_proof_action_log.png", '[data-testid="backend-proof"]', "Backend proof panel", None),
-    ("02_failure_injection_visible_effect.png", "#safety-panel", "Failure injection effect on safety", "inject_low_conf"),
+    (
+        "01_backend_proof_action_log.png",
+        '[data-testid="backend-proof"]',
+        "Backend proof panel",
+        None,
+    ),
+    (
+        "02_failure_injection_visible_effect.png",
+        "#safety-panel",
+        "Failure injection effect on safety",
+        "inject_low_conf",
+    ),
     ("03_hitl_decision_flow.png", '[data-testid="hitl"]', "HITL / safety gate", None),
-    ("04_digital_twin_command_feedback.png", '[data-testid="digital-twin"]', "Digital twin command feedback", "twin_pause"),
-    ("05_learning_evidence_panels.png", "#federated-learning-panel", "Learning evidence panels", None),
-    ("06_robotics_lab_profile_boundary.png", '[data-testid="nav-slam"]', "Robotics Lab profile boundary", None),
+    (
+        "04_digital_twin_command_feedback.png",
+        '[data-testid="digital-twin"]',
+        "Digital twin command feedback",
+        "twin_pause",
+    ),
+    (
+        "05_learning_evidence_panels.png",
+        "#federated-learning-panel",
+        "Learning evidence panels",
+        None,
+    ),
+    (
+        "06_robotics_lab_profile_boundary.png",
+        '[data-testid="nav-slam"]',
+        "Robotics Lab profile boundary",
+        None,
+    ),
     ("07_guided_demo_mode.png", "body", "Guided demo overlay", "guided_demo"),
 ]
 
