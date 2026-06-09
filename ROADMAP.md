@@ -137,14 +137,16 @@ Phased delivery for Simulated Rehab Robot Ops. **Phase 0 does not implement runt
 
 ---
 
-## Phase 4: MLOps + Fine-tuning + Continual Learning
+## Phase 4: MLOps + Synthetic Retraining + Drift-Triggered Retraining
 
-**Goal:** MLflow tracking, fine-tuning loops, drift-triggered retraining.
+**Goal:** MLflow tracking, synthetic retraining / candidate refresh loop, drift-triggered retraining recommendation.
+
+AXON includes a synthetic retraining / candidate refresh loop for small classical models. It is not fine-tuning of a pretrained neural network.
 
 **Required outputs:**
 - MLflow integration
-- Fine-tuning scripts for at least one model
-- Continual learning trigger documentation
+- Synthetic retraining / candidate refresh scripts for at least one model
+- Drift-triggered retraining recommendation documentation
 
 **What must be real:**
 - MLflow runs with artifacts
@@ -155,8 +157,8 @@ Phased delivery for Simulated Rehab Robot Ops. **Phase 0 does not implement runt
 
 **Evidence to collect:**
 - MLflow run screenshot
-- Fine-tuning before/after report
-- Continual learning drift evidence
+- Synthetic retraining / candidate refresh before/after report
+- Drift-triggered retraining recommendation evidence
 
 **Acceptance criteria:**
 - Reproducible training command documented in runbook

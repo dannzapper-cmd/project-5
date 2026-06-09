@@ -52,7 +52,7 @@ curl -X POST http://localhost:8000/api/v1/failure-injection/reset
 
 ## Intentionally Not in Scope
 
-- MLflow, fine-tuning, continual learning
+- MLflow, synthetic retraining / candidate refresh loop
 - ROS2, Nav2, SLAM
 - Vector DB / embedding RAG
 - Mandatory local LLM (Ollama)

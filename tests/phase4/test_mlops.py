@@ -189,6 +189,30 @@ def test_api_mlops_status_empty_state(client):
     assert "synthetic" in data.get("safety_notice", "").lower()
 
 
+def test_eval_report_includes_honest_comparison_note(tmp_path, monkeypatch):
+    monkeypatch.setenv("AXON_MLOPS_SMOKE", "true")
+    model_dir = tmp_path / "onnx"
+    meta_dir = tmp_path / "metadata"
+    model_dir.mkdir()
+    meta_dir.mkdir()
+    generate_emg_model(model_dir / "emg_anomaly_v0.onnx", metadata_dir=meta_dir)
+    monkeypatch.setattr("apps.mlops.paths.PHASE2_ONNX_DIR", model_dir)
+    monkeypatch.setattr("apps.mlops.paths.PHASE2_METADATA_DIR", meta_dir)
+    monkeypatch.setattr("apps.mlops.config.PHASE2_ONNX_DIR", model_dir)
+    monkeypatch.setattr("apps.mlops.config.PHASE2_METADATA_DIR", meta_dir)
+    monkeypatch.setattr("apps.mlops.config.MODELS_DIR", tmp_path / "models")
+    monkeypatch.setattr("apps.mlops.config.MLOPS_ARTIFACTS", tmp_path / "mlops")
+    latest_eval = tmp_path / "mlops" / "latest_eval.json"
+    monkeypatch.setattr("apps.mlops.config.LATEST_EVAL_PATH", latest_eval)
+    refresh_protected_paths()
+
+    report = run_evaluation_pipeline(signal_type="emg", smoke=True, seed=42)
+    assert "comparison_note" in report
+    assert "legacy 2-class heuristic baseline" in report["comparison_note"]
+    assert "evaluation asymmetry" in report["comparison_note"]
+    assert "synthetic retraining / candidate refresh" in report["methodology"].lower()
+
+
 def test_drift_event_schema():
     from apps.api.app.schemas.events import DriftEventV1
 
