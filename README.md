@@ -134,6 +134,8 @@ Full runbook: [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/pha
 
 For clean-machine reproduction from a fresh clone, see the [Fresh Clone Demo Checklist](docs/evidence/phase10/demo/fresh-clone-demo-checklist.md).
 
+To drive the dashboard during a demo (panel-by-panel walkthrough, backend proof, button behavior map, guided demo mode), see the [Dashboard Demo Guide](docs/dashboard/DEMO_GUIDE.md).
+
 ---
 
 ## Evidence
@@ -144,6 +146,8 @@ For clean-machine reproduction from a fresh clone, see the [Fresh Clone Demo Che
 | Demo verification report | [docs/evidence/phase10/demo/demo-verification-report.md](docs/evidence/phase10/demo/demo-verification-report.md) |
 | Demo runbook | [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/phase10/demo/runbook-phase10a.md) |
 | Fresh clone checklist | [docs/evidence/phase10/demo/fresh-clone-demo-checklist.md](docs/evidence/phase10/demo/fresh-clone-demo-checklist.md) |
+| Dashboard demo guide | [docs/dashboard/DEMO_GUIDE.md](docs/dashboard/DEMO_GUIDE.md) |
+| Dashboard UX hardening report | [docs/evidence/phase10/dashboard-ux-hardening-report.md](docs/evidence/phase10/dashboard-ux-hardening-report.md) |
 | Latest screenshots | [docs/evidence/phase10/demo/screenshots/latest/](docs/evidence/phase10/demo/screenshots/latest/) |
 | Evidence Center index | [docs/evidence/README.md](docs/evidence/README.md) |
 | Phase 9 final seal | [docs/evidence/phase9_final_seal_report.md](docs/evidence/phase9_final_seal_report.md) |
