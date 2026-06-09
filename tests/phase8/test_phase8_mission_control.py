@@ -113,6 +113,7 @@ def test_mission_evidence_honest_existence_flags(client):
     data = res.json()
     assert data["synthetic_data_only"] is True
     assert "items" in data
+    assert "not_generated" in data["summary"]
     for item in data["items"]:
         assert "exists" in item
         assert "status" in item
@@ -121,7 +122,55 @@ def test_mission_evidence_honest_existence_flags(client):
             assert path.exists(), f"claimed exists but missing: {item['path']}"
             assert item["status"] in ("available", "unparsed")
         else:
-            assert item["status"] == "missing"
+            assert item["status"] in ("missing", "not_generated")
+            if item["status"] == "not_generated":
+                assert "generate_cmd" in item
+
+
+def test_evidence_index_no_false_available_for_absent_generated():
+    from apps.api.app.mission.evidence_index import build_evidence_index
+
+    index = build_evidence_index(force_refresh=True)
+    for item in index["items"]:
+        path = ROOT / item["path"]
+        if not path.exists():
+            assert item["status"] != "available", item["path"]
+            assert item["exists"] is False
+
+
+def test_evidence_index_includes_mlops_category():
+    from apps.api.app.mission.evidence_index import build_evidence_index
+
+    index = build_evidence_index(force_refresh=True)
+    assert "mlops" in index["categories"]
+    mlops_items = [i for i in index["items"] if i["category"] == "mlops"]
+    assert mlops_items
+    for item in mlops_items:
+        if item["artifact_kind"] == "generated" and not item["exists"]:
+            assert item["status"] == "not_generated"
+            assert item["generate_cmd"] == "make mlops-pipeline"
+
+
+def test_evidence_fl_rl_not_generated_when_absent(monkeypatch, tmp_path):
+    from apps.api.app.mission import evidence_index as ei
+
+    missing_fl = tmp_path / "federated_report.json"
+    monkeypatch.setattr(
+        ei,
+        "FL_ARTIFACTS",
+        {"federated_report": missing_fl},
+    )
+    monkeypatch.setattr(ei, "RL_ARTIFACTS", {"rl_report": tmp_path / "rl_report.json"})
+    monkeypatch.setattr(ei, "_evidence_cache", None)
+    monkeypatch.setattr(ei, "_evidence_cache_ts", 0.0)
+
+    index = ei.build_evidence_index(force_refresh=True)
+    fl = next(i for i in index["items"] if i["id"] == "fl_federated_report")
+    rl = next(i for i in index["items"] if i["id"] == "rl_rl_report")
+    assert fl["status"] == "not_generated"
+    assert fl["generate_cmd"] == "make learning-fl-run"
+    assert rl["status"] == "not_generated"
+    assert rl["generate_cmd"] == "make learning-rl-run"
 
 
 @pytest.mark.parametrize("scenario", SCENARIO_NAMES)
@@ -242,7 +291,13 @@ def test_mission_status_degraded_when_all_optional_offline(client, monkeypatch):
     monkeypatch.setattr(
         "apps.api.app.mission.status.build_evidence_index",
         lambda **_: {
-            "summary": {"available": 0, "total": 1, "missing": 1, "unparsed": 0},
+            "summary": {
+                "available": 0,
+                "total": 1,
+                "missing": 1,
+                "not_generated": 0,
+                "unparsed": 0,
+            },
             "items": [],
         },
     )
@@ -275,6 +330,38 @@ def test_prohibited_medical_claims_scan():
             if re.search(re.escape(term), text, re.IGNORECASE):
                 violations.append(f"{path}: {term}")
     assert not violations, "Banned terms found: " + "; ".join(violations)
+
+
+def test_scenario_run_non_persisted_on_readonly(tmp_path, monkeypatch):
+    base = tmp_path / "phase8"
+    monkeypatch.setattr("apps.api.app.mission.scenarios.PHASE8_DIR", base)
+    monkeypatch.setattr(
+        "apps.api.app.mission.scenarios.MISSION_STATUS_ARTIFACT",
+        base / "phase8_mission_status.json",
+    )
+    monkeypatch.setattr(
+        "apps.api.app.mission.scenarios.MISSION_TIMELINE_ARTIFACT",
+        base / "phase8_mission_timeline.json",
+    )
+    monkeypatch.setattr(
+        "apps.api.app.mission.scenarios.MISSION_EVIDENCE_INDEX_ARTIFACT",
+        base / "phase8_mission_evidence_index.json",
+    )
+    monkeypatch.setattr(
+        "apps.api.app.mission.scenarios.SCENARIO_SUMMARY_ARTIFACT",
+        base / "phase8_scenario_summary.txt",
+    )
+
+    def _raise_readonly(self, *args, **kwargs):
+        raise PermissionError("read-only filesystem")
+
+    monkeypatch.setattr(Path, "write_text", _raise_readonly)
+
+    result = run_scenario("normal_operation")
+    assert result["status"] == "completed"
+    assert result["persisted"] is False
+    assert result["persistence_note"] == "artifact path read-only in this profile"
+    assert result["artifact_paths"] == {}
 
 
 def test_dashboard_mission_control_fallback_present():

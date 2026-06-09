@@ -14,7 +14,14 @@ if [ ! -x "$PYTHON" ]; then
   PYTEST="pytest"
 fi
 
+# Write runtime artifacts to a temp dir so verification does not dirty the git tree.
+PHASE8_TMP="$(mktemp -d)"
+export AXON_PHASE8_ARTIFACT_DIR="${PHASE8_TMP}/phase8"
+mkdir -p "$AXON_PHASE8_ARTIFACT_DIR"
+trap 'rm -rf "$PHASE8_TMP"' EXIT
+
 echo "=== Phase 8 Verification (Integrated Mission Control) ==="
+echo "Artifact dir (temp): $AXON_PHASE8_ARTIFACT_DIR"
 
 echo "--- Phase 8 pytest ---"
 "$PYTEST" tests/phase8/ -q
@@ -22,14 +29,14 @@ echo "PASS: phase8 tests"
 
 echo "--- Scenario runner smoke (normal_operation) ---"
 "$PYTHON" scripts/run_phase8_mission_scenario.py --scenario normal_operation >/dev/null
-test -f artifacts/phase8/phase8_mission_status.json
-test -f artifacts/phase8/phase8_mission_timeline.json
-test -f artifacts/phase8/phase8_mission_evidence_index.json
-test -f artifacts/phase8/phase8_scenario_summary.txt
+test -f "${AXON_PHASE8_ARTIFACT_DIR}/phase8_mission_status.json"
+test -f "${AXON_PHASE8_ARTIFACT_DIR}/phase8_mission_timeline.json"
+test -f "${AXON_PHASE8_ARTIFACT_DIR}/phase8_mission_evidence_index.json"
+test -f "${AXON_PHASE8_ARTIFACT_DIR}/phase8_scenario_summary.txt"
 echo "PASS: scenario runner artifacts"
 
 echo "--- Required artifact fields ---"
-"$PYTHON" - <<'PY'
+"$PYTHON" - <<PY
 import json
 from pathlib import Path
 
@@ -42,7 +49,8 @@ required = {
     "limitations",
     "seed",
 }
-for path in Path("artifacts/phase8").glob("*.json"):
+artifact_dir = Path("${AXON_PHASE8_ARTIFACT_DIR}")
+for path in artifact_dir.glob("*.json"):
     data = json.loads(path.read_text())
     missing = required - set(data)
     assert not missing, f"{path}: missing {missing}"
