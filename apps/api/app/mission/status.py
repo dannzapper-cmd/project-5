@@ -201,11 +201,17 @@ def build_mission_status(*, force_refresh: bool = False) -> dict[str, Any]:
     }
 
     evidence = build_evidence_index(force_refresh=True)
-    evidence_available = evidence["summary"]["available"] > 0
+    summary = evidence["summary"]
+    evidence_available = summary["available"] > 0
+    not_generated = summary.get("not_generated", 0)
     components["evidence_center"] = {
         "status": "ok" if evidence_available else "offline",
-        "message": f"{evidence['summary']['available']} evidence items available",
-        "total_items": evidence["summary"]["total"],
+        "message": (
+            f"{summary['available']} evidence items available"
+            + (f"; {not_generated} optional artifacts not generated" if not_generated else "")
+        ),
+        "total_items": summary["total"],
+        "not_generated": not_generated,
     }
 
     service_readiness = _service_readiness_summary()
