@@ -6,6 +6,14 @@
 
 ---
 
+## Demo video
+
+🎥 **Watch the AXON dashboard demo:** https://youtu.be/4LUz1CqIKAY
+
+This walkthrough shows AXON running in its local core demo path: live synthetic telemetry, scenario controls, edge-inference signals, agent traces, safety / HITL flow, digital twin state mirror, and observability evidence.
+
+---
+
 ## What is AXON?
 
 AXON (Autonomous eXecution and Operations Network) is a **simulated-only, synthetic-only, local-first** intelligent systems project for **Simulated Rehab Robot Ops**. It is a full-stack command and evidence system — not a chatbot, not a static dashboard, and not a medical device.
@@ -142,6 +150,7 @@ To drive the dashboard during a demo (panel-by-panel walkthrough, backend proof,
 
 | Artifact | Link |
 |----------|------|
+| Demo video | [YouTube walkthrough](https://youtu.be/4LUz1CqIKAY) |
 | Screenshot index | [docs/evidence/phase10/demo/screenshot-index.md](docs/evidence/phase10/demo/screenshot-index.md) |
 | Demo verification report | [docs/evidence/phase10/demo/demo-verification-report.md](docs/evidence/phase10/demo/demo-verification-report.md) |
 | Demo runbook | [docs/evidence/phase10/demo/runbook-phase10a.md](docs/evidence/phase10/demo/runbook-phase10a.md) |
